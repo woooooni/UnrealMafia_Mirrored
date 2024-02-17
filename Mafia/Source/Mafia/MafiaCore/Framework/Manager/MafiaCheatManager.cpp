@@ -1,0 +1,22 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "MafiaCore/Framework/Manager/MafiaCheatManager.h"
+
+void UMafiaCheatManager::CheatTemplate()
+{
+	GEngine->AddOnScreenDebugMessage(32, 3.f, FColor::Red, FString::Printf(TEXT("CheatTemplate")));
+}
+
+void UMafiaCheatManager::PlatFormCMD(const FString& InCommand)
+{
+	GEngine->AddOnScreenDebugMessage(32, 10.f, FColor::Red, FString::Printf(TEXT("Platform CommandLine : %s"), *InCommand));
+	//if (const UMafiaClientPlatformSessionSubsystem* SessionSubsystem = UMafiaClientPlatformSessionSubsystem::Get(this))
+	//{
+	//	const UMafiaLobbySession* LobbySession = SessionSubsystem->GetSession<UMafiaLobbySession>();
+	//	if (true == IsValid(LobbySession))
+	//	{
+	//		LobbySession->Req_Cheat(InCommand);
+	//	}
+	//}
+}

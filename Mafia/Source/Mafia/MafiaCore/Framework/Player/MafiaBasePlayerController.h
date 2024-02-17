@@ -1,0 +1,50 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/PlayerController.h"
+#include "MafiaBasePlayerController.generated.h"
+
+class AMafiaBaseHUD;
+class AMafiaBaseCharacter;
+/**
+ * 
+ */
+UCLASS(Abstract)
+class MAFIA_API AMafiaBasePlayerController : public APlayerController
+{
+	GENERATED_BODY()
+	
+protected:
+	AMafiaBasePlayerController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	
+	virtual void PostInitializeComponents() override;
+	/** Always called immediately after spawning and reading in replicated properties */
+	virtual void PostNetInit() override;
+
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+	virtual void TickDebug(float DeltaSeconds);
+
+	virtual void BindDelegates() {}
+	virtual void UnBindDelegates() {}
+
+	//~ Begin APlayerController interface
+	virtual void ClientSetHUD_Implementation(TSubclassOf<AHUD> NewHUDClass) override;
+	//~ End APlayerController interface
+
+#pragma region MatchCheat
+private:
+	UFUNCTION(Exec)
+	void CheatSetMinPlayerCount(const int32 InMinPlayerCount = 1);
+	UFUNCTION(Server, Reliable)
+	void ServerCheatSetMinPlayerCount(const int32 InMinPlayerCount);
+	UFUNCTION(Exec)
+	void CheatSetReadyForGame(const bool bReady = true);
+#pragma endregion
+
+public:
+	AMafiaBaseHUD* GetMetaHUD() const;
+	AMafiaBaseCharacter* GetBaseCharacter() const;
+};
