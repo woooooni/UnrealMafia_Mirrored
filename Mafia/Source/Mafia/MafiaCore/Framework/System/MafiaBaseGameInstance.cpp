@@ -4,6 +4,7 @@
 #include "MafiaCore/Framework/System/MafiaBaseGameInstance.h"
 #include "MafiaCore/Framework/System/MafiaGameEvents.h"
 #include "MafiaCore/Framework/Manager/MafiaCheatManager.h"
+#include "MafiaCore/Framework/GameModes/MafiaWorldSettings.h"
 #include "Mafia.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -14,6 +15,23 @@ UMafiaBaseGameInstance* UMafiaBaseGameInstance::Get(const UObject* WorldContextO
 	{
 		UMafiaBaseGameInstance* Instance = Cast<UMafiaBaseGameInstance>(UGameplayStatics::GetGameInstance(WorldContextObject));
 		return Instance;
+	}
+	return nullptr;
+}
+
+UMafiaWorldDataManager* UMafiaBaseGameInstance::GetMafiaWorldDataManager(const UObject* WorldContextObject)
+{
+	if (IsValid(WorldContextObject))
+	{
+		UWorld* World = WorldContextObject->GetWorld();
+		if (IsValid(World))
+		{
+			AMafiaWorldSettings* MafiaWorldSettings = Cast<AMafiaWorldSettings>(World->GetWorldSettings());
+			if (IsValid(MafiaWorldSettings))
+			{
+				return MafiaWorldSettings->GetMafiaWorldDataManager();
+			}
+		}
 	}
 	return nullptr;
 }

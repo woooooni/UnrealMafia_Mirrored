@@ -6,6 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "MafiaBaseGameInstance.generated.h"
 
+class UMafiaWorldDataManager;
 class UMafiaGameEvents;
 class UMafiaCheatManager;
 /**
@@ -18,6 +19,7 @@ class MAFIA_API UMafiaBaseGameInstance : public UGameInstance
 	
 public:
 	static UMafiaBaseGameInstance* Get(const UObject* WorldContextObject);
+	static UMafiaWorldDataManager* GetMafiaWorldDataManager(const UObject* WorldContextObject);
 
 public:
 	/* [OnlyEditor] Called to initialize the game instance for PIE instances of the game */

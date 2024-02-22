@@ -15,17 +15,6 @@ class MAFIA_API AMafiaPlayerController final : public AMafiaBasePlayerController
 {
 	GENERATED_BODY()
 
-
-private:
-	UFUNCTION(Exec)
-	void CheatSetupActor();
-
-	UFUNCTION(Exec)
-	void CheatDestoryActor();
-
-	UFUNCTION(Exec)
-	void CheatCheckActor();
-
-	AMafiaCharacter* ATestCharacter;
-	AMafiaCharacter* BTestCharacter;
+protected:
+	virtual void BeginPlay() override;
 };
