@@ -58,38 +58,3 @@ void UMafiaBaseUserWidget::Finalize()
 		UnBindDelegates();
 	}
 }
-
-AMafiaBaseHUD* UMafiaBaseUserWidget::GetBaseHUD() const
-{
-	if (!CachedHud.IsValid())
-	{
-		if (const AMafiaBasePlayerController* MyPC = GetBaseController())
-		{
-			CachedHud = Cast<AMafiaBaseHUD>(MyPC->GetHUD());
-		}
-	}
-	return CachedHud.Get();
-}
-
-AMafiaBaseCharacter* UMafiaBaseUserWidget::GetBaseCharacter() const
-{
-	if (!CachedCharacter.IsValid())
-	{
-		if (const AMafiaBasePlayerController* BasePlayerController = GetBaseController())
-		{
-			CachedCharacter = BasePlayerController->GetBaseCharacter();
-		}
-	}
-
-	return CachedCharacter.Get();
-}
-
-AMafiaBasePlayerController* UMafiaBaseUserWidget::GetBaseController() const
-{
-	if (!CachedPlayerController.IsValid())
-	{
-		CachedPlayerController = Cast<AMafiaBasePlayerController>(GetOwningPlayer());
-	}
-
-	return CachedPlayerController.Get();
-}

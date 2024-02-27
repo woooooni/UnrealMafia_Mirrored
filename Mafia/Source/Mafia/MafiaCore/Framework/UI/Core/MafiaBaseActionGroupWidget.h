@@ -21,15 +21,4 @@ protected:
 	virtual void NativeDestruct() override;
 	virtual void BindDelegates() override;
 	virtual void UnBindDelegates() override;
-
-public:
-	template < class T >
-	T* GetOwningCharacter() const
-	{
-		if (APlayerController* MyPlayerController = GetOwningPlayer())
-		{
-			return MyPlayerController->GetPawn<T>();
-		}
-		return nullptr;
-	}
 };

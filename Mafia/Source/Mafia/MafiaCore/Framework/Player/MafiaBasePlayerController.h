@@ -22,17 +22,21 @@ protected:
 	virtual void PostInitializeComponents() override;
 	/** Always called immediately after spawning and reading in replicated properties */
 	virtual void PostNetInit() override;
+	virtual void BindDelegates() {}
+	virtual void UnBindDelegates() {}
+
+	/** Only Study */
+	virtual void InitPlayerState() override;
+	virtual void SpawnDefaultHUD() override;
+	//~ Begin APlayerController interface
+	virtual void ClientSetHUD_Implementation(TSubclassOf<AHUD> NewHUDClass) override;
+	//~ End APlayerController interface
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void TickDebug(float DeltaSeconds);
 
-	virtual void BindDelegates() {}
-	virtual void UnBindDelegates() {}
-
-	//~ Begin APlayerController interface
-	virtual void ClientSetHUD_Implementation(TSubclassOf<AHUD> NewHUDClass) override;
-	//~ End APlayerController interface
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 #pragma region MatchCheat
 private:
@@ -44,7 +48,4 @@ private:
 	void CheatSetReadyForGame(const bool bReady = true);
 #pragma endregion
 
-public:
-	AMafiaBaseHUD* GetMetaHUD() const;
-	AMafiaBaseCharacter* GetBaseCharacter() const;
 };

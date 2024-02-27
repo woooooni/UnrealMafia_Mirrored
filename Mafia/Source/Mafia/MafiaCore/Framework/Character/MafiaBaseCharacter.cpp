@@ -15,7 +15,9 @@ AMafiaBaseCharacter::AMafiaBaseCharacter(const FObjectInitializer& ObjectInitial
 
 void AMafiaBaseCharacter::BeginPlay()
 {
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("Begin"));
 	Super::BeginPlay();
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("End"));
 }
 
 void AMafiaBaseCharacter::Tick(float DeltaTime)
@@ -30,9 +32,23 @@ void AMafiaBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 void AMafiaBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("Begin"));
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("Begin"));
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("End"));
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("End"));
+}
+
+void AMafiaBaseCharacter::OnRep_Owner()
+{
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("Begin"));
+	Super::OnRep_Owner();
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("End"));
+}
+
+void AMafiaBaseCharacter::OnRep_Controller()
+{
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("Begin"));
+	Super::OnRep_Controller();
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("End"));
 }
 
 void AMafiaBaseCharacter::OnRep_PlayerState()
@@ -40,24 +56,32 @@ void AMafiaBaseCharacter::OnRep_PlayerState()
 	/**
 	 * 이 함수는 Simulated & AutonomusProxy에서 모두 호출되는 함수
 	 */
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("Begin"));
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("Begin"));
 	Super::OnRep_PlayerState();
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("End"));
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("End"));
+}
+
+void AMafiaBaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("Begin"));
+	Super::EndPlay(EndPlayReason);
+	UnBindDelegates();
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("End"));
 }
 
 void AMafiaBaseCharacter::PostInitializeComponents()
 {
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("Begin"));
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("Begin"));
 	Super::PostInitializeComponents();
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("End"));
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("End"));
 }
 
 void AMafiaBaseCharacter::PostNetInit()
 {
 	/** 최초 생성시, 리플리케이트가 모두 완료된 후 호출됨. PostInitializeComponents 이후에 호출. AutonomusProxy 에서만 호출 */
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("Begin"));
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("Begin"));
 	Super::PostNetInit();
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("End"));
+	MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("End"));
 }
 
 void AMafiaBaseCharacter::NotifyActorOnClicked(FKey ButtonPressed)

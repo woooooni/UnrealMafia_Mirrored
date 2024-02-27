@@ -20,25 +20,38 @@ AMafiaBasePlayerController::AMafiaBasePlayerController(const FObjectInitializer&
 
 void AMafiaBasePlayerController::PostInitializeComponents()
 {
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("Begin"));
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Begin"));
 	Super::PostInitializeComponents();
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("End"));
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("End"));
+}
+
+void AMafiaBasePlayerController::InitPlayerState()
+{
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Begin"));
+	Super::InitPlayerState();
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("End"));
+}
+
+void AMafiaBasePlayerController::SpawnDefaultHUD()
+{
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Begin"));
+	Super::SpawnDefaultHUD();
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("End"));
 }
 
 void AMafiaBasePlayerController::PostNetInit()
 {
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("Begin"));
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Begin"));
 	Super::PostNetInit();
-	
 	BindDelegates();
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("End"));
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("End"));
 }
 
 void AMafiaBasePlayerController::BeginPlay()
 {
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("Begin"));
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Begin"));
 	Super::BeginPlay();
-	MAFIA_ALOG(LogMafiaCheat, Warning, TEXT("End"));
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("End"));
 }
 
 void AMafiaBasePlayerController::Tick(float DeltaSeconds)
@@ -90,8 +103,18 @@ void AMafiaBasePlayerController::TickDebug(float DeltaSeconds)
 #endif
 }
 
+void AMafiaBasePlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Begin"));
+	Super::EndPlay(EndPlayReason);
+	UnBindDelegates();
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("End"));
+}
+
 void AMafiaBasePlayerController::ClientSetHUD_Implementation(TSubclassOf<AHUD> NewHUDClass)
 {
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Begin"));
+
 	// Spawned HUD
 	Super::ClientSetHUD_Implementation(NewHUDClass);
 
@@ -99,6 +122,8 @@ void AMafiaBasePlayerController::ClientSetHUD_Implementation(TSubclassOf<AHUD> N
 	{
 		HUD->InitializeHUD();
 	}
+
+	MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("End"));
 }
 
 #pragma region MatchCheat
@@ -134,13 +159,3 @@ void AMafiaBasePlayerController::CheatSetReadyForGame(const bool bReady /*= true
 }
 
 #pragma endregion|
-
-AMafiaBaseHUD* AMafiaBasePlayerController::GetMetaHUD() const
-{
-	return Cast<AMafiaBaseHUD>(GetHUD());
-}
-
-AMafiaBaseCharacter* AMafiaBasePlayerController::GetBaseCharacter() const
-{
-	return Cast<AMafiaBaseCharacter>(GetCharacter());
-}

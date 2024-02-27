@@ -11,13 +11,13 @@ class AMafiaBaseCharacter;
 class AMafiaBasePlayerController;
 
 /**
- * 
+ *
  */
 UCLASS(Abstract, meta = (DisableNativeTick))
 class MAFIA_API UMafiaBaseUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 public:
 	UMafiaBaseUserWidget(const FObjectInitializer& ObjectInitializer);
 
@@ -31,9 +31,17 @@ public:
 
 	virtual void Finalize();
 
-	AMafiaBaseHUD* GetBaseHUD() const;
-	AMafiaBaseCharacter* GetBaseCharacter() const;
-	AMafiaBasePlayerController* GetBaseController() const;
+protected:
+	template < class T >
+	T* GetOwningHUD() const
+	{
+		if (APlayerController* MyPlayerController = GetOwningPlayer())
+		{
+			return MyPlayerController->GetHUD<T>();
+		}
+
+		return nullptr;
+	}
 
 protected:
 	virtual void OnAllWidgetsInitialized() {}
@@ -43,8 +51,4 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = "Widget Visibility Handle Config")
 	bool bVisibleManageByState;
-
-	mutable TWeakObjectPtr<AMafiaBaseHUD> CachedHud = nullptr;
-	mutable TWeakObjectPtr<AMafiaBaseCharacter> CachedCharacter = nullptr;
-	mutable TWeakObjectPtr<AMafiaBasePlayerController> CachedPlayerController = nullptr;
 };
