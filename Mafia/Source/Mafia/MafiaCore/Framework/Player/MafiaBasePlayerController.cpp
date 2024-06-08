@@ -56,6 +56,8 @@ void AMafiaBasePlayerController::BeginPlay()
 
 void AMafiaBasePlayerController::Tick(float DeltaSeconds)
 {
+	Super::Tick(DeltaSeconds);
+
 #if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
 	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
