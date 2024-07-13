@@ -8,6 +8,13 @@
 #include "GameFeatures/Mafia/Gameflow/MafiaChairMan.h"
 #include "MafiaBaseRoleComponent.generated.h"
 
+USTRUCT()
+struct FAffectedEvent
+{
+	GENERATED_BODY()
+public:
+	TWeakObjectPtr<UMafiaBaseRoleComponent> Other;
+};
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class MAFIA_API UMafiaBaseRoleComponent : public UActorComponent
@@ -66,15 +73,15 @@ protected:
 	void ClientAffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 
 protected:
-	bool IsDedicatedServer();
+	class UMafiaBaseGameInstance* GetServerInstance();
 
 
 protected:
 	/** ktw - 내가 능력을 볼 수 있는 플레이어의 Unique ID. */
 	TSet<uint32> VisiblePlayer;
 	
-	/** ktw - 이번 턴에 처리할 이벤트 목록. */
-	TArray<FUseAbilityEvent> EffectedAbilityEventsHeap;
+	/** ktw - 이번 턴에 내가 처리할 이벤트 목록. */
+	TArray<FAffectedEvent> CachedAffectedEventsHeap;
 
 
 protected:

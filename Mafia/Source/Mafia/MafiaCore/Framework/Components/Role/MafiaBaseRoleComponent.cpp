@@ -12,6 +12,9 @@ UMafiaBaseRoleComponent::UMafiaBaseRoleComponent(const FObjectInitializer& Objec
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	bWantsInitializeComponent = true;
+
+	CachedAffectedEventsHeap.Reserve(16);
+	CachedAffectedEventsHeap.Heapify();
 }
 
 void UMafiaBaseRoleComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -34,7 +37,7 @@ void UMafiaBaseRoleComponent::BeginPlay()
 void UMafiaBaseRoleComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
-	if (IsDedicatedServer())
+	if (GetServerInstance())
 	{
 		OwningPlayerState = GetOwner<AMafiaPlayerState>();
 		if (OwningPlayerState.IsValid() == false)
@@ -42,7 +45,6 @@ void UMafiaBaseRoleComponent::InitializeComponent()
 			MAFIA_ULOG(LogMafiaPlayerState, Warning, TEXT("UMafiaBaseRoleComponent::BeginPlay : No Has PlayerState"));
 		}
 	}
-
 }
 
 void UMafiaBaseRoleComponent::SetTeamType(EMafiaTeam InTeam)
@@ -72,41 +74,45 @@ void UMafiaBaseRoleComponent::AffectedByOther(EMafiaRole InRole, UMafiaBaseRoleC
 
 void UMafiaBaseRoleComponent::ClientAffectedByOther_Implementation(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
 {
-	/** ktw - 클라이언트에서 실행됩니다. : Autonomous Proxy. */
-	/** TODO : ktw - 능력에 영향을 받음. */
-
-
+	/** ktw - 클라이언트에서 실행됩니다. */
+	/** Todo : ktw -  서버가 직접 이벤트를 넣어줄 지 아니면, 클라이언트가 신호를 받아서 이벤트를 넣어 두고 한 번에 Flush? */
+	FAffectedEvent Event;
+	Event.Other = InOther;
+	CachedAffectedEventsHeap.HeapPush(Event);
 }
 
-bool UMafiaBaseRoleComponent::IsDedicatedServer()
+UMafiaBaseGameInstance* UMafiaBaseRoleComponent::GetServerInstance()
 {
 	if (UWorld* World = GetWorld())
 	{
 		if (IsValid(World))
 		{
-			if (UMafiaGameInstance* GameInstance = World->GetGameInstance<UMafiaGameInstance>())
+			if (UMafiaBaseGameInstance* GI = World->GetGameInstance<UMafiaBaseGameInstance>())
 			{
-				return GameInstance->IsDedicatedServerInstance();
+				if (GI->IsDedicatedServerInstance())
+				{
+					return GI;
+				}
+				else
+				{
+					return nullptr;
+				}
 			}
 		}
 	}
-	return false;
+	return nullptr;
 }
 
 void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaPlayerState* InOther)
 {
 	/** ktw - 서버에서 실행됩니다. */
-	if (IsDedicatedServer() && OwningPlayerState.IsValid())
+	if (UMafiaBaseGameInstance* GI = GetServerInstance())
 	{
-		UWorld* World = GetWorld();
-		if (UMafiaGameInstance* GameInstance = World->GetGameInstance<UMafiaGameInstance>())
+		if (OwningPlayerState.IsValid())
 		{
-			if (GameInstance->IsDedicatedServerInstance())
+			if (UMafiaChairMan* ChairMan = GI->GetChairMan())
 			{
-				if (UMafiaChairMan* ChairMan = GameInstance->GetChairMan())
-				{
-					ChairMan->AddAbilityEvent(OwningPlayerState.Get(), InOther);
-				}
+				ChairMan->AddAbilityEvent(OwningPlayerState.Get(), InOther);
 			}
 		}
 	}
