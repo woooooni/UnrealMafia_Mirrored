@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameMode.h"
+#include "GameFeatures/Mafia/Gameflow/MafiaChairMan.h"
 #include "MafiaGameMode.generated.h"
 
 /**
@@ -27,5 +28,7 @@ private:
 	virtual void HandleMatchHasEnded() override;
 
 	virtual void OnEndAssigningAbilityState() override;
+
+
 
 };

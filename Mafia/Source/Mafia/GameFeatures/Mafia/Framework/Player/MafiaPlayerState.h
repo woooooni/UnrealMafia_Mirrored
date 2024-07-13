@@ -14,4 +14,17 @@ class MAFIA_API AMafiaPlayerState final : public AMafiaBasePlayerState
 {
 	GENERATED_BODY()
 	
+public:
+	AMafiaPlayerState(const FObjectInitializer& ObjectInitializer);
+
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	FORCEINLINE class UMafiaBaseRoleComponent* GetRoleComponent() { return RoleComponent; }
+
+
+private:
+	UPROPERTY()
+	TObjectPtr<class UMafiaBaseRoleComponent> RoleComponent;
 };

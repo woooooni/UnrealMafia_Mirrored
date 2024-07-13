@@ -3,6 +3,7 @@
 
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameState.h"
+#include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Mafia.h"
 
@@ -22,7 +23,6 @@ void AMafiaBasePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 void AMafiaBasePlayerState::BeginPlay()
 {
 	MAFIA_ALOG(LogMafiaPlayerState, Log, TEXT("Begin"));
-	Super::BeginPlay();
 	MAFIA_ALOG(LogMafiaPlayerState, Log, TEXT("End. GetOwner:%s"), GetOwner() ? *GetOwner()->GetName() : TEXT("Other Client"));
 }
 
