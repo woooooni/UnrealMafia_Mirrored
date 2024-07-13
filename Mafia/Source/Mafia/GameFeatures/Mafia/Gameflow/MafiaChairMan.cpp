@@ -9,6 +9,11 @@
 
 UMafiaChairMan::UMafiaChairMan(const FObjectInitializer& ObjectInitializer)
 {
+	/**
+		ktw - TArray를 Heap으로 사용할 경우, Heapify를 먼저 호출해야합니다.
+		https://dev.epicgames.com/documentation/ko-kr/unreal-engine/array-containers-in-unreal-engine
+	*/
+
 	CachedAbilityEventsHeap.Reserve(16);
 	CachedAbilityEventsHeap.Heapify();
 }
@@ -28,10 +33,7 @@ void UMafiaChairMan::AddAbilityEvent(AMafiaPlayerState* InOrigin, AMafiaPlayerSt
 	Event.Origin = InOrigin->GetRoleComponent();
 	Event.Destination = InDestination->GetRoleComponent();
 
-	/** 
-		ktw - TArray를 Heap으로 사용할 경우, Heapify를 먼저 호출해야합니다. 
-		https://dev.epicgames.com/documentation/ko-kr/unreal-engine/array-containers-in-unreal-engine
-	*/
+	
 	CachedAbilityEventsHeap.HeapPush(Event);
 }
 
@@ -44,7 +46,7 @@ void UMafiaChairMan::FlushAbilityEvents()
 	{
 		if (Event.Destination.IsValid())
 		{
-			Event.Destination.Get()->AffectedByOther(Event.Role, Event.Origin.Get());
+			Event.Destination.Get()->ClientAffectedByOther(Event.Role, Event.Origin.Get());
 		}
 	}
 	CachedAbilityEventsHeap.Empty();

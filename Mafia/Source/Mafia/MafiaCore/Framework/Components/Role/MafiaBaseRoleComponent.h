@@ -42,8 +42,10 @@ public:
 	UFUNCTION()
 	void UseAbility(class AMafiaPlayerState* InOther);
 
+	/** ktw - 서버가 호출합니다. */
 	UFUNCTION()
 	void AffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
+	
 	
 
 protected:
@@ -59,6 +61,9 @@ protected:
 	/** ktw - 능력 사용 관련 함수들. */
 	UFUNCTION(Server, Reliable)
 	void ServerReqUseAbility(class AMafiaPlayerState* InOther);
+
+	UFUNCTION(Client, Reliable)
+	void ClientAffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 
 protected:
 	bool IsDedicatedServer();

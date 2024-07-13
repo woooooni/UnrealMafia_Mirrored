@@ -67,7 +67,15 @@ void UMafiaBaseRoleComponent::UseAbility(AMafiaPlayerState* InOther)
 
 void UMafiaBaseRoleComponent::AffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
 {
-	
+	ClientAffectedByOther(InRole, InOther);
+}
+
+void UMafiaBaseRoleComponent::ClientAffectedByOther_Implementation(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
+{
+	/** ktw - 클라이언트에서 실행됩니다. : Autonomous Proxy. */
+	/** TODO : ktw - 능력에 영향을 받음. */
+
+
 }
 
 bool UMafiaBaseRoleComponent::IsDedicatedServer()
@@ -87,7 +95,7 @@ bool UMafiaBaseRoleComponent::IsDedicatedServer()
 
 void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaPlayerState* InOther)
 {
-	/** ktw : 서버에서 실행됩니다. */
+	/** ktw - 서버에서 실행됩니다. */
 	if (IsDedicatedServer() && OwningPlayerState.IsValid())
 	{
 		UWorld* World = GetWorld();
@@ -106,19 +114,19 @@ void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaPlayerSta
 
 void UMafiaBaseRoleComponent::ServerReqSetTeam_Implementation(EMafiaTeam InTeam)
 {
-	/** ktw : 서버에서 실행됩니다. */
+	/** ktw - 서버에서 실행됩니다. */
 	TeamType = InTeam;
 }
 
 void UMafiaBaseRoleComponent::ServerReqSetRole_Implementation(EMafiaRole InRole)
 {
-	/** ktw : 서버에서 실행됩니다. */
+	/** ktw - 서버에서 실행됩니다. */
 	RoleType = InRole;
 }
 
 void UMafiaBaseRoleComponent::ServerReqSetDead_Implementation(bool InDead)
 {
-	/** ktw : 서버에서 실행됩니다. */
+	/** ktw - 서버에서 실행됩니다. */
 	bDead = InDead;
 }
 
