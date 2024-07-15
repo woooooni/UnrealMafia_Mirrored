@@ -2,4 +2,20 @@
 
 
 #include "GameFeatures/Mafia/Framework/Player/MafiaPlayerState.h"
+#include "Framework/Components/Role/MafiaBaseRoleComponent.h"
+#include "Net/UnrealNetwork.h"
+
+AMafiaPlayerState::AMafiaPlayerState(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	RoleComponent = CreateDefaultSubobject<UMafiaBaseRoleComponent>(TEXT("RoleComponent"));
+
+}
+
+void AMafiaPlayerState::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
 

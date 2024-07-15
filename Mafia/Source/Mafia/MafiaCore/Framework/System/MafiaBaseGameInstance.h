@@ -9,6 +9,7 @@
 class UMafiaWorldDataManager;
 class UMafiaGameEvents;
 class UMafiaCheatManager;
+class UMafiaChairMan;
 /**
  * 
  */
@@ -47,6 +48,7 @@ public:
 	virtual bool ProcessConsoleExec(const TCHAR* Cmd, FOutputDevice& Ar, UObject* Executor) override;
 public:
 	UMafiaGameEvents* GetGameEvents() const;
+	FORCEINLINE UMafiaChairMan* GetChairMan() const { return MafiaChairMan; }
 
 private:
 	void OnPreLoadMap(const FString& PreloadMapPath);
@@ -54,10 +56,14 @@ private:
 
 	void OnConnectionFailed(UWorld* InWorld, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);
 
+
 private:
 	UPROPERTY(Transient)
 	UMafiaGameEvents* GameEvents;
 
 	UPROPERTY(Transient)
 	UMafiaCheatManager* MafiaCheatManager;
+
+	UPROPERTY(Transient)
+	UMafiaChairMan* MafiaChairMan;
 };

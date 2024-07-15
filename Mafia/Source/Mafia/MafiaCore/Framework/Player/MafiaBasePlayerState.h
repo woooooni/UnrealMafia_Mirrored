@@ -34,4 +34,5 @@ protected:
 	/** 유저가 Ready버튼을 눌렀을때 */
 	UPROPERTY(Replicated)
 	uint8 bReadyForGame : 1;
+
 };
