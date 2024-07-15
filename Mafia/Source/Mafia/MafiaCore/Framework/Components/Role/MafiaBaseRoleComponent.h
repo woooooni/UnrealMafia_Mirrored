@@ -27,7 +27,6 @@ protected:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void InitializeComponent() override;
 	
 
 public:
@@ -49,7 +48,7 @@ public:
 	UFUNCTION()
 	void UseAbility(class AMafiaPlayerState* InOther);
 
-	/** ktw - 서버가 호출합니다. */
+	/** ktw - 서버에서 호출해야 합니다. */
 	UFUNCTION()
 	void AffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 	

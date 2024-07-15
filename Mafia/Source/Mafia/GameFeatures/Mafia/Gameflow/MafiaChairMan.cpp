@@ -6,6 +6,7 @@
 #include "GameFeatures/Mafia/Framework/Player/MafiaPlayerState.h"
 #include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
 #include "Mafia.h"
+#include <Framework/GameModes/MafiaBaseGameState.h>
 
 UMafiaChairMan::UMafiaChairMan(const FObjectInitializer& ObjectInitializer)
 {
@@ -18,7 +19,29 @@ UMafiaChairMan::UMafiaChairMan(const FObjectInitializer& ObjectInitializer)
 	CachedAbilityEventsHeap.Heapify();
 }
 
-void UMafiaChairMan::AddAbilityEvent(AMafiaPlayerState* InOrigin, AMafiaPlayerState* InDestination)
+void UMafiaChairMan::AssigningAbilities()
+{
+	UWorld* World = GetWorld();
+
+	if (IsValid(World))
+	{
+		if (AMafiaBaseGameState* GameState = World->GetGameState<AMafiaBaseGameState>())
+		{
+			int32 UserCount = GameState->GetJoinedUserCount();
+
+			for (auto& Iter : GameState->GetJoinedUserPlayerStateMap())
+			{
+				if (Iter.Value.IsValid())
+				{
+					/** Todo : ktw - Player마다 Role컴포넌트 생성. */
+					// Iter.Value.Get()->AssignAbility();
+				}
+			}
+		}
+	}
+}
+
+void UMafiaChairMan::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMafiaBasePlayerState* InDestination)
 {
 	FUseAbilityEvent Event;
 

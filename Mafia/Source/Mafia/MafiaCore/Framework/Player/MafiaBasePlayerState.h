@@ -29,10 +29,29 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerReqReady(bool bReady);
 	FORCEINLINE bool IsReadyForGame() const { return bReadyForGame; }
+
+public:
+	/** ktw - 서버에서 호출해야 합니다. */
+	UFUNCTION()
+	UMafiaBaseRoleComponent* AssignAbility(EMafiaRole InRole);
+
+	UFUNCTION()
+	FORCEINLINE UMafiaBaseRoleComponent* GetRoleComponent() { return RoleComponent; }
+	
+
+
+protected:
+	/** 플레이어 Role Component 생성. */
+	UFUNCTION()
+	UMafiaBaseRoleComponent* CreateRoleComponent(EMafiaRole InRole);
 	
 protected:
 	/** 유저가 Ready버튼을 눌렀을때 */
 	UPROPERTY(Replicated)
 	uint8 bReadyForGame : 1;
+
+	/** Mafia Role */
+	UPROPERTY(Replicated)
+	TObjectPtr<class UMafiaBaseRoleComponent> RoleComponent;
 
 };

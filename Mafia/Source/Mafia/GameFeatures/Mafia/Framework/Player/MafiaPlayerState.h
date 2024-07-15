@@ -20,11 +20,5 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:
-	FORCEINLINE class UMafiaBaseRoleComponent* GetRoleComponent() { return RoleComponent; }
 
-
-private:
-	UPROPERTY()
-	TObjectPtr<class UMafiaBaseRoleComponent> RoleComponent;
 };

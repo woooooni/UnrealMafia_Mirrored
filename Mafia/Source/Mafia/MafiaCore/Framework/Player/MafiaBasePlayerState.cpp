@@ -18,6 +18,7 @@ void AMafiaBasePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AMafiaBasePlayerState, bReadyForGame);
+	DOREPLIFETIME(AMafiaBasePlayerState, RoleComponent);
 }
 
 void AMafiaBasePlayerState::BeginPlay()
@@ -31,6 +32,60 @@ void AMafiaBasePlayerState::PostInitializeComponents()
 	MAFIA_ALOG(LogMafiaPlayerState, Log, TEXT("Begin"));
 	Super::PostInitializeComponents();
 	MAFIA_ALOG(LogMafiaPlayerState, Log, TEXT("End"));
+}
+
+UMafiaBaseRoleComponent* AMafiaBasePlayerState::AssignAbility(EMafiaRole InRole)
+{
+	if (HasAuthority())
+	{
+		return CreateRoleComponent(InRole);
+	}
+	
+	return nullptr;
+}
+
+UMafiaBaseRoleComponent* AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole InRole)
+{
+	switch (InRole)
+	{
+	case EMafiaRole::Basic:
+		//RoleComponent = NewObject<UMafiaBaseRoleComponent>(this, UMafiaBaseRoleComponent::StaticClass(), TEXT("Role Component"));
+		break;
+	case EMafiaRole::Madam:
+		break;
+	case EMafiaRole::Police:
+		break;
+	case EMafiaRole::Killer:
+		break;
+	case EMafiaRole::Mafia:
+		break;
+	case EMafiaRole::Vigilante:
+		break;
+	case EMafiaRole::BusDriver:
+		break;
+	case EMafiaRole::Detective:
+		break;
+	case EMafiaRole::Spirit:
+		break;
+	case EMafiaRole::GodFather:
+		break;
+	case EMafiaRole::Thief:
+		break;
+	case EMafiaRole::Soldier:
+		break;
+	case EMafiaRole::Doctor:
+		break;
+	default:
+		return nullptr;
+	}
+
+
+	if (IsValid(RoleComponent))
+	{
+		RoleComponent->RegisterComponent();
+	}
+
+	return RoleComponent;
 }
 
 void AMafiaBasePlayerState::ServerReqReady_Implementation(bool bReady)

@@ -8,7 +8,7 @@
 AMafiaPlayerState::AMafiaPlayerState(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	RoleComponent = CreateDefaultSubobject<UMafiaBaseRoleComponent>(TEXT("RoleComponent"));
+	
 
 }
 
