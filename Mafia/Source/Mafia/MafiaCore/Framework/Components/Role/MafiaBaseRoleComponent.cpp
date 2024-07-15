@@ -11,7 +11,7 @@ UMafiaBaseRoleComponent::UMafiaBaseRoleComponent(const FObjectInitializer& Objec
 	:Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	bWantsInitializeComponent = true;
+	SetIsReplicated(true);
 
 	CachedAffectedEventsHeap.Reserve(16);
 	CachedAffectedEventsHeap.Heapify();
@@ -31,45 +31,66 @@ void UMafiaBaseRoleComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 void UMafiaBaseRoleComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	SetIsReplicated(true);
-}
-
-void UMafiaBaseRoleComponent::InitializeComponent()
-{
-	Super::InitializeComponent();
-	if (GetServerInstance())
-	{
-		OwningPlayerState = GetOwner<AMafiaPlayerState>();
-		if (OwningPlayerState.IsValid() == false)
-		{
-			MAFIA_ULOG(LogMafiaPlayerState, Warning, TEXT("UMafiaBaseRoleComponent::BeginPlay : No Has PlayerState"));
-		}
-	}
 }
 
 void UMafiaBaseRoleComponent::SetTeamType(EMafiaTeam InTeam)
 {
-	ServerReqSetTeam(InTeam);
+	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy)
+	{
+		ServerReqSetTeam(InTeam);
+	}
+	else
+	{
+		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("클라이언트에서 호출해야합니다."));
+	}
 }
 
 void UMafiaBaseRoleComponent::SetRoleType(EMafiaRole InRole)
 {
-	ServerReqSetRole(InRole);
+	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy)
+	{
+		ServerReqSetRole(InRole);
+	}
+	else
+	{
+		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("클라이언트에서 호출해야합니다."));
+	}
 }
 
 void UMafiaBaseRoleComponent::SetDead(bool InDead)
 {
-	ServerReqSetDead(InDead);
+	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy)
+	{
+		ServerReqSetDead(InDead);
+	}
+	else
+	{
+		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("클라이언트에서 호출해야합니다."));
+	}
 }
 
 void UMafiaBaseRoleComponent::UseAbility(AMafiaPlayerState* InOther)
 {
-	ServerReqUseAbility(InOther);
+	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy)
+	{
+		ServerReqUseAbility(InOther);
+	}
+	else
+	{
+		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("클라이언트에서 호출해야합니다."));
+	}
 }
 
 void UMafiaBaseRoleComponent::AffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
 {
-	ClientAffectedByOther(InRole, InOther);
+	if (ENetRole::ROLE_Authority == GetOwnerRole())
+	{
+		ClientAffectedByOther(InRole, InOther);
+	}
+	else
+	{
+		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("서버에서 호출해야합니다."));
+	}
 }
 
 void UMafiaBaseRoleComponent::ClientAffectedByOther_Implementation(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
