@@ -47,7 +47,6 @@ enum class EMafiaTeam : uint8
 UENUM()
 enum class EMafiaRole : uint8
 {
-	Basic,			/* 일반 시민 */
 	Madam,			/* 마담 */
 
 	Police,			/* 경찰 */
@@ -60,10 +59,84 @@ enum class EMafiaRole : uint8
 	Detective,		/* 탐정 */
 	Spirit,			/* 영매 */
 
-	GodFather,		/* 대부 */
 	Thief,			/* 도둑 */
 	
 	Soldier,		/* 군인 */
 	Doctor,			/* 의사 */
+	
+	Citizen,		/* 일반 시민 */
 };
+
+/** ktw - 게임 플레이 시민팀 필수 직업입니다. */
+const static TArray<EMafiaRole> GCitizenEssentialRoleArray =
+{ 
+	EMafiaRole::Citizen,
+	EMafiaRole::Police
+};
+
+/** ktw - 게임 플레이 시민팀 특수 직업입니다. */
+const static TArray<EMafiaRole> GCitizenSpecialRoleArray =
+{
+	EMafiaRole::Doctor,
+	EMafiaRole::Vigilante,
+	EMafiaRole::Killer,
+	EMafiaRole::BusDriver,
+	EMafiaRole::Detective,
+	EMafiaRole::Spirit,
+	EMafiaRole::Soldier
+};
+
+/** ktw - 게임 플레이 마피아 팀 필수 직업입니다. */
+const static TArray<EMafiaRole> GMafiaEssentialRoleArray =
+{
+	EMafiaRole::Mafia
+};
+
+/** ktw - 게임 플레이 마피아 팀 특수 직업입니다. */
+const static TArray<EMafiaRole> GMafiaSpecialRoleArray =
+{
+	EMafiaRole::Madam,
+	EMafiaRole::Thief
+};
+
+
+/** ktw - 인원수에 따른 마피아 팀 직업 부여 */
+const static TArray<EMafiaRole> GMafiaAssignRoleArray =
+{
+	EMafiaRole::Mafia,
+	EMafiaRole::Madam,
+	EMafiaRole::Thief
+};
+
+/** ktw - 인원수에 따른 시민 팀 직업 부여 */
+const static TArray<EMafiaRole> GCitizenAssignRoleArray =
+{
+	EMafiaRole::Police,
+	EMafiaRole::Citizen,
+	EMafiaRole::Doctor,
+	EMafiaRole::Vigilante,
+	EMafiaRole::Killer,
+	EMafiaRole::BusDriver,
+	EMafiaRole::Detective,
+	EMafiaRole::Spirit,
+	EMafiaRole::Soldier
+};
+
+const static TArray<EMafiaTeam> GTeamDistributionArray =
+{
+	EMafiaTeam::Citizen,
+	EMafiaTeam::Citizen,
+	EMafiaTeam::Citizen,
+	EMafiaTeam::Mafia,
+	EMafiaTeam::Mafia,
+	EMafiaTeam::Mafia,
+	EMafiaTeam::Neutral,
+	EMafiaTeam::Citizen,
+	EMafiaTeam::Citizen,
+	EMafiaTeam::Citizen,
+	EMafiaTeam::Citizen,
+	EMafiaTeam::Citizen,
+}
+
+
 

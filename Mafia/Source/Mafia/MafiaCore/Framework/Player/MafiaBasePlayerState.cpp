@@ -48,7 +48,7 @@ UMafiaBaseRoleComponent* AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole I
 {
 	switch (InRole)
 	{
-	case EMafiaRole::Basic:
+	case EMafiaRole::Citizen:
 		//RoleComponent = NewObject<UMafiaBaseRoleComponent>(this, UMafiaBaseRoleComponent::StaticClass(), TEXT("Role Component"));
 		break;
 	case EMafiaRole::Madam:
@@ -66,8 +66,6 @@ UMafiaBaseRoleComponent* AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole I
 	case EMafiaRole::Detective:
 		break;
 	case EMafiaRole::Spirit:
-		break;
-	case EMafiaRole::GodFather:
 		break;
 	case EMafiaRole::Thief:
 		break;

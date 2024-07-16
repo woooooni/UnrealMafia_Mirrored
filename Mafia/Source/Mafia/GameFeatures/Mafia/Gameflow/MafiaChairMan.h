@@ -54,7 +54,7 @@ public:
 
 
 private:
-	TArray<EMafiaRole> MakeShuffledRoleArray(int32 InPlayerCount);
+	void MakeShuffledRoleArray(int32 InPlayerCount, TArray<EMafiaRole>& OutSuffledArray);
 
 private:
 	/* ktw - EMafiaRole에 선언된 Role의 값을 순서로 Event를 정렬합니다. */

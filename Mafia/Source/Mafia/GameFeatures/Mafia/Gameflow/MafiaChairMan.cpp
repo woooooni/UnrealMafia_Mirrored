@@ -83,9 +83,42 @@ void UMafiaChairMan::FlushAbilityEvents()
 	CachedAbilityEventsHeap.Empty();
 }
 
-TArray<EMafiaRole> UMafiaChairMan::MakeShuffledRoleArray(int32 InUserCount)
+void UMafiaChairMan::MakeShuffledRoleArray(int32 InUserCount, TArray<EMafiaRole>& OutSuffledArray)
 {
-	TArray<EMafiaRole> ShuffledRoleArray;
-	Algo::RandomShuffle<TArray<EMafiaRole>>(ShuffledRoleArray);
-	return ShuffledRoleArray;
+	/** 
+	OutSuffledArray.Reserve(InUserCount);
+
+	/** 
+		ktw - 플레이어 수 : 4 ~ 20
+		FMath::IsWithin				: 이상 ~ 미만
+		FMath::IsWithinInclusive	: 이상 ~ 이하
+	*/
+	ensure(FMath::IsWithinInclusive(InUserCount, 4, 12));
+
+	TArray<EMafiaTeam> DistributionArray = TArray<EMafiaTeam>(GTeamDistributionArray.GetData(), InUserCount);
+	Algo::RandomShuffle<TArray<EMafiaTeam>>(DistributionArray);
+
+	int32 CitizenCount = 0;
+	int32 MafiaCount = 0;
+
+	for (int32 i = 0; i < InUserCount; ++i)
+	{
+		if (DistributionArray[i] == EMafiaTeam::Citizen)
+		{
+			/** Todo : ktw - OutSuffledArray에 시민팀 Role 추가. */
+			++CitizenCount;
+		}
+		else if (DistributionArray[i] == EMafiaTeam::Mafia)
+		{
+			/** Todo : ktw - OutSuffledArray에 마피아팀 Role 추가. */
+			++MafiaCount;
+		}
+		else
+		{
+			/** Todo : ktw - OutSuffledArray에 Killer Role 추가. */
+		}
+	}
+	
+	Algo::RandomShuffle<TArray<EMafiaRole>>(OutSuffledArray);
+	
 }
