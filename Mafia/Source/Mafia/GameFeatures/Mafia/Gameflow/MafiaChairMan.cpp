@@ -5,8 +5,10 @@
 #include "Mafia/MafiaCore/Framework/System/MafiaLogChannels.h"
 #include "GameFeatures/Mafia/Framework/Player/MafiaPlayerState.h"
 #include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
+#include "Framework/GameModes/MafiaBaseGameState.h"
+#include "Algo/RandomShuffle.h"
 #include "Mafia.h"
-#include <Framework/GameModes/MafiaBaseGameState.h>
+
 
 UMafiaChairMan::UMafiaChairMan(const FObjectInitializer& ObjectInitializer)
 {
@@ -27,13 +29,14 @@ void UMafiaChairMan::AssigningAbilities()
 	{
 		if (AMafiaBaseGameState* GameState = World->GetGameState<AMafiaBaseGameState>())
 		{
-			int32 UserCount = GameState->GetJoinedUserCount();
-
+			int32 PlayerCount = GameState->GetJoinedUserCount();
+			TArray<EMafiaRole> ShuffledRoleArray = MakeShuffledRoleArray(PlayerCount);
+			int32 Num = 0;
 			for (auto& Iter : GameState->GetJoinedUserPlayerStateMap())
 			{
 				if (Iter.Value.IsValid())
 				{
-					/** Todo : ktw - Player마다 Role컴포넌트 생성. */
+					
 					// Iter.Value.Get()->AssignAbility();
 				}
 			}
@@ -78,4 +81,11 @@ void UMafiaChairMan::FlushAbilityEvents()
 		}
 	}
 	CachedAbilityEventsHeap.Empty();
+}
+
+TArray<EMafiaRole> UMafiaChairMan::MakeShuffledRoleArray(int32 InUserCount)
+{
+	TArray<EMafiaRole> ShuffledRoleArray;
+	Algo::RandomShuffle<TArray<EMafiaRole>>(ShuffledRoleArray);
+	return ShuffledRoleArray;
 }
