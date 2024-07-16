@@ -52,6 +52,10 @@ public:
 	UFUNCTION()
 	void FlushAbilityEvents();
 
+
+private:
+	TArray<EMafiaRole> MakeShuffledRoleArray(int32 InPlayerCount);
+
 private:
 	/* ktw - EMafiaRole에 선언된 Role의 값을 순서로 Event를 정렬합니다. */
 	TArray<FUseAbilityEvent> CachedAbilityEventsHeap;
