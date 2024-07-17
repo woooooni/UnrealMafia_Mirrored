@@ -18,7 +18,7 @@ UMafiaChairMan::UMafiaChairMan(const FObjectInitializer& ObjectInitializer)
 	*/
 	
 	CachedAbilityEventsHeap.Reserve(16);
-	CachedAbilityEventsHeap.Heapify();
+	CachedAbilityEventsHeap.Heapify(FUseAbilityEvent::StaticStruct());
 }
 
 void UMafiaChairMan::AssigningAbilities()
@@ -30,14 +30,18 @@ void UMafiaChairMan::AssigningAbilities()
 		if (AMafiaBaseGameState* GameState = World->GetGameState<AMafiaBaseGameState>())
 		{
 			int32 PlayerCount = GameState->GetJoinedUserCount();
-			TArray<EMafiaRole> ShuffledRoleArray = MakeShuffledRoleArray(PlayerCount);
-			int32 Num = 0;
-			for (auto& Iter : GameState->GetJoinedUserPlayerStateMap())
+			TArray<EMafiaRole> ShuffledRoleArray;
+
+			bool bMakeSucceed = MakeShuffledRoleArray(PlayerCount, ShuffledRoleArray);
+			if (bMakeSucceed)
 			{
-				if (Iter.Value.IsValid())
+				int32 Num = 0;
+				for (auto& Iter : GameState->GetJoinedUserPlayerStateMap())
 				{
-					
-					// Iter.Value.Get()->AssignAbility();
+					if (Iter.Value.IsValid())
+					{
+						Iter.Value.Get()->AssignAbility(ShuffledRoleArray[Num++]);
+					}
 				}
 			}
 		}
@@ -83,7 +87,8 @@ void UMafiaChairMan::FlushAbilityEvents()
 	CachedAbilityEventsHeap.Empty();
 }
 
-void UMafiaChairMan::MakeShuffledRoleArray(int32 InUserCount, TArray<EMafiaRole>& OutSuffledArray)
+
+bool UMafiaChairMan::MakeShuffledRoleArray(int32 InUserCount, OUT TArray<EMafiaRole>& OutSuffledArray)
 {
 	/** 
 	OutSuffledArray.Reserve(InUserCount);
@@ -93,32 +98,37 @@ void UMafiaChairMan::MakeShuffledRoleArray(int32 InUserCount, TArray<EMafiaRole>
 		FMath::IsWithin				: 이상 ~ 미만
 		FMath::IsWithinInclusive	: 이상 ~ 이하
 	*/
-	ensure(FMath::IsWithinInclusive(InUserCount, 4, 12));
+	if (FMath::IsWithinInclusive<int32>(InUserCount, 4, 12) == false)
+	{
+		return false;
+	}
+		
 
-	TArray<EMafiaTeam> DistributionArray = TArray<EMafiaTeam>(GTeamDistributionArray.GetData(), InUserCount);
+	TArray<EMafiaTeam> DistributionArray = TArray<EMafiaTeam>(GTeamDistributionArray.GetData(), InUserCount - 1);
 	Algo::RandomShuffle<TArray<EMafiaTeam>>(DistributionArray);
 
-	int32 CitizenCount = 0;
-	int32 MafiaCount = 0;
+
+	int32 CitizenIdx = 0;
+	int32 MafiaIdx = 0;
 
 	for (int32 i = 0; i < InUserCount; ++i)
 	{
-		if (DistributionArray[i] == EMafiaTeam::Citizen)
+		switch (DistributionArray[i])
 		{
-			/** Todo : ktw - OutSuffledArray에 시민팀 Role 추가. */
-			++CitizenCount;
-		}
-		else if (DistributionArray[i] == EMafiaTeam::Mafia)
-		{
-			/** Todo : ktw - OutSuffledArray에 마피아팀 Role 추가. */
-			++MafiaCount;
-		}
-		else
-		{
-			/** Todo : ktw - OutSuffledArray에 Killer Role 추가. */
+		case EMafiaTeam::Citizen:
+			OutSuffledArray.Push(GCitizenAssignRoleArray[CitizenIdx]);
+			++CitizenIdx;
+			break;
+		case EMafiaTeam::Mafia:
+			OutSuffledArray.Push(GMafiaAssignRoleArray[MafiaIdx]);
+			++MafiaIdx;
+			break;
+		case EMafiaTeam::Neutral:
+			OutSuffledArray.Push(EMafiaRole::Killer);
+			break;
 		}
 	}
 	
 	Algo::RandomShuffle<TArray<EMafiaRole>>(OutSuffledArray);
-	
+	return true;
 }

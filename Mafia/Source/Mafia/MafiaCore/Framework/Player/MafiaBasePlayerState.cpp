@@ -24,6 +24,7 @@ void AMafiaBasePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 void AMafiaBasePlayerState::BeginPlay()
 {
 	MAFIA_ALOG(LogMafiaPlayerState, Log, TEXT("Begin"));
+	Super::BeginPlay();
 	MAFIA_ALOG(LogMafiaPlayerState, Log, TEXT("End. GetOwner:%s"), GetOwner() ? *GetOwner()->GetName() : TEXT("Other Client"));
 }
 

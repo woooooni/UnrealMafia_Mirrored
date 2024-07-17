@@ -15,14 +15,28 @@ struct FUseAbilityEvent
 
 public:
 	EMafiaRole Role;
+
+	UPROPERTY()
 	TWeakObjectPtr<class UMafiaBaseRoleComponent> Origin;
+
+	UPROPERTY()
 	TWeakObjectPtr<class UMafiaBaseRoleComponent> Destination;
 
 public:
 	/** ktw - Pred Definition */
-	bool operator < (const FUseAbilityEvent& Other) const
+	friend bool operator < (const FUseAbilityEvent& A, const FUseAbilityEvent& B)
+	{
+		return A.Role > B.Role;
+	}
+
+	FORCEINLINE bool operator< (FUseAbilityEvent& Other) const
 	{
 		return Role > Other.Role;
+	}
+
+	FORCEINLINE bool operator()(const FUseAbilityEvent& A, const FUseAbilityEvent& B) const
+	{
+		return A.Role > B.Role;
 	}
 };
 
@@ -38,6 +52,7 @@ public:
 	UMafiaChairMan(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
+	UFUNCTION()
 	void AssigningAbilities();
 
 public:
@@ -53,8 +68,8 @@ public:
 	void FlushAbilityEvents();
 
 
-private:
-	void MakeShuffledRoleArray(int32 InPlayerCount, TArray<EMafiaRole>& OutSuffledArray);
+protected:
+	bool MakeShuffledRoleArray(int32 InPlayerCount, OUT TArray<EMafiaRole>& OutSuffledArray);
 
 private:
 	/* ktw - EMafiaRole에 선언된 Role의 값을 순서로 Event를 정렬합니다. */

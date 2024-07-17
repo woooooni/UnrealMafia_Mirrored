@@ -136,7 +136,4 @@ const static TArray<EMafiaTeam> GTeamDistributionArray =
 	EMafiaTeam::Citizen,
 	EMafiaTeam::Citizen,
 	EMafiaTeam::Citizen,
-}
-
-
-
+};
