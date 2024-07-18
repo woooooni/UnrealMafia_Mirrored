@@ -1,10 +1,12 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameMode.h"
+#include "MafiaCore/Framework/System/MafiaBaseGameInstance.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameState.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameSession.h"
 #include "MafiaCore/Framework/Player/MafiaBasePlayerController.h"
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
+#include "Framework/Manager/MafiaChairManManager.h"
 #include "MafiaCore/Framework/UI/Core/MafiaBaseHUD.h"
 #include "MafiaCore/Framework/Types/MafiaTypes.h"
 #include "Mafia.h"

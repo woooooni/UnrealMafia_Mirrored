@@ -15,7 +15,6 @@ AMafiaPlayerState::AMafiaPlayerState(const FObjectInitializer& ObjectInitializer
 void AMafiaPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 

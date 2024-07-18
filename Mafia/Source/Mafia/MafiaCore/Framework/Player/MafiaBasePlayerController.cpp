@@ -6,6 +6,8 @@
 #include "MafiaCore/Framework/Character/MafiaBaseCharacter.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameMode.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameState.h"
+#include "MafiaCore/Framework/System/MafiaBaseGameInstance.h"
+#include "Framework/Manager/MafiaChairManManager.h"
 #include "MafiaCore/Framework/UI/Core/MafiaBaseHUD.h"
 #include "Mafia.h"
 
@@ -158,6 +160,31 @@ void AMafiaBasePlayerController::CheatSetReadyForGame(const bool bReady /*= true
 		}
 	}
 #endif
+}
+
+void AMafiaBasePlayerController::CheatAssignAbility()
+{
+#if ENABLE_CHEAT
+	if (ROLE_AutonomousProxy == GetLocalRole())
+	{
+		ServerReqAssignAbility();
+	}
+#endif
+}
+
+void AMafiaBasePlayerController::ServerReqAssignAbility_Implementation()
+{
+	if (UMafiaBaseGameInstance* MafiaBaseGameInstance = UMafiaBaseGameInstance::Get(this))
+	{
+		if (MafiaBaseGameInstance->IsDedicatedServerInstance())
+		{
+			if (UMafiaChairManManager* MafiaChairManManager = MafiaBaseGameInstance->GetChairMan())
+			{
+				MafiaChairManManager->AssigningAbilities();
+			}
+		}
+	}
+
 }
 
 #pragma endregion|

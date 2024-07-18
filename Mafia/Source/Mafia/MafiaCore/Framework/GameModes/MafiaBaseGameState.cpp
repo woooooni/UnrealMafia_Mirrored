@@ -5,6 +5,8 @@
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameMode.h"
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
 #include "MafiaCore/Framework/System/MafiaGameEvents.h"
+#include "MafiaCore/Framework/System/MafiaBaseGameInstance.h"
+#include "Framework/Manager/MafiaChairManManager.h"
 #include "MafiaCore/Framework/Types/MafiaTypes.h"
 #include "Mafia.h"
 
@@ -279,6 +281,7 @@ void AMafiaBaseGameState::AddGameDuration(const float InAddedSeconds) const
 		MafiaBaseGameMode->AddGameDuration(InAddedSeconds);
 	}
 }
+
 
 void AMafiaBaseGameState::OnRep_MafiaFlowState()
 {

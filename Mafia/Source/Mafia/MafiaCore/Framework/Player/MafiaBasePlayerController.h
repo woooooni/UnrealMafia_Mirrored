@@ -48,4 +48,14 @@ private:
 	void CheatSetReadyForGame(const bool bReady = true);
 #pragma endregion
 
+#pragma region AbilityCheat
+private:
+	UFUNCTION(Exec)
+	void CheatAssignAbility();
+
+	UFUNCTION(Server, Reliable)
+	void ServerReqAssignAbility();
+
+#pragma endregion
+
 };

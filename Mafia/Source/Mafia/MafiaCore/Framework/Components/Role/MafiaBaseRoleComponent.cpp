@@ -1,7 +1,8 @@
-#include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
+#include "Framework/Components/Role/MafiaBaseRoleComponent.h"
+#include "Framework/Manager/MafiaChairManManager.h"
+#include "Framework/System/MafiaLogChannels.h"
 #include "GameFeatures/Mafia/Framework/GameModes/MafiaGameMode.h"
 #include "GameFeatures/Mafia/Framework/Player/MafiaPlayerState.h"
-#include "MafiaCore/Framework/System/MafiaLogChannels.h"
 #include "GameFeatures/Mafia/Framework/GameModes/MafiaGameState.h"
 #include "GameFeatures/Mafia/Framework/System/MafiaGameInstance.h"
 #include "Mafia.h"
@@ -11,8 +12,6 @@ UMafiaBaseRoleComponent::UMafiaBaseRoleComponent(const FObjectInitializer& Objec
 	:Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	SetIsReplicated(true);
-
 	CachedAffectedEventsHeap.Reserve(16);
 	CachedAffectedEventsHeap.Heapify();
 }
@@ -24,13 +23,18 @@ void UMafiaBaseRoleComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	DOREPLIFETIME(UMafiaBaseRoleComponent, TeamType);
 	DOREPLIFETIME(UMafiaBaseRoleComponent, RoleType);
 	DOREPLIFETIME(UMafiaBaseRoleComponent, bDead);
-
+	DOREPLIFETIME(UMafiaBaseRoleComponent, RoleName);
 }
 
 
 void UMafiaBaseRoleComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	OwningPlayerState = Cast<AMafiaBasePlayerState>(GetOwner());
+	if (OwningPlayerState.IsValid() == false)
+	{
+		MAFIA_ULOG(LogMafiaPlayerState, Error, TEXT("UMafiaBaseRoleComponent::BeginPlay : OwningPlayerState is Not Valid."));
+	}
 }
 
 void UMafiaBaseRoleComponent::SetTeamType(EMafiaTeam InTeam)
@@ -69,6 +73,18 @@ void UMafiaBaseRoleComponent::SetDead(bool InDead)
 	}
 }
 
+void UMafiaBaseRoleComponent::SetRoleName(FName InRoleName)
+{
+	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy)
+	{
+		ServerReqSetRoleName(InRoleName);
+	}
+	else
+	{
+		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("클라이언트에서 호출해야합니다."));
+	}
+}
+
 void UMafiaBaseRoleComponent::UseAbility(AMafiaPlayerState* InOther)
 {
 	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy)
@@ -93,6 +109,18 @@ void UMafiaBaseRoleComponent::AffectedByOther(EMafiaRole InRole, UMafiaBaseRoleC
 	}
 }
 
+void UMafiaBaseRoleComponent::FlushEvents()
+{
+	if (ENetRole::ROLE_Authority == GetOwnerRole())
+	{
+		ClientFlush();
+	}
+	else
+	{
+		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("서버에서 호출해야합니다."));
+	}
+}
+
 void UMafiaBaseRoleComponent::ClientAffectedByOther_Implementation(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
 {
 	/** ktw - 클라이언트에서 실행됩니다. */
@@ -100,6 +128,15 @@ void UMafiaBaseRoleComponent::ClientAffectedByOther_Implementation(EMafiaRole In
 	FAffectedEvent Event;
 	Event.Other = InOther;
 	CachedAffectedEventsHeap.HeapPush(Event);
+}
+
+void UMafiaBaseRoleComponent::ClientFlush_Implementation()
+{
+	for (auto Event : CachedAffectedEventsHeap)
+	{
+		/** Todo : ktw - 실제 UI처리 및 동작 처리! */
+	}
+	CachedAffectedEventsHeap.Empty();
 }
 
 UMafiaBaseGameInstance* UMafiaBaseRoleComponent::GetServerInstance()
@@ -131,9 +168,9 @@ void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaPlayerSta
 	{
 		if (OwningPlayerState.IsValid())
 		{
-			if (UMafiaChairMan* ChairMan = GI->GetChairMan())
+			if (UMafiaChairManManager* ChairManManager = GI->GetChairMan())
 			{
-				ChairMan->AddAbilityEvent(OwningPlayerState.Get(), InOther);
+				ChairManManager->AddAbilityEvent(OwningPlayerState.Get(), InOther);
 			}
 		}
 	}
@@ -155,6 +192,26 @@ void UMafiaBaseRoleComponent::ServerReqSetDead_Implementation(bool InDead)
 {
 	/** ktw - 서버에서 실행됩니다. */
 	bDead = InDead;
+}
+
+void UMafiaBaseRoleComponent::ServerReqSetRoleName_Implementation(FName InRoleName)
+{
+	/** ktw - 서버에서 실행됩니다. */
+	RoleName = InRoleName;
+}
+
+bool operator<(const FAffectedEvent& A, const FAffectedEvent& B)
+{
+	if (A.Other.IsValid() && B.Other.IsValid())
+	{
+		return (A.Other.Get()->GetRoleType() > B.Other.Get()->GetRoleType());
+	}
+	else
+	{
+		check(false);
+		return false;
+	}
+	return false;
 }
 
 

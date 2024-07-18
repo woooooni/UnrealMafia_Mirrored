@@ -9,6 +9,7 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class USkeletalMeshComponent;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
@@ -62,7 +63,11 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	// To add mapping context
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+	
+public:
+	void ChangeColor(FVector InColor, uint32 InMaterialIndex);
 
 public:
 	/** Returns CameraBoom subobject **/

@@ -4,8 +4,13 @@
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameState.h"
 #include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
+#include "GameFeatures/Mafia/Framework/Components/Role/MafiaCitizenRoleComponent.h"
+#include "GameFeatures/Mafia/Framework/Components/Role/MafiaPoliceRoleComponent.h"
+#include "GameFeatures/Mafia/Framework/Components/Role/MafiaDoctorRoleComponent.h"
+#include "GameFeatures/Mafia/Framework/Components/Role/MafiaGodFatherRoleComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Mafia.h"
+#include "Mafia/Framework/Player/MafiaPlayerController.h"
 
 AMafiaBasePlayerState::AMafiaBasePlayerState(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
@@ -50,15 +55,17 @@ UMafiaBaseRoleComponent* AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole I
 	switch (InRole)
 	{
 	case EMafiaRole::Citizen:
-		//RoleComponent = NewObject<UMafiaBaseRoleComponent>(this, UMafiaBaseRoleComponent::StaticClass(), TEXT("Role Component"));
+		RoleComponent = NewObject<UMafiaCitizenRoleComponent>(this, UMafiaCitizenRoleComponent::StaticClass(), TEXT("RoleComponent"), RF_Transient);
 		break;
 	case EMafiaRole::Madam:
 		break;
 	case EMafiaRole::Police:
+		RoleComponent = NewObject<UMafiaPoliceRoleComponent>(this, UMafiaPoliceRoleComponent::StaticClass(), TEXT("RoleComponent"), RF_Transient);
 		break;
 	case EMafiaRole::Killer:
 		break;
 	case EMafiaRole::Mafia:
+		RoleComponent = NewObject<UMafiaGodFatherRoleComponent>(this, UMafiaGodFatherRoleComponent::StaticClass(), TEXT("RoleComponent"), RF_Transient);
 		break;
 	case EMafiaRole::Vigilante:
 		break;
@@ -73,6 +80,7 @@ UMafiaBaseRoleComponent* AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole I
 	case EMafiaRole::Soldier:
 		break;
 	case EMafiaRole::Doctor:
+		RoleComponent = NewObject<UMafiaDoctorRoleComponent>(this, UMafiaDoctorRoleComponent::StaticClass(), TEXT("RoleComponent"), RF_Transient);
 		break;
 	default:
 		return nullptr;
@@ -81,10 +89,32 @@ UMafiaBaseRoleComponent* AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole I
 
 	if (IsValid(RoleComponent))
 	{
+		RoleComponent->SetIsReplicated(true);
 		RoleComponent->RegisterComponent();
 	}
 
 	return RoleComponent;
+}
+
+void AMafiaBasePlayerState::OnRepDebugRoleComponent()
+{
+	UWorld* World = GetWorld();
+	if (IsValid(World))
+	{
+		AMafiaBasePlayerController* LocalPlayerController = Cast<AMafiaBasePlayerController>(World->GetFirstPlayerController());
+		if (LocalPlayerController)
+		{
+			if (AMafiaBasePlayerState* OtherPlayerState = LocalPlayerController->GetPlayerState<AMafiaBasePlayerState>())
+			{
+				if (OtherPlayerState->GetUniqueId() == GetUniqueId())
+				{
+					GEngine->AddOnScreenDebugMessage(32, 10.f, FColor::Red, FString::Printf(TEXT("My Role Is : %s"), *RoleComponent->GetRoleName().ToString()));
+					// MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("Unique Id : %s, My Role : %s"), *OtherPlayerState->GetUniqueId().ToString(), *RoleComponent->GetRoleName().ToString());
+				}
+			}
+		}
+	}
+	
 }
 
 void AMafiaBasePlayerState::ServerReqReady_Implementation(bool bReady)

@@ -9,7 +9,7 @@
 class UMafiaWorldDataManager;
 class UMafiaGameEvents;
 class UMafiaCheatManager;
-class UMafiaChairMan;
+class UMafiaChairManManager;
 /**
  * 
  */
@@ -48,7 +48,7 @@ public:
 	virtual bool ProcessConsoleExec(const TCHAR* Cmd, FOutputDevice& Ar, UObject* Executor) override;
 public:
 	UMafiaGameEvents* GetGameEvents() const;
-	FORCEINLINE UMafiaChairMan* GetChairMan() const { return MafiaChairMan; }
+	FORCEINLINE UMafiaChairManManager* GetChairMan() const { return MafiaChairManManager; }
 
 private:
 	void OnPreLoadMap(const FString& PreloadMapPath);
@@ -64,6 +64,8 @@ private:
 	UPROPERTY(Transient)
 	UMafiaCheatManager* MafiaCheatManager;
 
+
+	/** ktw - Only Has Server Instance */
 	UPROPERTY(Transient)
-	UMafiaChairMan* MafiaChairMan;
+	UMafiaChairManManager* MafiaChairManManager;
 };

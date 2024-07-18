@@ -5,18 +5,23 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Framework/Types/MafiaTypes.h"
-#include "GameFeatures/Mafia/Gameflow/MafiaChairMan.h"
 #include "MafiaBaseRoleComponent.generated.h"
 
 USTRUCT()
 struct FAffectedEvent
 {
 	GENERATED_BODY()
+
 public:
-	TWeakObjectPtr<UMafiaBaseRoleComponent> Other;
+	TWeakObjectPtr<class UMafiaBaseRoleComponent> Other;
+
+public:
+	/** ktw - Pred Definition */
+	friend bool operator< (const FAffectedEvent& A, const FAffectedEvent& B);
+	
 };
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(Abstract, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class MAFIA_API UMafiaBaseRoleComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -27,7 +32,6 @@ protected:
 
 protected:
 	virtual void BeginPlay() override;
-	
 
 public:
 	UFUNCTION()
@@ -42,19 +46,28 @@ public:
 	void SetDead(bool InDead);
 	FORCEINLINE bool IsDead() { return bDead; }
 
+	UFUNCTION()
+	void SetRoleName(FName InRoleName);
+	FORCEINLINE FName GetRoleName() { return RoleName; }
 
-	
-public:
 	UFUNCTION()
 	void UseAbility(class AMafiaPlayerState* InOther);
-
-	/** ktw - 서버에서 호출해야 합니다. */
+	
+public:
+	/** ktw - 아래 함수들은 모두 서버에서 호출해야 합니다. */
 	UFUNCTION()
 	void AffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 	
-	
+	/** ktw - 아래 함수들은 모두 서버에서 호출해야 합니다. */
+	UFUNCTION()
+	void FlushEvents();
+
+
 
 protected:
+	class UMafiaBaseGameInstance* GetServerInstance();
+
+private:
 	UFUNCTION(Server, Reliable)
 	void ServerReqSetTeam(EMafiaTeam InTeam);
 
@@ -64,6 +77,9 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerReqSetDead(bool InDead);
 
+	UFUNCTION(Server, Reliable)
+	void ServerReqSetRoleName(FName InRoleName);
+
 	/** ktw - 능력 사용 관련 함수들. */
 	UFUNCTION(Server, Reliable)
 	void ServerReqUseAbility(class AMafiaPlayerState* InOther);
@@ -71,8 +87,8 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void ClientAffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 
-protected:
-	class UMafiaBaseGameInstance* GetServerInstance();
+	UFUNCTION(Client, Reliable)
+	void ClientFlush();
 
 
 protected:
@@ -91,8 +107,14 @@ protected:
 	EMafiaRole RoleType;
 
 	UPROPERTY(Replicated)
+	FName RoleName;
+
+private:
+	UPROPERTY(Replicated)
 	uint8 bDead : 1;
+
 	
 	
-	TWeakObjectPtr<AMafiaPlayerState> OwningPlayerState;
+	
+	TWeakObjectPtr<class AMafiaBasePlayerState> OwningPlayerState;
 };

@@ -5,7 +5,7 @@
 #include "MafiaCore/Framework/System/MafiaGameEvents.h"
 #include "MafiaCore/Framework/Manager/MafiaCheatManager.h"
 #include "MafiaCore/Framework/GameModes/MafiaWorldSettings.h"
-#include "GameFeatures/Mafia/Gameflow/MafiaChairMan.h"
+#include "Framework/Manager/MafiaChairManManager.h"
 #include "Mafia.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -50,7 +50,7 @@ void UMafiaBaseGameInstance::Init()
 	}
 	else
 	{
-		MafiaChairMan = NewObject<UMafiaChairMan>(this, UMafiaChairMan::StaticClass());
+		MafiaChairManManager = NewObject<UMafiaChairManManager>(this, UMafiaChairManManager::StaticClass());
 	}
 
 	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UMafiaBaseGameInstance::OnPreLoadMap);
@@ -69,9 +69,9 @@ void UMafiaBaseGameInstance::Shutdown()
 		GameEvents = nullptr;
 	}
 
-	if (IsValid(MafiaChairMan))
+	if (IsValid(MafiaChairManManager))
 	{
-		MafiaChairMan = nullptr;
+		MafiaChairManManager = nullptr;
 	}
 
 	Super::Shutdown();

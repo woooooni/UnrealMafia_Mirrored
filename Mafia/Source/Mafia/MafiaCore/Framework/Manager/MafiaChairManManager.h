@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "MafiaCore/Framework/Types/MafiaTypes.h"
-#include "MafiaChairMan.generated.h"
+#include "MafiaChairManManager.generated.h"
 
 
 USTRUCT()
@@ -24,19 +24,9 @@ public:
 
 public:
 	/** ktw - Pred Definition */
-	friend bool operator < (const FUseAbilityEvent& A, const FUseAbilityEvent& B)
-	{
-		return A.Role > B.Role;
-	}
-
-	FORCEINLINE bool operator< (FUseAbilityEvent& Other) const
+	FORCEINLINE bool operator< (const FUseAbilityEvent& Other) const
 	{
 		return Role > Other.Role;
-	}
-
-	FORCEINLINE bool operator()(const FUseAbilityEvent& A, const FUseAbilityEvent& B) const
-	{
-		return A.Role > B.Role;
 	}
 };
 
@@ -44,12 +34,12 @@ public:
  *	ktw - Server에 존재하는 GameInstance만 이 객체를 가지고 있습니다.
  */
 UCLASS()
-class MAFIA_API UMafiaChairMan final : public UObject
+class MAFIA_API UMafiaChairManManager final : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	UMafiaChairMan(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UMafiaChairManManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
 	UFUNCTION()

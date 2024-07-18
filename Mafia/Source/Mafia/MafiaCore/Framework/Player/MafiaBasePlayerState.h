@@ -44,6 +44,10 @@ protected:
 	/** 플레이어 Role Component 생성. */
 	UFUNCTION()
 	UMafiaBaseRoleComponent* CreateRoleComponent(EMafiaRole InRole);
+
+private:
+	UFUNCTION()
+	void OnRepDebugRoleComponent();
 	
 protected:
 	/** 유저가 Ready버튼을 눌렀을때 */
@@ -51,7 +55,7 @@ protected:
 	uint8 bReadyForGame : 1;
 
 	/** Mafia Role */
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, ReplicatedUsing = OnRepDebugRoleComponent)
 	TObjectPtr<class UMafiaBaseRoleComponent> RoleComponent;
 
 };

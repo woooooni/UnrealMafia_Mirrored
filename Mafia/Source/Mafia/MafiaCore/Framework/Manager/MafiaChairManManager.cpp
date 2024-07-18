@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GameFeatures/Mafia/Gameflow/MafiaChairMan.h"
+#include "Framework/Manager/MafiaChairManManager.h"
 #include "Mafia/MafiaCore/Framework/System/MafiaLogChannels.h"
 #include "GameFeatures/Mafia/Framework/Player/MafiaPlayerState.h"
 #include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
@@ -10,7 +10,7 @@
 #include "Mafia.h"
 
 
-UMafiaChairMan::UMafiaChairMan(const FObjectInitializer& ObjectInitializer)
+UMafiaChairManManager::UMafiaChairManManager(const FObjectInitializer& ObjectInitializer)
 {
 	/**
 		ktw - TArray를 Heap으로 사용할 경우, Heapify를 먼저 호출해야합니다.
@@ -18,10 +18,11 @@ UMafiaChairMan::UMafiaChairMan(const FObjectInitializer& ObjectInitializer)
 	*/
 	
 	CachedAbilityEventsHeap.Reserve(16);
-	CachedAbilityEventsHeap.Heapify(FUseAbilityEvent::StaticStruct());
+	CachedAbilityEventsHeap.Heapify();
 }
 
-void UMafiaChairMan::AssigningAbilities()
+
+void UMafiaChairManManager::AssigningAbilities()
 {
 	UWorld* World = GetWorld();
 
@@ -48,13 +49,13 @@ void UMafiaChairMan::AssigningAbilities()
 	}
 }
 
-void UMafiaChairMan::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMafiaBasePlayerState* InDestination)
+void UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMafiaBasePlayerState* InDestination)
 {
 	FUseAbilityEvent Event;
 
 	if (nullptr == InOrigin || nullptr == InDestination)
 	{
-		MAFIA_ULOG(LogMafiaManager, Log, TEXT("UMafiaChairMan::AddAbilityEvent : InOrigin is Null or InDestination is Null"));
+		MAFIA_ULOG(LogMafiaManager, Log, TEXT("UMafiaChairManManager::AddAbilityEvent : InOrigin is Null or InDestination is Null"));
 		return;
 	}
 		
@@ -65,7 +66,7 @@ void UMafiaChairMan::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMafiaBase
 
 	if (Event.Origin.IsValid() == false || Event.Destination.IsValid() == false)
 	{
-		MAFIA_ULOG(LogMafiaManager, Log, TEXT("UMafiaChairMan::AddAbilityEvent : RoleComponent is Null"));
+		MAFIA_ULOG(LogMafiaManager, Log, TEXT("UMafiaChairManManager::AddAbilityEvent : RoleComponent is Null"));
 		return;
 	}
 
@@ -75,7 +76,7 @@ void UMafiaChairMan::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMafiaBase
 
 
 
-void UMafiaChairMan::FlushAbilityEvents()
+void UMafiaChairManManager::FlushAbilityEvents()
 {
 	for (auto& Event : CachedAbilityEventsHeap)
 	{
@@ -88,7 +89,7 @@ void UMafiaChairMan::FlushAbilityEvents()
 }
 
 
-bool UMafiaChairMan::MakeShuffledRoleArray(int32 InUserCount, OUT TArray<EMafiaRole>& OutSuffledArray)
+bool UMafiaChairManManager::MakeShuffledRoleArray(int32 InUserCount, OUT TArray<EMafiaRole>& OutSuffledArray)
 {
 	/** 
 	OutSuffledArray.Reserve(InUserCount);
@@ -98,13 +99,13 @@ bool UMafiaChairMan::MakeShuffledRoleArray(int32 InUserCount, OUT TArray<EMafiaR
 		FMath::IsWithin				: 이상 ~ 미만
 		FMath::IsWithinInclusive	: 이상 ~ 이하
 	*/
-	if (FMath::IsWithinInclusive<int32>(InUserCount, 4, 12) == false)
+	if (FMath::IsWithinInclusive<int32>(InUserCount, 1, 12) == false)
 	{
 		return false;
 	}
 		
 
-	TArray<EMafiaTeam> DistributionArray = TArray<EMafiaTeam>(GTeamDistributionArray.GetData(), InUserCount - 1);
+	TArray<EMafiaTeam> DistributionArray = TArray<EMafiaTeam>(GTeamDistributionArray.GetData(), InUserCount);
 	Algo::RandomShuffle<TArray<EMafiaTeam>>(DistributionArray);
 
 

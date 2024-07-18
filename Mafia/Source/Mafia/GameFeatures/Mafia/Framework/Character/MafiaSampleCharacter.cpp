@@ -53,6 +53,7 @@ AMafiaSampleCharacter::AMafiaSampleCharacter(const FObjectInitializer& ObjectIni
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -88), FRotator(0, 0, -90));
 }
 
 void AMafiaSampleCharacter::BeginPlay()
@@ -68,6 +69,21 @@ void AMafiaSampleCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+	}
+
+	ChangeColor(FVector(1.0, 0.0, 0.0), 0);
+}
+
+void AMafiaSampleCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+void AMafiaSampleCharacter::ChangeColor(FVector InColor, uint32 InMaterialIndex)
+{
+	if (GetMesh()->GetMaterial(InMaterialIndex))
+	{
+		GetMesh()->SetVectorParameterValueOnMaterials(TEXT("Tint"), InColor);
 	}
 }
 
