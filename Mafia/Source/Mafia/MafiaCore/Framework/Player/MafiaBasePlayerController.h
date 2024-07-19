@@ -60,7 +60,7 @@ private:
 	void CheatUseAbility(int32 InPlayerNum);
 
 	UFUNCTION(Server, Reliable)
-	void ServerReqUseAbility(int32 InPlayerNum);
+	void ServerReqUseAbility(class AMafiaBasePlayerState* InMyPlayerState, class AMafiaBasePlayerState* InOtherPlayerState);
 #pragma endregion
 
 

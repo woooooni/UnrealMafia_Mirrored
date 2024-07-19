@@ -207,12 +207,48 @@ void AMafiaBasePlayerController::CheatAssignAbility()
 
 void AMafiaBasePlayerController::CheatUseAbility(int32 InPlayerNum)
 {
-	ServerReqUseAbility(InPlayerNum);
+	if (AMafiaBasePlayerState* MyPlayerState = GetPlayerState<AMafiaBasePlayerState>())
+	{
+		UWorld* World = GetWorld();
+
+		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
+		{
+			if (0 >= InPlayerNum || GS->PlayerArray.IsValidIndex(InPlayerNum - 1) == false)
+			{
+				MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Invalid Player Number"));
+				return;
+			}
+
+			if (AMafiaBasePlayerState* OtherPlayerState = Cast<AMafiaBasePlayerState>(GS->PlayerArray[InPlayerNum - 1]))
+			{
+				if (MyPlayerState->GetUniqueId() != OtherPlayerState->GetUniqueId())
+				{
+					ServerReqUseAbility(MyPlayerState, OtherPlayerState);
+				}
+				else
+				{
+					MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("That Player is My Player"));
+				}
+				
+			}
+		}
+	}
+
+	
 }
 
-void AMafiaBasePlayerController::ServerReqUseAbility_Implementation(int32 InPlayerNum)
+void AMafiaBasePlayerController::ServerReqUseAbility_Implementation(AMafiaBasePlayerState* InMyPlayerState, AMafiaBasePlayerState* InOtherPlayerState)
 {
-
+	if (UMafiaBaseGameInstance* MafiaBaseGameInstance = UMafiaBaseGameInstance::Get(this))
+	{
+		if (MafiaBaseGameInstance->IsDedicatedServerInstance())
+		{
+			if (UMafiaChairManManager* MafiaChairManManager = MafiaBaseGameInstance->GetChairMan())
+			{
+				MafiaChairManManager->AddAbilityEvent(InMyPlayerState, InOtherPlayerState);
+			}
+		}
+	}
 }
 
 void AMafiaBasePlayerController::ServerReqAssignAbility_Implementation()
