@@ -56,6 +56,13 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerReqAssignAbility();
 
+	UFUNCTION(Exec)
+	void CheatUseAbility(int32 InPlayerNum);
+
+	UFUNCTION(Server, Reliable)
+	void ServerReqUseAbility(int32 InPlayerNum);
 #pragma endregion
+
+
 
 };

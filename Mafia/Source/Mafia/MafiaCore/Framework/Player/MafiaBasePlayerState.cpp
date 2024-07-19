@@ -44,7 +44,12 @@ UMafiaBaseRoleComponent* AMafiaBasePlayerState::AssignAbility(EMafiaRole InRole)
 {
 	if (HasAuthority())
 	{
-		return CreateRoleComponent(InRole);
+		RoleComponent = CreateRoleComponent(InRole);
+		if (IsValid(RoleComponent))
+		{
+			PostInitializeRoleComponent();
+		}
+		return RoleComponent;
 	}
 	
 	return nullptr;
@@ -52,20 +57,27 @@ UMafiaBaseRoleComponent* AMafiaBasePlayerState::AssignAbility(EMafiaRole InRole)
 
 UMafiaBaseRoleComponent* AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole InRole)
 {
+	if (IsValid(RoleComponent))
+	{
+		RoleComponent->DestroyComponent();
+		RoleComponent = nullptr;
+	}
+
+	UMafiaBaseRoleComponent* NewRoleComponent = nullptr;
 	switch (InRole)
 	{
 	case EMafiaRole::Citizen:
-		RoleComponent = NewObject<UMafiaCitizenRoleComponent>(this, UMafiaCitizenRoleComponent::StaticClass(), TEXT("RoleComponent"), RF_Transient);
+		NewRoleComponent = NewObject<UMafiaCitizenRoleComponent>(this);
 		break;
 	case EMafiaRole::Madam:
 		break;
 	case EMafiaRole::Police:
-		RoleComponent = NewObject<UMafiaPoliceRoleComponent>(this, UMafiaPoliceRoleComponent::StaticClass(), TEXT("RoleComponent"), RF_Transient);
+		NewRoleComponent = NewObject<UMafiaPoliceRoleComponent>(this);
 		break;
 	case EMafiaRole::Killer:
 		break;
 	case EMafiaRole::Mafia:
-		RoleComponent = NewObject<UMafiaGodFatherRoleComponent>(this, UMafiaGodFatherRoleComponent::StaticClass(), TEXT("RoleComponent"), RF_Transient);
+		NewRoleComponent = NewObject<UMafiaGodFatherRoleComponent>(this);
 		break;
 	case EMafiaRole::Vigilante:
 		break;
@@ -80,42 +92,34 @@ UMafiaBaseRoleComponent* AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole I
 	case EMafiaRole::Soldier:
 		break;
 	case EMafiaRole::Doctor:
-		RoleComponent = NewObject<UMafiaDoctorRoleComponent>(this, UMafiaDoctorRoleComponent::StaticClass(), TEXT("RoleComponent"), RF_Transient);
+		NewRoleComponent = NewObject<UMafiaDoctorRoleComponent>(this);
 		break;
 	default:
 		return nullptr;
 	}
 
-
-	if (IsValid(RoleComponent))
+	if (IsValid(NewRoleComponent))
 	{
-		RoleComponent->SetIsReplicated(true);
-		RoleComponent->RegisterComponent();
+		NewRoleComponent->SetIsReplicated(true);
+		NewRoleComponent->RegisterComponent();
 	}
 
-	return RoleComponent;
+	return NewRoleComponent;
 }
 
-void AMafiaBasePlayerState::OnRepDebugRoleComponent()
+void AMafiaBasePlayerState::PostInitializeRoleComponent_Implementation()
 {
-	UWorld* World = GetWorld();
-	if (IsValid(World))
-	{
-		AMafiaBasePlayerController* LocalPlayerController = Cast<AMafiaBasePlayerController>(World->GetFirstPlayerController());
-		if (LocalPlayerController)
-		{
-			if (AMafiaBasePlayerState* OtherPlayerState = LocalPlayerController->GetPlayerState<AMafiaBasePlayerState>())
-			{
-				if (OtherPlayerState->GetUniqueId() == GetUniqueId())
-				{
-					GEngine->AddOnScreenDebugMessage(32, 10.f, FColor::Red, FString::Printf(TEXT("My Role Is : %s"), *RoleComponent->GetRoleName().ToString()));
-					// MAFIA_ALOG(LogMafiaCharacter, Warning, TEXT("Unique Id : %s, My Role : %s"), *OtherPlayerState->GetUniqueId().ToString(), *RoleComponent->GetRoleName().ToString());
-				}
-			}
-		}
-	}
-	
+	/**	
+		### 클라이언트에서는 RoleComponent가 아직 리플리케이션 되지 않아 Valid 체크가 실패할 수 있습니다.
+		#Todo : ktw - Role Component를 생성하고 수행할 동작을 구현합니다.
+		
+		1. 클라이언트에서 실행됩니다. 
+		2. Server에서 Role Component가 생성된 후, 호출됩니다.
+		3. 좋은 함수이름있으면 변경해도 됩니다.
+	*/
+
 }
+
 
 void AMafiaBasePlayerState::ServerReqReady_Implementation(bool bReady)
 {

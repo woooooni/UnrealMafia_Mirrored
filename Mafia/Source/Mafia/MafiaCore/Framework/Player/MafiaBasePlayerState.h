@@ -30,6 +30,10 @@ public:
 	void ServerReqReady(bool bReady);
 	FORCEINLINE bool IsReadyForGame() const { return bReadyForGame; }
 
+protected:
+	UFUNCTION(Client, Reliable)
+	void PostInitializeRoleComponent();
+
 public:
 	/** ktw - 서버에서 호출해야 합니다. */
 	UFUNCTION()
@@ -41,13 +45,14 @@ public:
 
 
 protected:
-	/** 플레이어 Role Component 생성. */
+	/** 플레이어 Role Component 생성. AssignAbility에서 호출. */
 	UFUNCTION()
 	UMafiaBaseRoleComponent* CreateRoleComponent(EMafiaRole InRole);
 
-private:
-	UFUNCTION()
-	void OnRepDebugRoleComponent();
+	
+
+
+
 	
 protected:
 	/** 유저가 Ready버튼을 눌렀을때 */
@@ -55,7 +60,7 @@ protected:
 	uint8 bReadyForGame : 1;
 
 	/** Mafia Role */
-	UPROPERTY(Replicated, ReplicatedUsing = OnRepDebugRoleComponent)
+	UPROPERTY(Replicated)
 	TObjectPtr<class UMafiaBaseRoleComponent> RoleComponent;
 
 };

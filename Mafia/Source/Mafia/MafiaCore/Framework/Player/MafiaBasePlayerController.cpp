@@ -7,6 +7,7 @@
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameMode.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameState.h"
 #include "MafiaCore/Framework/System/MafiaBaseGameInstance.h"
+#include "Framework/Components/Role/MafiaBaseRoleComponent.h"
 #include "Framework/Manager/MafiaChairManManager.h"
 #include "MafiaCore/Framework/UI/Core/MafiaBaseHUD.h"
 #include "Mafia.h"
@@ -104,6 +105,38 @@ void AMafiaBasePlayerController::TickDebug(float DeltaSeconds)
 		const FString DebugString = FString::Printf(TEXT("bReady:%d"), PS->IsReadyForGame());
 		GEngine->AddOnScreenDebugMessage(PopupKey--, SMALL_NUMBER, FColor::Black, DebugString);
 	}
+
+	/** PlayerState:Role */
+	{
+		int32 PlayerNum = 1;
+		for (auto Pair : GS->GetJoinedUserPlayerStateMap())
+		{
+			AMafiaBasePlayerState* Val = Pair.Value.Get();
+			if (IsValid(Val))
+			{
+				if (UMafiaBaseRoleComponent* RoleComponent = Val->GetRoleComponent())
+				{
+					if (PS->GetUniqueId() == Val->GetUniqueId())
+					{
+						const FString DebugString = FString::Printf(TEXT("My Role : %s"), *RoleComponent->GetRoleName().ToString());
+						GEngine->AddOnScreenDebugMessage(PopupKey--, SMALL_NUMBER, FColor::Blue, DebugString);
+					}
+					else
+					{
+						const FString DebugString = FString::Printf(TEXT("Player %d Role : %s"), PlayerNum++, *RoleComponent->GetRoleName().ToString());
+						GEngine->AddOnScreenDebugMessage(PopupKey--, SMALL_NUMBER, FColor::Yellow, DebugString);
+					}
+					
+				}
+				else
+				{
+					const FString DebugString = FString::Printf(TEXT("%s Role : %s"), *Val->GetUniqueId().ToString(), TEXT("NONE"));
+					GEngine->AddOnScreenDebugMessage(PopupKey--, SMALL_NUMBER, FColor::Black, DebugString);
+				}
+			}
+		}
+		
+	}
 #endif
 }
 
@@ -170,6 +203,16 @@ void AMafiaBasePlayerController::CheatAssignAbility()
 		ServerReqAssignAbility();
 	}
 #endif
+}
+
+void AMafiaBasePlayerController::CheatUseAbility(int32 InPlayerNum)
+{
+	ServerReqUseAbility(InPlayerNum);
+}
+
+void AMafiaBasePlayerController::ServerReqUseAbility_Implementation(int32 InPlayerNum)
+{
+
 }
 
 void AMafiaBasePlayerController::ServerReqAssignAbility_Implementation()
