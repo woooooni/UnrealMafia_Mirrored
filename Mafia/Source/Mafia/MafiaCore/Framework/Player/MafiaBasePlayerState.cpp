@@ -8,6 +8,7 @@
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaPoliceRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaDoctorRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaGodFatherRoleComponent.h"
+#include "GameFeatures/Mafia/Framework/Character/MafiaSampleCharacter.h"
 #include "Net/UnrealNetwork.h"
 #include "Mafia.h"
 #include "Mafia/Framework/Player/MafiaPlayerController.h"
@@ -30,6 +31,17 @@ void AMafiaBasePlayerState::BeginPlay()
 {
 	MAFIA_ALOG(LogMafiaPlayerState, Log, TEXT("Begin"));
 	Super::BeginPlay();
+	if (HasAuthority())
+	{
+		if (UWorld* World = GetWorld())
+		{
+			if (APlayerController* PC = GetPlayerController())
+			{
+				AMafiaSampleCharacter* DefaultCharacter = World->SpawnActor<AMafiaSampleCharacter>(AMafiaSampleCharacter::StaticClass(), FVector(0, 0, 60), FRotator(0, 0, 0));
+				PC->SetPawn(DefaultCharacter);
+			}
+		}
+	}
 	MAFIA_ALOG(LogMafiaPlayerState, Log, TEXT("End. GetOwner:%s"), GetOwner() ? *GetOwner()->GetName() : TEXT("Other Client"));
 }
 
@@ -110,14 +122,13 @@ UMafiaBaseRoleComponent* AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole I
 void AMafiaBasePlayerState::PostInitializeRoleComponent_Implementation()
 {
 	/**	
-		### 클라이언트에서는 RoleComponent가 아직 리플리케이션 되지 않아 Valid 체크가 실패할 수 있습니다.
+		### 클라이언트에서는 RoleComponent가 아직 리플리케이션 되지 않아 Valid 체크가 실패할 수 있습니다. ###
 		#Todo : ktw - Role Component를 생성하고 수행할 동작을 구현합니다.
 		
 		1. 클라이언트에서 실행됩니다. 
 		2. Server에서 Role Component가 생성된 후, 호출됩니다.
 		3. 좋은 함수이름있으면 변경해도 됩니다.
 	*/
-
 }
 
 

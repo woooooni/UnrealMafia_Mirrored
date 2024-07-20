@@ -5,6 +5,8 @@
 #include "GameFeatures/Mafia/Framework/Player/MafiaPlayerState.h"
 #include "GameFeatures/Mafia/Framework/GameModes/MafiaGameState.h"
 #include "GameFeatures/Mafia/Framework/System/MafiaGameInstance.h"
+#include "MafiaCore/Framework/Player/MafiaBasePlayerController.h"
+#include "GameFeatures/Mafia/Framework/Character/MafiaSampleCharacter.h"
 #include "Mafia.h"
 #include "Net/UnrealNetwork.h"
 
@@ -214,4 +216,50 @@ bool operator<(const FAffectedEvent& A, const FAffectedEvent& B)
 	return false;
 }
 
-
+void UMafiaBaseRoleComponent::OnRepChangeRoleType()
+{
+	if (GetOwnerRole() != ROLE_Authority)
+	{
+		if (AMafiaBasePlayerState* PS = GetOwner<AMafiaBasePlayerState>())
+		{
+			if (AMafiaBasePlayerController* PC = Cast<AMafiaBasePlayerController>(PS->GetPlayerController()))
+			{
+				if (AMafiaSampleCharacter* Character = Cast<AMafiaSampleCharacter>(PC->GetPawn()))
+				{
+					switch (RoleType)
+					{
+					case EMafiaRole::Madam:
+						break;
+					case EMafiaRole::Police:
+						Character->ChangeColor(FLinearColor(0, 0, 1, 0), 0);
+						break;
+					case EMafiaRole::Killer:
+						break;
+					case EMafiaRole::Mafia:
+						Character->ChangeColor(FLinearColor(1, 0, 0, 0), 0);
+						break;
+					case EMafiaRole::Vigilante:
+						break;
+					case EMafiaRole::BusDriver:
+						break;
+					case EMafiaRole::Detective:
+						break;
+					case EMafiaRole::Spirit:
+						break;
+					case EMafiaRole::Thief:
+						break;
+					case EMafiaRole::Soldier:
+						break;
+					case EMafiaRole::Doctor:
+						Character->ChangeColor(FLinearColor(1, 1, 0, 0), 0);
+						break;
+					case EMafiaRole::Citizen:
+						break;
+					default:
+						break;
+					}
+				}
+			}
+		}
+	}
+}

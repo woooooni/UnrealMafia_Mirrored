@@ -8,8 +8,9 @@
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameState.h"
 #include "MafiaCore/Framework/System/MafiaBaseGameInstance.h"
 #include "Framework/Components/Role/MafiaBaseRoleComponent.h"
+#include "Framework/UI/Core/MafiaBaseHUD.h"
 #include "Framework/Manager/MafiaChairManManager.h"
-#include "MafiaCore/Framework/UI/Core/MafiaBaseHUD.h"
+#include "Mafia/Framework/Character/MafiaSampleCharacter.h"
 #include "Mafia.h"
 
 AMafiaBasePlayerController::AMafiaBasePlayerController(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -198,10 +199,11 @@ void AMafiaBasePlayerController::CheatSetReadyForGame(const bool bReady /*= true
 void AMafiaBasePlayerController::CheatAssignAbility()
 {
 #if ENABLE_CHEAT
-	if (ROLE_AutonomousProxy == GetLocalRole())
+	if (GetLocalRole()== ROLE_AutonomousProxy)
 	{
 		ServerReqAssignAbility();
 	}
+	
 #endif
 }
 
@@ -235,6 +237,14 @@ void AMafiaBasePlayerController::CheatUseAbility(int32 InPlayerNum)
 	}
 
 	
+}
+
+void AMafiaBasePlayerController::CheatChangeCharacterColor(int32 InRed, int32 InGreen, int32 InBlue, int32 InAlpha)
+{
+	if (AMafiaSampleCharacter* DefaultCharacter = GetPawn<AMafiaSampleCharacter>())
+	{
+		DefaultCharacter->ChangeColor(FLinearColor(InRed, InGreen, InBlue, InAlpha), 0);
+	}
 }
 
 void AMafiaBasePlayerController::ServerReqUseAbility_Implementation(AMafiaBasePlayerState* InMyPlayerState, AMafiaBasePlayerState* InOtherPlayerState)

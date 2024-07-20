@@ -90,6 +90,10 @@ private:
 	UFUNCTION(Client, Reliable)
 	void ClientFlush();
 
+private:
+	UFUNCTION()
+	virtual void OnRepChangeRoleType();
+
 
 protected:
 	/** ktw - 내가 능력을 볼 수 있는 플레이어의 Unique ID. */
@@ -103,7 +107,7 @@ protected:
 	UPROPERTY(Replicated)
 	EMafiaTeam TeamType;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, ReplicatedUsing = OnRepChangeRoleType)
 	EMafiaRole RoleType;
 
 	UPROPERTY(Replicated)
@@ -113,8 +117,6 @@ private:
 	UPROPERTY(Replicated)
 	uint8 bDead : 1;
 
-	
-	
 	
 	TWeakObjectPtr<class AMafiaBasePlayerState> OwningPlayerState;
 };

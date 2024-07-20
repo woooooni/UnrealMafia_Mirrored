@@ -45,6 +45,8 @@ AMafiaSampleCharacter::AMafiaSampleCharacter(const FObjectInitializer& ObjectIni
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	/*CameraBoom->bInheritPitch = false;
+	CameraBoom->SetRelativeLocationAndRotation(FVector(0, 0, 44), FRotator(-30, 0, 0));*/
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
@@ -62,16 +64,8 @@ void AMafiaSampleCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	// Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
-	}
 
-	ChangeColor(FVector(1.0, 0.0, 0.0), 0);
+	ChangeColor(FLinearColor(1.0, 0.0, 0.0), 0);
 }
 
 void AMafiaSampleCharacter::Tick(float DeltaTime)
@@ -79,11 +73,11 @@ void AMafiaSampleCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AMafiaSampleCharacter::ChangeColor(FVector InColor, uint32 InMaterialIndex)
+void AMafiaSampleCharacter::ChangeColor(FLinearColor InColor, uint32 InMaterialIndex)
 {
 	if (GetMesh()->GetMaterial(InMaterialIndex))
 	{
-		GetMesh()->SetVectorParameterValueOnMaterials(TEXT("Tint"), InColor);
+		GetMesh()->SetVectorParameterValueOnMaterials(TEXT("Tint"), FVector(InColor));
 	}
 }
 

@@ -30,7 +30,7 @@ public:
 	void ServerReqReady(bool bReady);
 	FORCEINLINE bool IsReadyForGame() const { return bReadyForGame; }
 
-protected:
+private:
 	UFUNCTION(Client, Reliable)
 	void PostInitializeRoleComponent();
 

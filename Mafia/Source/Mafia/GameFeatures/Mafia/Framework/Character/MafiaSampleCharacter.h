@@ -67,7 +67,7 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	
 public:
-	void ChangeColor(FVector InColor, uint32 InMaterialIndex);
+	void ChangeColor(FLinearColor InColor, uint32 InMaterialIndex);
 
 public:
 	/** Returns CameraBoom subobject **/
