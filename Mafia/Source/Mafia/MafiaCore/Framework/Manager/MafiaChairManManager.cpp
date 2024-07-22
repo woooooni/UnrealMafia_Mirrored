@@ -2,10 +2,11 @@
 
 
 #include "Framework/Manager/MafiaChairManManager.h"
-#include "Mafia/MafiaCore/Framework/System/MafiaLogChannels.h"
-#include "GameFeatures/Mafia/Framework/Player/MafiaPlayerState.h"
+#include "MafiaCore/Framework/System/MafiaLogChannels.h"
+#include "MafiaCore/Framework/GameModes/MafiaBaseGameMode.h"
 #include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
 #include "Framework/GameModes/MafiaBaseGameState.h"
+#include "GameFeatures/Mafia/Framework/Player/MafiaPlayerState.h"
 #include "Algo/RandomShuffle.h"
 #include "Mafia.h"
 
@@ -22,7 +23,7 @@ UMafiaChairManManager::UMafiaChairManManager(const FObjectInitializer& ObjectIni
 }
 
 
-void UMafiaChairManManager::AssigningAbilities()
+void UMafiaChairManManager::AssigningAllPlayersAbility()
 {
 	UWorld* World = GetWorld();
 
@@ -51,7 +52,7 @@ void UMafiaChairManManager::AssigningAbilities()
 
 void UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMafiaBasePlayerState* InDestination)
 {
-	FUseAbilityEvent Event;
+	FUseAbilityEventData Event;
 
 	if (nullptr == InOrigin || nullptr == InDestination)
 	{
@@ -86,6 +87,26 @@ void UMafiaChairManManager::FlushAbilityEvents()
 		}
 	}
 	CachedAbilityEventsHeap.Empty();
+}
+
+void UMafiaChairManManager::BeginVote()
+{
+	
+}
+
+void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InOrigin, AMafiaBasePlayerState* InDestination)
+{
+
+}
+
+void UMafiaChairManManager::FlushVote()
+{
+
+}
+
+void UMafiaChairManManager::EndVote()
+{
+	
 }
 
 
@@ -132,4 +153,20 @@ bool UMafiaChairManManager::MakeShuffledRoleArray(int32 InUserCount, OUT TArray<
 	
 	Algo::RandomShuffle<TArray<EMafiaRole>>(OutSuffledArray);
 	return true;
+}
+
+bool UMafiaChairManManager::IsPossibleVote()
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (AMafiaBaseGameMode* GameMode = World->GetAuthGameMode<AMafiaBaseGameMode>())
+		{
+			if (AMafiaBaseGameState* GS = GameMode->GetGameState<AMafiaBaseGameState>())
+			{
+				return EMafiaFlowState::Vote == GS->GetMafiaFlowState();
+			}
+		}
+
+	}
+	return false;
 }

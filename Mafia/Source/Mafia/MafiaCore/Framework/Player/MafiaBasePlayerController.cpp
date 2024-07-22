@@ -209,6 +209,7 @@ void AMafiaBasePlayerController::CheatAssignAbility()
 
 void AMafiaBasePlayerController::CheatUseAbility(int32 InPlayerNum)
 {
+#if ENABLE_CHEAT
 	if (AMafiaBasePlayerState* MyPlayerState = GetPlayerState<AMafiaBasePlayerState>())
 	{
 		UWorld* World = GetWorld();
@@ -231,24 +232,26 @@ void AMafiaBasePlayerController::CheatUseAbility(int32 InPlayerNum)
 				{
 					MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("That Player is My Player"));
 				}
-				
 			}
 		}
 	}
 
-	
+#endif
 }
 
 void AMafiaBasePlayerController::CheatChangeCharacterColor(int32 InRed, int32 InGreen, int32 InBlue, int32 InAlpha)
 {
+#if ENABLE_CHEAT
 	if (AMafiaSampleCharacter* DefaultCharacter = GetPawn<AMafiaSampleCharacter>())
 	{
 		DefaultCharacter->ChangeColor(FLinearColor(InRed, InGreen, InBlue, InAlpha), 0);
 	}
+#endif
 }
 
 void AMafiaBasePlayerController::ServerReqUseAbility_Implementation(AMafiaBasePlayerState* InMyPlayerState, AMafiaBasePlayerState* InOtherPlayerState)
 {
+#if ENABLE_CHEAT
 	if (UMafiaBaseGameInstance* MafiaBaseGameInstance = UMafiaBaseGameInstance::Get(this))
 	{
 		if (MafiaBaseGameInstance->IsDedicatedServerInstance())
@@ -259,21 +262,23 @@ void AMafiaBasePlayerController::ServerReqUseAbility_Implementation(AMafiaBasePl
 			}
 		}
 	}
+#endif
 }
 
 void AMafiaBasePlayerController::ServerReqAssignAbility_Implementation()
 {
+#if ENABLE_CHEAT
 	if (UMafiaBaseGameInstance* MafiaBaseGameInstance = UMafiaBaseGameInstance::Get(this))
 	{
 		if (MafiaBaseGameInstance->IsDedicatedServerInstance())
 		{
 			if (UMafiaChairManManager* MafiaChairManManager = MafiaBaseGameInstance->GetChairMan())
 			{
-				MafiaChairManManager->AssigningAbilities();
+				MafiaChairManManager->AssigningAllPlayersAbility();
 			}
 		}
 	}
-
+#endif
 }
 
-#pragma endregion|
+#pragma endregion

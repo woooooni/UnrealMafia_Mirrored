@@ -17,7 +17,7 @@ public:
 
 public:
 	/** ktw - Pred Definition */
-	friend bool operator< (const FAffectedEvent& A, const FAffectedEvent& B);
+	friend bool operator < (const FAffectedEvent& A, const FAffectedEvent& B);
 	
 };
 
@@ -28,7 +28,7 @@ class MAFIA_API UMafiaBaseRoleComponent : public UActorComponent
 
 protected:	
 	UMafiaBaseRoleComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -54,14 +54,23 @@ public:
 	void UseAbility(class AMafiaPlayerState* InOther);
 	
 public:
-	/** ktw - 아래 함수들은 모두 서버에서 호출해야 합니다. */
+	/** 
+		ktw - 아래 함수는 서버에서 호출해야합니다.
+	*/
 	UFUNCTION()
 	void AffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 	
-	/** ktw - 아래 함수들은 모두 서버에서 호출해야 합니다. */
+	/** 
+		ktw - 아래 함수는 서버에서 호출해야합니다.
+	*/
 	UFUNCTION()
 	void FlushEvents();
 
+	/** 
+		ktw - 아래 함수는 서버에서 호출해야합니다.
+	*/
+	UFUNCTION()
+	void PostVoteEvent(AMafiaBasePlayerState* InDestination, bool InSucceed);
 
 
 protected:
@@ -88,20 +97,14 @@ private:
 	void ClientAffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 
 	UFUNCTION(Client, Reliable)
-	void ClientFlush();
+	void ClientAffectedEventsFlush();
+
+	UFUNCTION(Client, Reliable)
+	void ClientPostVoteEvent(class AMafiaBasePlayerState* InDestination, bool InSucceed);
 
 private:
 	UFUNCTION()
 	virtual void OnRepChangeRoleType();
-
-
-protected:
-	/** ktw - 내가 능력을 볼 수 있는 플레이어의 Unique ID. */
-	TSet<uint32> VisiblePlayer;
-	
-	/** ktw - 이번 턴에 내가 처리할 이벤트 목록. */
-	TArray<FAffectedEvent> CachedAffectedEventsHeap;
-
 
 protected:
 	UPROPERTY(Replicated)
@@ -113,10 +116,17 @@ protected:
 	UPROPERTY(Replicated)
 	FName RoleName;
 
+protected:
+	/** ktw - 내가 능력을 볼 수 있는 플레이어의 Unique ID. */
+	TSet<uint32> VisiblePlayerSet;
+
+	/** ktw - 이번 턴에 내가 처리할 이벤트 목록. */
+	TArray<FAffectedEvent> CachedAffectedEventsHeap;
+
 private:
 	UPROPERTY(Replicated)
 	uint8 bDead : 1;
 
-	
+private:
 	TWeakObjectPtr<class AMafiaBasePlayerState> OwningPlayerState;
 };

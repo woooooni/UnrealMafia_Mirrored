@@ -115,7 +115,19 @@ void UMafiaBaseRoleComponent::FlushEvents()
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
-		ClientFlush();
+		ClientAffectedEventsFlush();
+	}
+	else
+	{
+		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("서버에서 호출해야합니다."));
+	}
+}
+
+void UMafiaBaseRoleComponent::PostVoteEvent(AMafiaBasePlayerState* InDestination, bool InSucceed)
+{
+	if (ENetRole::ROLE_Authority == GetOwnerRole())
+	{
+		ClientPostVoteEvent(InDestination, InSucceed);
 	}
 	else
 	{
@@ -132,13 +144,19 @@ void UMafiaBaseRoleComponent::ClientAffectedByOther_Implementation(EMafiaRole In
 	CachedAffectedEventsHeap.HeapPush(Event);
 }
 
-void UMafiaBaseRoleComponent::ClientFlush_Implementation()
+void UMafiaBaseRoleComponent::ClientAffectedEventsFlush_Implementation()
 {
 	for (auto Event : CachedAffectedEventsHeap)
 	{
 		/** Todo : ktw - 실제 UI처리 및 동작 처리! */
 	}
 	CachedAffectedEventsHeap.Empty();
+}
+
+void UMafiaBaseRoleComponent::ClientPostVoteEvent_Implementation(AMafiaBasePlayerState* InDestination, bool InSucceed)
+{
+
+
 }
 
 UMafiaBaseGameInstance* UMafiaBaseRoleComponent::GetServerInstance()
@@ -202,7 +220,7 @@ void UMafiaBaseRoleComponent::ServerReqSetRoleName_Implementation(FName InRoleNa
 	RoleName = InRoleName;
 }
 
-bool operator<(const FAffectedEvent& A, const FAffectedEvent& B)
+bool operator < (const FAffectedEvent& A, const FAffectedEvent& B)
 {
 	if (A.Other.IsValid() && B.Other.IsValid())
 	{
@@ -215,6 +233,8 @@ bool operator<(const FAffectedEvent& A, const FAffectedEvent& B)
 	}
 	return false;
 }
+
+
 
 void UMafiaBaseRoleComponent::OnRepChangeRoleType()
 {

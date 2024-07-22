@@ -63,4 +63,8 @@ protected:
 	UPROPERTY(Replicated)
 	TObjectPtr<class UMafiaBaseRoleComponent> RoleComponent;
 
+	/** */
+	UPROPERTY(Replicated)
+	uint8 VoteCount;
+
 };

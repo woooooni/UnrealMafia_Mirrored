@@ -9,7 +9,7 @@
 
 
 USTRUCT()
-struct FUseAbilityEvent
+struct FUseAbilityEventData
 {
 	GENERATED_BODY()
 
@@ -24,11 +24,13 @@ public:
 
 public:
 	/** ktw - Pred Definition */
-	FORCEINLINE bool operator< (const FUseAbilityEvent& Other) const
+	FORCEINLINE bool operator< (const FUseAbilityEventData& Other) const
 	{
 		return Role > Other.Role;
 	}
 };
+
+
 
 /**
  *	ktw - Server에 존재하는 GameInstance만 이 객체를 가지고 있습니다.
@@ -43,25 +45,38 @@ public:
 
 public:
 	UFUNCTION()
-	void AssigningAbilities();
+	void AssigningAllPlayersAbility();
 
 public:
-	/** 
-		ktw - Start -> Destination으로 향하는 능력 사용 이벤트를 Heap에 임시 저장합니다. 
-		InOrigin : 능력 사용 Player, InDestination : 능력에 영향을 받은 Player.
-	*/
+	/** ktw - Origin -> Destination으로 향하는 능력 사용 이벤트를 Heap에 임시 저장합니다.  */
+	// InOrigin : 능력 사용 Player, InDestination : 능력에 영향을 받은 Player.
 	UFUNCTION()
 	void AddAbilityEvent(class AMafiaBasePlayerState* InOrigin, class AMafiaBasePlayerState* InDestination);
 
-	/** ktw - Heap에 저장된 이벤트들을 순회하면서 Flush합니다. */
+	/** ktw - Heap에 저장된 능력 이벤트들을 순회하면서 Flush합니다. */
 	UFUNCTION()
 	void FlushAbilityEvents();
 
 
+public:
+	UFUNCTION()
+	void BeginVote();
+
+	UFUNCTION()
+	void AddVoteEvent(class AMafiaBasePlayerState* InOrigin, class AMafiaBasePlayerState* InDestination);
+
+	UFUNCTION()
+	void FlushVote();
+
+	UFUNCTION()
+	void EndVote();
+
+
 protected:
 	bool MakeShuffledRoleArray(int32 InPlayerCount, OUT TArray<EMafiaRole>& OutSuffledArray);
+	bool IsPossibleVote();
 
 private:
 	/* ktw - EMafiaRole에 선언된 Role의 값을 순서로 Event를 정렬합니다. */
-	TArray<FUseAbilityEvent> CachedAbilityEventsHeap;
+	TArray<FUseAbilityEventData> CachedAbilityEventsHeap;
 };
