@@ -67,6 +67,15 @@ enum class EMafiaRole : uint8
 	Citizen,		/* 일반 시민 */
 };
 
+UENUM()
+enum class EMafiaVoteFlag : uint8
+{
+	ImpossibleVote,
+	NoHasOwningPlayerState,
+	InvalidAccountId,
+	Succeed,
+};
+
 /** ktw - 게임 플레이 시민팀 필수 직업입니다. */
 const static TArray<EMafiaRole> GCitizenEssentialRoleArray =
 { 
