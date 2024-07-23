@@ -52,6 +52,9 @@ public:
 
 	UFUNCTION()
 	void UseAbility(class AMafiaPlayerState* InOther);
+
+	UFUNCTION()
+	FORCEINLINE const class AMafiaBasePlayerState* GetOwningPlayerState() const { return OwningPlayerState.Get(); }
 	
 public:
 	/** 
@@ -66,11 +69,17 @@ public:
 	UFUNCTION()
 	void FlushEvents();
 
+	/**
+		ktw - 아래 함수는 서버에서 호출해야합니다.
+	*/
+	UFUNCTION()
+	void PreVoteEvent();
+
 	/** 
 		ktw - 아래 함수는 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
-	void PostVoteEvent(AMafiaBasePlayerState* InDestination, bool InSucceed);
+	void PostVoteEvent(UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag);
 
 
 protected:
@@ -100,7 +109,10 @@ private:
 	void ClientAffectedEventsFlush();
 
 	UFUNCTION(Client, Reliable)
-	void ClientPostVoteEvent(class AMafiaBasePlayerState* InDestination, bool InSucceed);
+	void ClientPreVoteEvent();
+
+	UFUNCTION(Client, Reliable)
+	void ClientPostVoteEvent(class UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag);
 
 private:
 	UFUNCTION()
@@ -128,5 +140,6 @@ private:
 	uint8 bDead : 1;
 
 private:
+	UPROPERTY(Replicated)
 	TWeakObjectPtr<class AMafiaBasePlayerState> OwningPlayerState;
 };

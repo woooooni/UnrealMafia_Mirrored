@@ -56,7 +56,7 @@ void UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMa
 
 	if (nullptr == InOrigin || nullptr == InDestination)
 	{
-		MAFIA_ULOG(LogMafiaManager, Log, TEXT("UMafiaChairManManager::AddAbilityEvent : InOrigin is Null or InDestination is Null"));
+		MAFIA_ULOG(LogMafiaChairMan, Log, TEXT("UMafiaChairManManager::AddAbilityEvent : InOrigin is Null or InDestination is Null"));
 		return;
 	}
 		
@@ -67,7 +67,7 @@ void UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMa
 
 	if (Event.Origin.IsValid() == false || Event.Destination.IsValid() == false)
 	{
-		MAFIA_ULOG(LogMafiaManager, Log, TEXT("UMafiaChairManManager::AddAbilityEvent : RoleComponent is Null"));
+		MAFIA_ULOG(LogMafiaChairMan, Log, TEXT("UMafiaChairManManager::AddAbilityEvent : RoleComponent is Null"));
 		return;
 	}
 
@@ -77,7 +77,7 @@ void UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMa
 
 
 
-void UMafiaChairManManager::FlushAbilityEvents()
+void UMafiaChairManManager::DispatchAbilityEvents()
 {
 	for (auto& Event : CachedAbilityEventsHeap)
 	{
@@ -89,25 +89,90 @@ void UMafiaChairManManager::FlushAbilityEvents()
 	CachedAbilityEventsHeap.Empty();
 }
 
-void UMafiaChairManManager::BeginVote()
+void UMafiaChairManManager::RequestFlushAbilityEvents() const
 {
-	
+	if (UWorld* World = GetWorld())
+	{
+		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
+		{
+			for (auto& Pair : GS->GetJoinedUserPlayerStateMap())
+			{
+				if (Pair.Value.IsValid())
+				{
+					if (AMafiaBasePlayerState* PS = Pair.Value.Get())
+					{
+						if (UMafiaBaseRoleComponent* RoleComponent = PS->GetRoleComponent())
+						{
+							RoleComponent->FlushEvents();
+						}
+					}
+				}
+				else
+				{
+					MAFIA_ULOG(LogMafiaChairMan, Error, TEXT("PlayerState Is Invalid."));
+				}
+			}
+		}
+	}
 }
 
-void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InOrigin, AMafiaBasePlayerState* InDestination)
+void UMafiaChairManManager::StartVote()
 {
-
+	CachedVoteMap.Empty();
 }
 
-void UMafiaChairManManager::FlushVote()
+void UMafiaChairManManager::AddVoteEvent(UMafiaBaseRoleComponent* InOrigin, UMafiaBaseRoleComponent* InDestination)
 {
+	InOrigin->PreVoteEvent();
 
+	EMafiaVoteFlag Flag = EMafiaVoteFlag::ImpossibleVote;
+	if (IsPossibleVote())
+	{
+		if (const AMafiaBasePlayerState* PS = InOrigin->GetOwningPlayerState())
+		{
+			const FString& AccountIdStr = PS->GetUniqueId().ToString();
+			if (AccountIdStr.IsEmpty())
+			{
+				Flag = EMafiaVoteFlag::InvalidAccountId;
+				MAFIA_ULOG(LogMafiaChairMan, Warning, TEXT("AccountIdStr is empty"));
+				InOrigin->PostVoteEvent(InDestination, Flag);
+				return;
+			}
+
+			const FName AccountId = FName(*AccountIdStr);
+			FPlayerVoteData* Pair = CachedVoteMap.Find(AccountId);
+
+			if (Pair)
+			{
+				Pair->VotedCount++;
+			}
+			else
+			{
+				FPlayerVoteData VoteData;
+				VoteData.Origin = InOrigin;
+				VoteData.Destination = InDestination;
+				VoteData.VotedCount = 1;
+
+				CachedVoteMap.Emplace(AccountId, VoteData);
+			}
+
+			Flag = EMafiaVoteFlag::Succeed;
+		}
+		else
+		{
+			Flag = EMafiaVoteFlag::NoHasOwningPlayerState;
+		}
+		
+	}
+
+	InOrigin->PostVoteEvent(InDestination, Flag);
 }
 
 void UMafiaChairManManager::EndVote()
 {
-	
+	CachedVoteMap.Empty();
 }
+
 
 
 bool UMafiaChairManManager::MakeShuffledRoleArray(int32 InUserCount, OUT TArray<EMafiaRole>& OutSuffledArray)
@@ -159,14 +224,10 @@ bool UMafiaChairManManager::IsPossibleVote()
 {
 	if (UWorld* World = GetWorld())
 	{
-		if (AMafiaBaseGameMode* GameMode = World->GetAuthGameMode<AMafiaBaseGameMode>())
+		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
 		{
-			if (AMafiaBaseGameState* GS = GameMode->GetGameState<AMafiaBaseGameState>())
-			{
-				return EMafiaFlowState::Vote == GS->GetMafiaFlowState();
-			}
+			return EMafiaFlowState::Vote == GS->GetMafiaFlowState();
 		}
-
 	}
 	return false;
 }

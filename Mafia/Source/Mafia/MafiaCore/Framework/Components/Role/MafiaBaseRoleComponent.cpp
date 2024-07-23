@@ -26,6 +26,7 @@ void UMafiaBaseRoleComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	DOREPLIFETIME(UMafiaBaseRoleComponent, RoleType);
 	DOREPLIFETIME(UMafiaBaseRoleComponent, bDead);
 	DOREPLIFETIME(UMafiaBaseRoleComponent, RoleName);
+	DOREPLIFETIME(UMafiaBaseRoleComponent, OwningPlayerState);
 }
 
 
@@ -89,7 +90,7 @@ void UMafiaBaseRoleComponent::SetRoleName(FName InRoleName)
 
 void UMafiaBaseRoleComponent::UseAbility(AMafiaPlayerState* InOther)
 {
-	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy)
+	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy == GetOwnerRole())
 	{
 		ServerReqUseAbility(InOther);
 	}
@@ -123,11 +124,19 @@ void UMafiaBaseRoleComponent::FlushEvents()
 	}
 }
 
-void UMafiaBaseRoleComponent::PostVoteEvent(AMafiaBasePlayerState* InDestination, bool InSucceed)
+void UMafiaBaseRoleComponent::PreVoteEvent()
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
-		ClientPostVoteEvent(InDestination, InSucceed);
+		ClientPreVoteEvent();
+	}
+}
+
+void UMafiaBaseRoleComponent::PostVoteEvent(UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag)
+{
+	if (ENetRole::ROLE_Authority == GetOwnerRole())
+	{
+		ClientPostVoteEvent(InDestination, InFlag);
 	}
 	else
 	{
@@ -137,8 +146,8 @@ void UMafiaBaseRoleComponent::PostVoteEvent(AMafiaBasePlayerState* InDestination
 
 void UMafiaBaseRoleComponent::ClientAffectedByOther_Implementation(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
 {
-	/** ktw - 클라이언트에서 실행됩니다. */
-	/** Todo : ktw -  서버가 직접 이벤트를 넣어줄 지 아니면, 클라이언트가 신호를 받아서 이벤트를 넣어 두고 한 번에 Flush? */
+	/** ktw : 클라이언트에서 실행됩니다. */
+	/** Todo - ktw :  서버가 직접 이벤트를 넣어줄 지 아니면, 클라이언트가 신호를 받아서 이벤트를 넣어 두고 한 번에 Flush? */
 	FAffectedEvent Event;
 	Event.Other = InOther;
 	CachedAffectedEventsHeap.HeapPush(Event);
@@ -146,18 +155,108 @@ void UMafiaBaseRoleComponent::ClientAffectedByOther_Implementation(EMafiaRole In
 
 void UMafiaBaseRoleComponent::ClientAffectedEventsFlush_Implementation()
 {
-	for (auto Event : CachedAffectedEventsHeap)
+	/** ktw : 클라이언트에서 실행됩니다. */
+	if (OwningPlayerState.IsValid())
 	{
-		/** Todo : ktw - 실제 UI처리 및 동작 처리! */
+		if (APlayerController* PC = OwningPlayerState.Get()->GetPlayerController())
+		{
+			if (PC->GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
+			{
+				/** Todo - ktw : 영향 받은 플레이어에 대해 처리. */
+				CachedAffectedEventsHeap.Empty();
+			}
+		}
 	}
-	CachedAffectedEventsHeap.Empty();
+	
 }
 
-void UMafiaBaseRoleComponent::ClientPostVoteEvent_Implementation(AMafiaBasePlayerState* InDestination, bool InSucceed)
+void UMafiaBaseRoleComponent::ClientPreVoteEvent_Implementation()
 {
-
-
+	/** ktw : 클라이언트에서 실행됩니다. */
+	if (OwningPlayerState.IsValid())
+	{
+		if (APlayerController* PC = OwningPlayerState.Get()->GetPlayerController())
+		{
+			if (PC->GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
+			{
+				/** Todo - ktw : 투표 이전 실행할 기능 추가. */
+				
+			}
+		}
+	}
 }
+
+void UMafiaBaseRoleComponent::ClientPostVoteEvent_Implementation(UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag)
+{
+	/** ktw : 클라이언트에서 실행됩니다. */
+	if (OwningPlayerState.IsValid())
+	{
+		if (APlayerController* PC = OwningPlayerState.Get()->GetPlayerController())
+		{
+			if (PC->GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
+			{
+				/** Todo - ktw : 투표 Flag당 실행할 기능 추가. */
+				switch (InFlag)
+				{
+				case EMafiaVoteFlag::ImpossibleVote:
+					break;
+				case EMafiaVoteFlag::NoHasOwningPlayerState:
+					break;
+				case EMafiaVoteFlag::InvalidAccountId:
+					break;
+				case EMafiaVoteFlag::Succeed:
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+}
+
+
+
+
+void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaPlayerState* InOther)
+{
+	/** ktw - 서버에서 실행됩니다. */
+	if (UMafiaBaseGameInstance* GI = GetServerInstance())
+	{
+		if (OwningPlayerState.IsValid())
+		{
+			if (UMafiaChairManManager* ChairManManager = GI->GetChairMan())
+			{
+				ChairManManager->AddAbilityEvent(OwningPlayerState.Get(), InOther);
+			}
+		}
+	}
+}
+
+void UMafiaBaseRoleComponent::ServerReqSetTeam_Implementation(EMafiaTeam InTeam)
+{
+	/** ktw : 서버에서 실행됩니다. */
+	TeamType = InTeam;
+}
+
+void UMafiaBaseRoleComponent::ServerReqSetRole_Implementation(EMafiaRole InRole)
+{
+	/** ktw : 서버에서 실행됩니다. */
+	RoleType = InRole;
+}
+
+void UMafiaBaseRoleComponent::ServerReqSetDead_Implementation(bool InDead)
+{
+	/** ktw : 서버에서 실행됩니다. */
+	bDead = InDead;
+}
+
+void UMafiaBaseRoleComponent::ServerReqSetRoleName_Implementation(FName InRoleName)
+{
+	/** ktw : 서버에서 실행됩니다. */
+	RoleName = InRoleName;
+}
+
+
 
 UMafiaBaseGameInstance* UMafiaBaseRoleComponent::GetServerInstance()
 {
@@ -181,45 +280,6 @@ UMafiaBaseGameInstance* UMafiaBaseRoleComponent::GetServerInstance()
 	return nullptr;
 }
 
-void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaPlayerState* InOther)
-{
-	/** ktw - 서버에서 실행됩니다. */
-	if (UMafiaBaseGameInstance* GI = GetServerInstance())
-	{
-		if (OwningPlayerState.IsValid())
-		{
-			if (UMafiaChairManManager* ChairManManager = GI->GetChairMan())
-			{
-				ChairManManager->AddAbilityEvent(OwningPlayerState.Get(), InOther);
-			}
-		}
-	}
-}
-
-void UMafiaBaseRoleComponent::ServerReqSetTeam_Implementation(EMafiaTeam InTeam)
-{
-	/** ktw - 서버에서 실행됩니다. */
-	TeamType = InTeam;
-}
-
-void UMafiaBaseRoleComponent::ServerReqSetRole_Implementation(EMafiaRole InRole)
-{
-	/** ktw - 서버에서 실행됩니다. */
-	RoleType = InRole;
-}
-
-void UMafiaBaseRoleComponent::ServerReqSetDead_Implementation(bool InDead)
-{
-	/** ktw - 서버에서 실행됩니다. */
-	bDead = InDead;
-}
-
-void UMafiaBaseRoleComponent::ServerReqSetRoleName_Implementation(FName InRoleName)
-{
-	/** ktw - 서버에서 실행됩니다. */
-	RoleName = InRoleName;
-}
-
 bool operator < (const FAffectedEvent& A, const FAffectedEvent& B)
 {
 	if (A.Other.IsValid() && B.Other.IsValid())
@@ -236,9 +296,10 @@ bool operator < (const FAffectedEvent& A, const FAffectedEvent& B)
 
 
 
+
 void UMafiaBaseRoleComponent::OnRepChangeRoleType()
 {
-	if (GetOwnerRole() != ROLE_Authority)
+	if (GetOwnerRole() == ROLE_AutonomousProxy)
 	{
 		if (AMafiaBasePlayerState* PS = GetOwner<AMafiaBasePlayerState>())
 		{
@@ -251,12 +312,12 @@ void UMafiaBaseRoleComponent::OnRepChangeRoleType()
 					case EMafiaRole::Madam:
 						break;
 					case EMafiaRole::Police:
-						Character->ChangeColor(FLinearColor(0, 0, 1, 0), 0);
+						Character->ChangeColor(FLinearColor(0, 0, 1), 0);
 						break;
 					case EMafiaRole::Killer:
 						break;
 					case EMafiaRole::Mafia:
-						Character->ChangeColor(FLinearColor(1, 0, 0, 0), 0);
+						Character->ChangeColor(FLinearColor(1, 0, 0), 0);
 						break;
 					case EMafiaRole::Vigilante:
 						break;
@@ -271,7 +332,7 @@ void UMafiaBaseRoleComponent::OnRepChangeRoleType()
 					case EMafiaRole::Soldier:
 						break;
 					case EMafiaRole::Doctor:
-						Character->ChangeColor(FLinearColor(1, 1, 0, 0), 0);
+						Character->ChangeColor(FLinearColor(1, 1, 0), 0);
 						break;
 					case EMafiaRole::Citizen:
 						break;
