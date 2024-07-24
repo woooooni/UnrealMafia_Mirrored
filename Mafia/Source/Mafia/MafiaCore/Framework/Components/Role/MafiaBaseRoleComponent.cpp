@@ -132,11 +132,11 @@ void UMafiaBaseRoleComponent::PreVoteEvent()
 	}
 }
 
-void UMafiaBaseRoleComponent::ResponseVoteEvent(UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag)
+void UMafiaBaseRoleComponent::ResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag)
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
-		ClientResponseVoteEvent(InDestination, InFlag);
+		ClientResponseVoteEvent(InCandidate, InFlag);
 	}
 	else
 	{
@@ -186,12 +186,12 @@ void UMafiaBaseRoleComponent::ClientPreVoteEvent_Implementation()
 	}
 }
 
-void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag)
+void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag)
 {
 	/** ktw : 클라이언트에서 실행됩니다. */
 	if (OwningPlayerState.IsValid())
 	{
-		if (APlayerController* PC = OwningPlayerState.Get()->GetPlayerController())
+		if (APlayerController* PC = (OwningPlayerState.Get()->GetPlayerController()))
 		{
 			if (PC->GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
 			{

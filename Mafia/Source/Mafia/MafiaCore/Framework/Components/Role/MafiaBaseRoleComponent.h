@@ -54,7 +54,7 @@ public:
 	void UseAbility(class AMafiaPlayerState* InOther);
 
 	UFUNCTION()
-	FORCEINLINE const class AMafiaBasePlayerState* GetOwningPlayerState() const { return OwningPlayerState.Get(); }
+	FORCEINLINE class AMafiaBasePlayerState* GetOwningPlayerState() const { return OwningPlayerState.Get(); }
 	
 public:
 	/** 
@@ -79,7 +79,7 @@ public:
 		ktw - 아래 함수는 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
-	void ResponseVoteEvent(UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag);
+	void ResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag);
 
 
 protected:
@@ -112,7 +112,7 @@ private:
 	void ClientPreVoteEvent();
 
 	UFUNCTION(Client, Reliable)
-	void ClientResponseVoteEvent(class UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag);
+	void ClientResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag);
 
 private:
 	UFUNCTION()
