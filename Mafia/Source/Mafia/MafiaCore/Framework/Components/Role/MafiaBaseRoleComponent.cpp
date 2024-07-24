@@ -132,11 +132,11 @@ void UMafiaBaseRoleComponent::PreVoteEvent()
 	}
 }
 
-void UMafiaBaseRoleComponent::PostVoteEvent(UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag)
+void UMafiaBaseRoleComponent::ResponseVoteEvent(UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag)
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
-		ClientPostVoteEvent(InDestination, InFlag);
+		ClientResponseVoteEvent(InDestination, InFlag);
 	}
 	else
 	{
@@ -186,7 +186,7 @@ void UMafiaBaseRoleComponent::ClientPreVoteEvent_Implementation()
 	}
 }
 
-void UMafiaBaseRoleComponent::ClientPostVoteEvent_Implementation(UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag)
+void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag)
 {
 	/** ktw : 클라이언트에서 실행됩니다. */
 	if (OwningPlayerState.IsValid())
@@ -200,9 +200,7 @@ void UMafiaBaseRoleComponent::ClientPostVoteEvent_Implementation(UMafiaBaseRoleC
 				{
 				case EMafiaVoteFlag::ImpossibleVote:
 					break;
-				case EMafiaVoteFlag::NoHasOwningPlayerState:
-					break;
-				case EMafiaVoteFlag::InvalidAccountId:
+				case EMafiaVoteFlag::AlreadyVoted:
 					break;
 				case EMafiaVoteFlag::Succeed:
 					break;

@@ -89,7 +89,7 @@ void UMafiaChairManManager::DispatchAbilityEvents()
 	CachedAbilityEventsHeap.Empty();
 }
 
-void UMafiaChairManManager::RequestFlushAbilityEvents() const
+void UMafiaChairManManager::FlushAbilityEvents() const
 {
 	if (UWorld* World = GetWorld())
 	{
@@ -118,30 +118,51 @@ void UMafiaChairManManager::RequestFlushAbilityEvents() const
 
 void UMafiaChairManManager::StartVote()
 {
-	CachedVoteMap.Empty();
+	CachedVoteEventsMap.Empty();
+	CachedVotedPlayerSet.Empty();
 }
 
-void UMafiaChairManManager::AddVoteEvent(UMafiaBaseRoleComponent* InOrigin, UMafiaBaseRoleComponent* InDestination)
+void UMafiaChairManManager::SendVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaBasePlayerState* InCandidate)
 {
-	InOrigin->PreVoteEvent();
-
-	EMafiaVoteFlag Flag = EMafiaVoteFlag::ImpossibleVote;
-	if (IsPossibleVote())
+	if (IsValid(InVotor) && IsValid(InCandidate))
 	{
-		if (const AMafiaBasePlayerState* PS = InOrigin->GetOwningPlayerState())
+		/** ktw : 1. AccountId & RoleComponent 유효성 체크. */
+		const FString& VotorAccountIdStr = InVotor->GetUniqueId().ToString();
+		const FString& CandidateAccountIdStr = InCandidate->GetUniqueId().ToString();
+
+		if (CandidateAccountIdStr.IsEmpty() || VotorAccountIdStr.IsEmpty())
 		{
-			const FString& AccountIdStr = PS->GetUniqueId().ToString();
-			if (AccountIdStr.IsEmpty())
-			{
-				Flag = EMafiaVoteFlag::InvalidAccountId;
-				MAFIA_ULOG(LogMafiaChairMan, Warning, TEXT("AccountIdStr is empty"));
-				InOrigin->PostVoteEvent(InDestination, Flag);
-				return;
-			}
+			MAFIA_ULOG(LogMafiaChairMan, Warning, TEXT("AccountIdStr is empty"));
+			return;
+		}
 
-			const FName AccountId = FName(*AccountIdStr);
-			FPlayerVoteData* Pair = CachedVoteMap.Find(AccountId);
+		UMafiaBaseRoleComponent* VotorRoleComponent = InVotor->GetRoleComponent();
+		UMafiaBaseRoleComponent* CandidateRoleComponent = InCandidate->GetRoleComponent();
 
+		if (IsValid(VotorRoleComponent) == false || IsValid(CandidateRoleComponent) == false)
+		{
+			MAFIA_ULOG(LogMafiaChairMan, Warning, TEXT("RoleComponent is Invalid."));
+			return;
+		}
+
+
+		/** ktw : 2. 중복 투표 체크. */
+		const FName VotorAccountId = FName(*VotorAccountIdStr);
+		const FName CandidateAccountId = FName(*CandidateAccountIdStr);
+		EMafiaVoteFlag Flag = EMafiaVoteFlag::ImpossibleVote;
+		
+		if (CachedVotedPlayerSet.Find(VotorAccountId))
+		{
+			Flag = EMafiaVoteFlag::AlreadyVoted;
+			VotorRoleComponent->ResponseVoteEvent(CandidateRoleComponent, Flag);
+			return;
+		}
+
+
+		/** ktw : 3. 투표가 가능한 상태인지 체크. */
+		if (IsPossibleVote())
+		{
+			FPlayerVoteData* Pair = CachedVoteEventsMap.Find(CandidateAccountId);
 			if (Pair)
 			{
 				Pair->VotedCount++;
@@ -149,28 +170,24 @@ void UMafiaChairManManager::AddVoteEvent(UMafiaBaseRoleComponent* InOrigin, UMaf
 			else
 			{
 				FPlayerVoteData VoteData;
-				VoteData.Origin = InOrigin;
-				VoteData.Destination = InDestination;
+				VoteData.Candidate = CandidateRoleComponent;
 				VoteData.VotedCount = 1;
 
-				CachedVoteMap.Emplace(AccountId, VoteData);
+				CachedVoteEventsMap.Emplace(CandidateAccountId, VoteData);
+				CachedVotedPlayerSet.Emplace(VotorAccountId);
 			}
 
 			Flag = EMafiaVoteFlag::Succeed;
 		}
-		else
-		{
-			Flag = EMafiaVoteFlag::NoHasOwningPlayerState;
-		}
-		
-	}
 
-	InOrigin->PostVoteEvent(InDestination, Flag);
+		VotorRoleComponent->ResponseVoteEvent(CandidateRoleComponent, Flag);
+	}
 }
 
 void UMafiaChairManManager::EndVote()
 {
-	CachedVoteMap.Empty();
+	CachedVoteEventsMap.Empty();
+	CachedVotedPlayerSet.Empty();
 }
 
 

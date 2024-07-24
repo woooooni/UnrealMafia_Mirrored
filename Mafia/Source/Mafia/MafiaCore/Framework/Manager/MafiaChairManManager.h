@@ -37,13 +37,8 @@ struct FPlayerVoteData
 
 public:
 	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseRoleComponent> Origin;
-
-	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseRoleComponent> Destination;
-
+	TWeakObjectPtr<class UMafiaBaseRoleComponent> Candidate;
 	uint8 VotedCount = 0;
-
 };
 
 
@@ -75,21 +70,23 @@ public:
 
 	/** ktw : RoleComponent에 전송한 이벤트를 실행하는 신호를 보냅니다. */
 	UFUNCTION()
-	void RequestFlushAbilityEvents() const;
+	void FlushAbilityEvents() const;
 
 
 public:
 	UFUNCTION()
 	void StartVote();
 
+
+	/** ktw : InVotor - 투표자, InCandidate - 피투표자 */
 	UFUNCTION()
-	void AddVoteEvent(class UMafiaBaseRoleComponent* InOrigin, class UMafiaBaseRoleComponent* InDestination);
+	void SendVoteEvent(class AMafiaBasePlayerState* InVotor, class AMafiaBasePlayerState* InCandidate);
 
 	UFUNCTION()
 	void EndVote();
 
 public:
-	FORCEINLINE const TMap<FName, FPlayerVoteData>& GetPlayerVoteMap() { return CachedVoteMap; }
+	FORCEINLINE const TMap<FName, FPlayerVoteData>& GetPlayerVoteMap() { return CachedVoteEventsMap; }
 
 
 protected:
@@ -99,5 +96,10 @@ protected:
 private:
 	/** ktw : EMafiaRole에 선언된 Role의 값을 순서로 Event를 정렬합니다. */
 	TArray<FUseAbilityEventData> CachedAbilityEventsHeap;
-	TMap<FName, FPlayerVoteData> CachedVoteMap;
+
+	/** ktw : 피 투표자를 저장합니다. */
+	TMap<FName, FPlayerVoteData> CachedVoteEventsMap;
+
+	/** ktw : 투표자를 저장합니다. */
+	TSet<FName> CachedVotedPlayerSet;
 };

@@ -79,7 +79,7 @@ public:
 		ktw - 아래 함수는 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
-	void PostVoteEvent(UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag);
+	void ResponseVoteEvent(UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag);
 
 
 protected:
@@ -112,7 +112,7 @@ private:
 	void ClientPreVoteEvent();
 
 	UFUNCTION(Client, Reliable)
-	void ClientPostVoteEvent(class UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag);
+	void ClientResponseVoteEvent(class UMafiaBaseRoleComponent* InDestination, EMafiaVoteFlag InFlag);
 
 private:
 	UFUNCTION()

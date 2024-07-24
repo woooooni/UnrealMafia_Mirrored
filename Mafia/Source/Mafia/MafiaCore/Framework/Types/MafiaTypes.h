@@ -71,8 +71,7 @@ UENUM()
 enum class EMafiaVoteFlag : uint8
 {
 	ImpossibleVote,
-	NoHasOwningPlayerState,
-	InvalidAccountId,
+	AlreadyVoted,
 	Succeed,
 };
 
