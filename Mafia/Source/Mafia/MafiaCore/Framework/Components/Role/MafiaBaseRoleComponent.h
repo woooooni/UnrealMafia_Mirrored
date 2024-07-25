@@ -53,30 +53,32 @@ public:
 	UFUNCTION()
 	void UseAbility(class AMafiaPlayerState* InOther);
 
+	
+
 	UFUNCTION()
 	FORCEINLINE class AMafiaBasePlayerState* GetOwningPlayerState() const { return OwningPlayerState.Get(); }
 	
 public:
 	/** 
-		ktw - 아래 함수는 서버에서 호출해야합니다.
+		ktw - 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
 	void AffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 	
 	/** 
-		ktw - 아래 함수는 서버에서 호출해야합니다.
+		ktw - 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
 	void FlushEvents();
 
 	/**
-		ktw - 아래 함수는 서버에서 호출해야합니다.
+		ktw - 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
 	void PreVoteEvent();
 
 	/** 
-		ktw - 아래 함수는 서버에서 호출해야합니다.
+		ktw - 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
 	void ResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag);

@@ -38,6 +38,7 @@ struct FPlayerVoteData
 public:
 	UPROPERTY()
 	TWeakObjectPtr<class UMafiaBaseRoleComponent> Candidate;
+	TSet<FName> VotersSet;
 	uint8 VotedCount = 0;
 };
 
@@ -64,7 +65,7 @@ public:
 	UFUNCTION()
 	void AddAbilityEvent(class AMafiaBasePlayerState* InOrigin, class AMafiaBasePlayerState* InDestination);
 
-	/** ktw : Heap에 저장된 능력 이벤트들을 순회하면서 각 RoleComponent에 이벤트를 전송합니다. */
+	/** ktw : Heap에 저장된 능력 이벤트들을 순회하면서 각 플레이어의 RoleComponent에 이벤트를 전송합니다. */
 	UFUNCTION()
 	void DispatchAbilityEvents();
 
@@ -97,9 +98,12 @@ private:
 	/** ktw : EMafiaRole에 선언된 Role의 값을 순서로 Event를 정렬합니다. */
 	TArray<FUseAbilityEventData> CachedAbilityEventsHeap;
 
-	/** ktw : 피 투표자를 저장합니다. */
-	TMap<FName, FPlayerVoteData> CachedVoteEventsMap;
+	/** 
+		ktw : 피 투표자를 저장합니다. 
 
-	/** ktw : 투표자를 저장합니다. */
-	TSet<FName> CachedVotedPlayerSet;
+		Key - 피 투표자 AccountId.
+		Value - FPlayerVoteData.
+
+	*/
+	TMap<FName, FPlayerVoteData> CachedVoteEventsMap;
 };

@@ -186,6 +186,8 @@ void AMafiaBaseGameMode::HandleRoundIsAssigningAbility()
 	MAFIA_ALOG(LogMafiaGameMode, Warning, TEXT("HandleRoundIsAssigningAbility"));
 
 	AMafiaBaseGameSession* MafiaBaseGameSession = Cast<AMafiaBaseGameSession>(GameSession);
+	UMafiaBaseGameInstance* MafiaBaseGameInstance = Cast<UMafiaBaseGameInstance>(GetGameInstance());
+	
 	if (IsValid(MafiaBaseGameSession))
 	{
 		MafiaBaseGameSession->HandleRoundIsAssigningAbility();
@@ -194,17 +196,20 @@ void AMafiaBaseGameMode::HandleRoundIsAssigningAbility()
 	{
 		ensure(false);
 	}
+
 }
 
 void AMafiaBaseGameMode::HandleInProgressMafia()
 {
 	MAFIA_ALOG(LogMafiaGameMode, Warning, TEXT("HandleInProgressMafia"));
 	AMafiaBaseGameState* MafiaBaseGameState = GetGameState<AMafiaBaseGameState>();
+	
 	if (false == IsValid(MafiaBaseGameState))
 	{
 		ensure(false);
 		return;
 	}
+
 
 	UWorld* MyWorld = GetWorld();
 	if (false == IsValid(MyWorld))

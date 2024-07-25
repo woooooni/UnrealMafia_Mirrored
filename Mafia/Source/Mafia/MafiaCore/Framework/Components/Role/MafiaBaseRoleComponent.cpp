@@ -88,6 +88,7 @@ void UMafiaBaseRoleComponent::SetRoleName(FName InRoleName)
 	}
 }
 
+
 void UMafiaBaseRoleComponent::UseAbility(AMafiaPlayerState* InOther)
 {
 	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy == GetOwnerRole())
@@ -217,7 +218,7 @@ void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(UMafiaBaseR
 
 void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaPlayerState* InOther)
 {
-	/** ktw - 서버에서 실행됩니다. */
+	/** ktw : 서버에서 실행됩니다. */
 	if (UMafiaBaseGameInstance* GI = GetServerInstance())
 	{
 		if (OwningPlayerState.IsValid())
@@ -228,6 +229,12 @@ void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaPlayerSta
 			}
 		}
 	}
+}
+
+void UMafiaBaseRoleComponent::ServerReqBusDriverUseAbility_Implementation()
+{
+	/** ktw : 서버에서 실행됩니다. */
+
 }
 
 void UMafiaBaseRoleComponent::ServerReqSetTeam_Implementation(EMafiaTeam InTeam)
@@ -342,3 +349,5 @@ void UMafiaBaseRoleComponent::OnRepChangeRoleType()
 		}
 	}
 }
+
+

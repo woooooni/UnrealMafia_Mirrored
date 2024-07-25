@@ -119,7 +119,6 @@ void UMafiaChairManManager::FlushAbilityEvents() const
 void UMafiaChairManManager::StartVote()
 {
 	CachedVoteEventsMap.Empty();
-	CachedVotedPlayerSet.Empty();
 }
 
 void UMafiaChairManManager::SendVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaBasePlayerState* InCandidate)
@@ -151,11 +150,14 @@ void UMafiaChairManManager::SendVoteEvent(AMafiaBasePlayerState* InVotor, AMafia
 		const FName CandidateAccountId = FName(*CandidateAccountIdStr);
 		EMafiaVoteFlag Flag = EMafiaVoteFlag::ImpossibleVote;
 		
-		if (CachedVotedPlayerSet.Find(VotorAccountId))
+		if (auto Pair = CachedVoteEventsMap.Find(CandidateAccountId))
 		{
-			Flag = EMafiaVoteFlag::AlreadyVoted;
-			VotorRoleComponent->ResponseVoteEvent(CandidateRoleComponent, Flag);
-			return;
+			if (Pair->VotersSet.Find(VotorAccountId))
+			{
+				Flag = EMafiaVoteFlag::AlreadyVoted;
+				VotorRoleComponent->ResponseVoteEvent(CandidateRoleComponent, Flag);
+				return;
+			}
 		}
 
 
@@ -165,16 +167,18 @@ void UMafiaChairManManager::SendVoteEvent(AMafiaBasePlayerState* InVotor, AMafia
 			FPlayerVoteData* Pair = CachedVoteEventsMap.Find(CandidateAccountId);
 			if (Pair)
 			{
+				/** Todo - ktw : 필요하면, 예외처리 추가. */
+				Pair->VotersSet.Emplace(VotorAccountId);
 				Pair->VotedCount++;
 			}
 			else
 			{
 				FPlayerVoteData VoteData;
-				VoteData.Candidate = CandidateRoleComponent;
+				VoteData.VotersSet.Emplace(VotorAccountId);
 				VoteData.VotedCount = 1;
-
+				VoteData.Candidate = CandidateRoleComponent;
+				
 				CachedVoteEventsMap.Emplace(CandidateAccountId, VoteData);
-				CachedVotedPlayerSet.Emplace(VotorAccountId);
 			}
 
 			Flag = EMafiaVoteFlag::Succeed;
@@ -187,7 +191,6 @@ void UMafiaChairManManager::SendVoteEvent(AMafiaBasePlayerState* InVotor, AMafia
 void UMafiaChairManManager::EndVote()
 {
 	CachedVoteEventsMap.Empty();
-	CachedVotedPlayerSet.Empty();
 }
 
 
