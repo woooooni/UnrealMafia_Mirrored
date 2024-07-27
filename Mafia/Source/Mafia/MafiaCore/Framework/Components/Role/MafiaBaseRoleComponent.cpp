@@ -101,11 +101,11 @@ void UMafiaBaseRoleComponent::UseAbility(AMafiaPlayerState* InOther)
 	}
 }
 
-void UMafiaBaseRoleComponent::AffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
+void UMafiaBaseRoleComponent::AffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
-		ClientAffectedByOther(InRole, InOther);
+		ClientAffectedAbilityByOther(InRole, InOther);
 	}
 	else
 	{
@@ -113,7 +113,7 @@ void UMafiaBaseRoleComponent::AffectedByOther(EMafiaRole InRole, UMafiaBaseRoleC
 	}
 }
 
-void UMafiaBaseRoleComponent::FlushEvents()
+void UMafiaBaseRoleComponent::FlushAbilityEvents()
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
@@ -145,7 +145,7 @@ void UMafiaBaseRoleComponent::ResponseVoteEvent(UMafiaBaseRoleComponent* InCandi
 	}
 }
 
-void UMafiaBaseRoleComponent::ClientAffectedByOther_Implementation(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
+void UMafiaBaseRoleComponent::ClientAffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
 {
 	/** ktw : 클라이언트에서 실행됩니다. */
 	/** Todo - ktw :  서버가 직접 이벤트를 넣어줄 지 아니면, 클라이언트가 신호를 받아서 이벤트를 넣어 두고 한 번에 Flush? */
@@ -197,16 +197,21 @@ void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(UMafiaBaseR
 			if (PC->GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
 			{
 				/** Todo - ktw : 투표 Flag당 실행할 기능 추가. */
-				switch (InFlag)
+				if (EMafiaVoteFlag::ImpossibleVote == InFlag)
 				{
-				case EMafiaVoteFlag::ImpossibleVote:
-					break;
-				case EMafiaVoteFlag::AlreadyVoted:
-					break;
-				case EMafiaVoteFlag::Succeed:
-					break;
-				default:
-					break;
+
+				}
+				else if(EMafiaVoteFlag::AlreadyVoted == InFlag)
+				{
+
+				}
+				else if (EMafiaVoteFlag::Succeed == InFlag)
+				{
+
+				}
+				else
+				{
+
 				}
 			}
 		}
@@ -231,11 +236,6 @@ void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaPlayerSta
 	}
 }
 
-void UMafiaBaseRoleComponent::ServerReqBusDriverUseAbility_Implementation()
-{
-	/** ktw : 서버에서 실행됩니다. */
-
-}
 
 void UMafiaBaseRoleComponent::ServerReqSetTeam_Implementation(EMafiaTeam InTeam)
 {

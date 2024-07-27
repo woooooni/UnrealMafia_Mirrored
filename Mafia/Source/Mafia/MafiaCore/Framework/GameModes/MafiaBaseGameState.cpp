@@ -212,6 +212,16 @@ void AMafiaBaseGameState::SetMafiaFlowState(const EMafiaFlowState InState, const
 	UpdateTimerStartSeconds();
 
 	MafiaFlowState = InState;
+	if (UMafiaBaseGameInstance* GameInstance = Cast<UMafiaBaseGameInstance>(GetGameInstance()))
+	{
+		if (GameInstance->IsDedicatedServerInstance())
+		{
+			if (UMafiaChairManManager* ChairMan = GameInstance->GetChairMan())
+			{
+				ChairMan->OnSetMafiaFlowState(InState);
+			}
+		}
+	}
 	OnRep_MafiaFlowState(); // server call
 }
 

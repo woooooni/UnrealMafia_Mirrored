@@ -63,13 +63,13 @@ public:
 		ktw - 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
-	void AffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
+	void AffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 	
 	/** 
 		ktw - 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
-	void FlushEvents();
+	void FlushAbilityEvents();
 
 	/**
 		ktw - 서버에서 호출해야합니다.
@@ -105,7 +105,7 @@ private:
 	void ServerReqUseAbility(class AMafiaPlayerState* InOther);
 
 	UFUNCTION(Client, Reliable)
-	void ClientAffectedByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
+	void ClientAffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 
 	UFUNCTION(Client, Reliable)
 	void ClientAffectedEventsFlush();

@@ -186,7 +186,6 @@ void AMafiaBaseGameMode::HandleRoundIsAssigningAbility()
 	MAFIA_ALOG(LogMafiaGameMode, Warning, TEXT("HandleRoundIsAssigningAbility"));
 
 	AMafiaBaseGameSession* MafiaBaseGameSession = Cast<AMafiaBaseGameSession>(GameSession);
-	UMafiaBaseGameInstance* MafiaBaseGameInstance = Cast<UMafiaBaseGameInstance>(GetGameInstance());
 	
 	if (IsValid(MafiaBaseGameSession))
 	{
@@ -235,6 +234,7 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 	// 최초 투표만 예외
 	if (CurrentFlowState == EMafiaFlowState::None)
 	{
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::None, 3.f);
 		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Day, InitialVoteWaitTime);
 		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, InitialVoteWaitTime);
 	}

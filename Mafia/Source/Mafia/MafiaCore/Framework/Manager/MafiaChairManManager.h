@@ -57,13 +57,24 @@ public:
 
 public:
 	UFUNCTION()
-	void AssigningAllPlayersAbility();
+	void OnSetMafiaFlowState(EMafiaFlowState InFlowState);
 
 public:
 	/** ktw : Origin -> Destination으로 향하는 능력 사용 이벤트를 Heap에 임시 저장합니다.  */
 	// InOrigin : 능력 사용 Player, InDestination : 능력에 영향을 받은 Player.
 	UFUNCTION()
 	void AddAbilityEvent(class AMafiaBasePlayerState* InOrigin, class AMafiaBasePlayerState* InDestination);
+
+	/** ktw : InVotor - 투표자, InCandidate - 피투표자 */
+	UFUNCTION()
+	void AddVoteEvent(class AMafiaBasePlayerState* InVotor, class AMafiaBasePlayerState* InCandidate);
+
+public:
+	FORCEINLINE const TMap<FName, FPlayerVoteData>& GetPlayerVoteMap() { return CachedVoteEventsMap; }
+
+private:
+	UFUNCTION()
+	void AssigningAllPlayersAbility();
 
 	/** ktw : Heap에 저장된 능력 이벤트들을 순회하면서 각 플레이어의 RoleComponent에 이벤트를 전송합니다. */
 	UFUNCTION()
@@ -74,25 +85,18 @@ public:
 	void FlushAbilityEvents() const;
 
 
-public:
+private:
 	UFUNCTION()
 	void StartVote();
-
-
-	/** ktw : InVotor - 투표자, InCandidate - 피투표자 */
-	UFUNCTION()
-	void SendVoteEvent(class AMafiaBasePlayerState* InVotor, class AMafiaBasePlayerState* InCandidate);
 
 	UFUNCTION()
 	void EndVote();
 
-public:
-	FORCEINLINE const TMap<FName, FPlayerVoteData>& GetPlayerVoteMap() { return CachedVoteEventsMap; }
-
-
-protected:
+private:
 	bool MakeShuffledRoleArray(int32 InPlayerCount, OUT TArray<EMafiaRole>& OutSuffledArray);
 	bool IsPossibleVote();
+
+
 
 private:
 	/** ktw : EMafiaRole에 선언된 Role의 값을 순서로 Event를 정렬합니다. */

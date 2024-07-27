@@ -23,6 +23,7 @@ UMafiaChairManManager::UMafiaChairManManager(const FObjectInitializer& ObjectIni
 }
 
 
+
 void UMafiaChairManManager::AssigningAllPlayersAbility()
 {
 	UWorld* World = GetWorld();
@@ -83,7 +84,7 @@ void UMafiaChairManManager::DispatchAbilityEvents()
 	{
 		if (Event.Destination.IsValid())
 		{
-			Event.Destination.Get()->AffectedByOther(Event.Role, Event.Origin.Get());
+			Event.Destination.Get()->AffectedAbilityByOther(Event.Role, Event.Origin.Get());
 		}
 	}
 	CachedAbilityEventsHeap.Empty();
@@ -103,7 +104,7 @@ void UMafiaChairManManager::FlushAbilityEvents() const
 					{
 						if (UMafiaBaseRoleComponent* RoleComponent = PS->GetRoleComponent())
 						{
-							RoleComponent->FlushEvents();
+							RoleComponent->FlushAbilityEvents();
 						}
 					}
 				}
@@ -121,7 +122,7 @@ void UMafiaChairManManager::StartVote()
 	CachedVoteEventsMap.Empty();
 }
 
-void UMafiaChairManManager::SendVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaBasePlayerState* InCandidate)
+void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaBasePlayerState* InCandidate)
 {
 	if (IsValid(InVotor) && IsValid(InCandidate))
 	{
@@ -250,4 +251,33 @@ bool UMafiaChairManManager::IsPossibleVote()
 		}
 	}
 	return false;
+}
+
+void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
+{
+	/** ktw : AMafiaBaseGameState::SetMafiaFlowState에서 호출됩니다. */
+	
+	if (EMafiaFlowState::None == InFlowState)
+	{
+		AssigningAllPlayersAbility();
+	}
+	else if (EMafiaFlowState::Day == InFlowState)
+	{
+		/** 
+			Todo - ktw : Reliable RPC 라도 리플리케이션되는데 시간이 걸려서 Distpatch 후 따로 클라이언트에게 신호를 받고 
+							Flush 신호를 보내는 걸로 넘어가야 할 것 같기도 합니다. (그때 동안 연출.)
+		*/
+
+		DispatchAbilityEvents();
+		FlushAbilityEvents();
+	}	
+	else if (EMafiaFlowState::Vote == InFlowState)
+	{
+		StartVote();
+	}
+	else if (EMafiaFlowState::Night == InFlowState)
+	{
+		EndVote();
+	}
+			
 }
