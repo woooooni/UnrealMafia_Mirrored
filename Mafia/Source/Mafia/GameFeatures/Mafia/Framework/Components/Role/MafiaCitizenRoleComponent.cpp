@@ -17,3 +17,14 @@ void UMafiaCitizenRoleComponent::BeginPlay()
 	RoleType = EMafiaRole::Citizen;
 	RoleName = TEXT("시민");
 }
+
+void UMafiaCitizenRoleComponent::ClientAffectedEventsFlush_Implementation()
+{
+
+
+}
+
+void UMafiaCitizenRoleComponent::ClientResponsePostUseAbility_Implementation(UMafiaBaseRoleComponent* InOther)
+{
+
+}

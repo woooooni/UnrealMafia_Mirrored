@@ -82,9 +82,12 @@ void UMafiaChairManManager::DispatchAbilityEvents()
 {
 	for (auto& Event : CachedAbilityEventsHeap)
 	{
-		if (Event.Destination.IsValid())
+		if (Event.Origin.IsValid() && Event.Destination.IsValid())
 		{
 			Event.Destination.Get()->AffectedAbilityByOther(Event.Role, Event.Origin.Get());
+
+			/** Todo - ktw :  Response 신호를 언제 뿌려줄지 결정.(ex) 경찰이면, 경찰한테'만' 찍은 플레이어의 팀을 알려줘야 한다.) */
+			Event.Origin.Get()->ResponsePostUseAbility(Event.Destination.Get());
 		}
 	}
 	CachedAbilityEventsHeap.Empty();
@@ -119,7 +122,29 @@ void UMafiaChairManManager::FlushAbilityEvents() const
 
 void UMafiaChairManManager::StartVote()
 {
-	CachedVoteEventsMap.Empty();
+	if (UWorld* World = GetWorld())
+	{
+		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
+		{
+			for (auto& Pair : GS->GetJoinedUserPlayerStateMap())
+			{
+				if (Pair.Value.IsValid())
+				{
+					if (AMafiaBasePlayerState* PS = Pair.Value.Get())
+					{
+						if (UMafiaBaseRoleComponent* RoleComponent = PS->GetRoleComponent())
+						{
+							RoleComponent->PreVoteEvent();
+						}
+					}
+				}
+				else
+				{
+					MAFIA_ULOG(LogMafiaChairMan, Error, TEXT("PlayerState Is Invalid."));
+				}
+			}
+		}
+	}
 }
 
 void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaBasePlayerState* InCandidate)

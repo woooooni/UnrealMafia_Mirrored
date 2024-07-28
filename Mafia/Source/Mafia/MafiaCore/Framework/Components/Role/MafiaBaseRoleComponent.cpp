@@ -113,6 +113,18 @@ void UMafiaBaseRoleComponent::AffectedAbilityByOther(EMafiaRole InRole, UMafiaBa
 	}
 }
 
+void UMafiaBaseRoleComponent::ResponsePostUseAbility(UMafiaBaseRoleComponent* InOther)
+{
+	if (ENetRole::ROLE_Authority == GetOwnerRole())
+	{
+		ClientResponsePostUseAbility(InOther);
+	}
+	else
+	{
+		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("서버에서 호출해야합니다."));
+	}
+}
+
 void UMafiaBaseRoleComponent::FlushAbilityEvents()
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
@@ -131,6 +143,10 @@ void UMafiaBaseRoleComponent::PreVoteEvent()
 	{
 		ClientPreVoteEvent();
 	}
+	else
+	{
+		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("서버에서 호출해야합니다."));
+	}
 }
 
 void UMafiaBaseRoleComponent::ResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag)
@@ -145,30 +161,13 @@ void UMafiaBaseRoleComponent::ResponseVoteEvent(UMafiaBaseRoleComponent* InCandi
 	}
 }
 
-void UMafiaBaseRoleComponent::ClientAffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
+void UMafiaBaseRoleComponent::ClientAffectedAbilityByOther_Implementation(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
 {
 	/** ktw : 클라이언트에서 실행됩니다. */
 	/** Todo - ktw :  서버가 직접 이벤트를 넣어줄 지 아니면, 클라이언트가 신호를 받아서 이벤트를 넣어 두고 한 번에 Flush? */
 	FAffectedEvent Event;
 	Event.Other = InOther;
 	CachedAffectedEventsHeap.HeapPush(Event);
-}
-
-void UMafiaBaseRoleComponent::ClientAffectedEventsFlush_Implementation()
-{
-	/** ktw : 클라이언트에서 실행됩니다. */
-	if (OwningPlayerState.IsValid())
-	{
-		if (APlayerController* PC = OwningPlayerState.Get()->GetPlayerController())
-		{
-			if (PC->GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
-			{
-				/** Todo - ktw : 영향 받은 플레이어에 대해 처리. */
-				CachedAffectedEventsHeap.Empty();
-			}
-		}
-	}
-	
 }
 
 void UMafiaBaseRoleComponent::ClientPreVoteEvent_Implementation()

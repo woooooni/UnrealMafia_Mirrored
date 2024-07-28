@@ -16,3 +16,11 @@ void UMafiaDoctorRoleComponent::BeginPlay()
 	RoleType = EMafiaRole::Doctor;
 	RoleName = TEXT("의사");
 }
+
+void UMafiaDoctorRoleComponent::ClientAffectedEventsFlush_Implementation()
+{
+}
+
+void UMafiaDoctorRoleComponent::ClientResponsePostUseAbility_Implementation(UMafiaBaseRoleComponent* InOther)
+{
+}

@@ -16,3 +16,11 @@ void UMafiaPoliceRoleComponent::BeginPlay()
 	RoleType = EMafiaRole::Police;
 	RoleName = TEXT("경찰");
 }
+
+void UMafiaPoliceRoleComponent::ClientAffectedEventsFlush_Implementation()
+{
+}
+
+void UMafiaPoliceRoleComponent::ClientResponsePostUseAbility_Implementation(UMafiaBaseRoleComponent* InOther)
+{
+}

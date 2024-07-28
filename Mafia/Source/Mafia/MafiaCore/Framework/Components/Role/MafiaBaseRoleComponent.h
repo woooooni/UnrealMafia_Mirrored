@@ -64,6 +64,12 @@ public:
 	*/
 	UFUNCTION()
 	void AffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
+
+	/**
+		ktw - 서버에서 호출해야합니다.
+	*/
+	UFUNCTION()
+	void ResponsePostUseAbility(UMafiaBaseRoleComponent* InOther);
 	
 	/** 
 		ktw - 서버에서 호출해야합니다.
@@ -87,6 +93,13 @@ public:
 protected:
 	class UMafiaBaseGameInstance* GetServerInstance();
 
+protected:
+	UFUNCTION(Client, Reliable)
+	virtual void ClientAffectedEventsFlush() PURE_VIRTUAL(UMafiaBaseRoleComponent::ClientAffectedEventsFlush, );
+
+	UFUNCTION(Client, Reliable)
+	virtual void ClientResponsePostUseAbility(UMafiaBaseRoleComponent* InOther) PURE_VIRTUAL(UMafiaBaseRoleComponent::ClientResponseUseAbilityToOther, );
+
 private:
 	UFUNCTION(Server, Reliable)
 	void ServerReqSetTeam(EMafiaTeam InTeam);
@@ -106,9 +119,6 @@ private:
 
 	UFUNCTION(Client, Reliable)
 	void ClientAffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
-
-	UFUNCTION(Client, Reliable)
-	void ClientAffectedEventsFlush();
 
 	UFUNCTION(Client, Reliable)
 	void ClientPreVoteEvent();

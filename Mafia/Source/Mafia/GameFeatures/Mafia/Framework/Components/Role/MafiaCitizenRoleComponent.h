@@ -20,4 +20,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+protected:
+	virtual void ClientAffectedEventsFlush_Implementation() override;
+	virtual void ClientResponsePostUseAbility_Implementation(UMafiaBaseRoleComponent* InOther) override;
 };
