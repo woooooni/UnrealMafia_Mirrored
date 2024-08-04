@@ -65,11 +65,13 @@ protected:
 	UPROPERTY(Replicated)
 	uint8 bReadyForGame : 1;
 
+	/** Player Color */
+	UPROPERTY(Replicated)
+	FLinearColor PlayerColor;
+
 	/** Mafia Role */
 	UPROPERTY(Replicated)
 	TObjectPtr<class UMafiaBaseRoleComponent> RoleComponent;
 
-	/** Player Color */
-	UPROPERTY(Replicated)
-	FLinearColor PlayerColor;
+
 };

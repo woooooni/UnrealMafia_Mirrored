@@ -218,7 +218,7 @@ void AMafiaBaseGameState::SetMafiaFlowState(const EMafiaFlowState InState, const
 		{
 			if (UMafiaChairManManager* ChairMan = GameInstance->GetChairMan())
 			{
-				ChairMan->OnSetMafiaFlowState(InState);
+				ChairMan->OnSetMafiaFlowState(MafiaFlowState);
 			}
 		}
 	}

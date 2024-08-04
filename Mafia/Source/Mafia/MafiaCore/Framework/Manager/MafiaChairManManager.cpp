@@ -216,7 +216,29 @@ void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaB
 
 void UMafiaChairManManager::EndVote()
 {
-	CachedVoteEventsMap.Empty();
+	if (UWorld* World = GetWorld())
+	{
+		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
+		{
+			for (auto& Pair : GS->GetJoinedUserPlayerStateMap())
+			{
+				if (Pair.Value.IsValid())
+				{
+					if (AMafiaBasePlayerState* PS = Pair.Value.Get())
+					{
+						if (UMafiaBaseRoleComponent* RoleComponent = PS->GetRoleComponent())
+						{
+							RoleComponent->PostVoteEvent();
+						}
+					}
+				}
+				else
+				{
+					MAFIA_ULOG(LogMafiaChairMan, Error, TEXT("PlayerState Is Invalid."));
+				}
+			}
+		}
+	}
 }
 
 
@@ -288,11 +310,6 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	}
 	else if (EMafiaFlowState::Day == InFlowState)
 	{
-		/** 
-			Todo - ktw : Reliable RPC 라도 리플리케이션되는데 시간이 걸려서 Distpatch 후 따로 클라이언트에게 신호를 받고 
-							Flush 신호를 보내는 걸로 넘어가야 할 것 같기도 합니다. (그때 동안 연출.)
-		*/
-
 		DispatchAbilityEvents();
 		FlushAbilityEvents();
 	}	

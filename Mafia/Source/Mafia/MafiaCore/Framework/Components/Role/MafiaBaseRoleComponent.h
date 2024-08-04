@@ -51,14 +51,18 @@ public:
 	FORCEINLINE FName GetRoleName() { return RoleName; }
 
 	UFUNCTION()
-	void UseAbility(class AMafiaPlayerState* InOther);
+	void UseAbility(class AMafiaBasePlayerState* InOther);
 
+	UFUNCTION()
+	void Vote(class AMafiaBasePlayerState* InOther);
 	
 
 	UFUNCTION()
 	FORCEINLINE class AMafiaBasePlayerState* GetOwningPlayerState() const { return OwningPlayerState.Get(); }
 	
 public:
+
+#pragma region Role Ability(역할 능력 관련)
 	/** 
 		ktw : 서버에서 호출해야합니다.
 	*/
@@ -70,13 +74,15 @@ public:
 	*/
 	UFUNCTION()
 	void ResponsePostUseAbility(UMafiaBaseRoleComponent* InOther);
-	
-	/** 
+
+	/**
 		ktw : 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
 	void FlushAbilityEvents();
-
+#pragma endregion Role Ability(역할 능력 관련)
+	
+#pragma region Vote(투표)
 	/**
 		ktw : 서버에서 호출해야합니다.
 	*/
@@ -89,16 +95,48 @@ public:
 	UFUNCTION()
 	void ResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag);
 
+	/**
+		ktw : 서버에서 호출해야합니다.
+	*/
+	UFUNCTION()
+	void PostVoteEvent();
+#pragma endregion Vote
 
-protected:
-	class UMafiaBaseGameInstance* GetServerInstance();
+
+
+
+
+#pragma region Role Ability RPC
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerReqUseAbility(AMafiaBasePlayerState* InOther);
 
 protected:
 	UFUNCTION(Client, Reliable)
-	virtual void ClientAffectedEventsFlush();
+	void ClientAffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 
 	UFUNCTION(Client, Reliable)
 	virtual void ClientResponsePostUseAbility(UMafiaBaseRoleComponent* InOther);
+
+	UFUNCTION(Client, Reliable)
+	virtual void ClientAffectedEventsFlush();
+#pragma endregion Role Ability RPC
+
+#pragma region Vote(투표) RPC
+private:
+	UFUNCTION(Server, Reliable)
+	void ServerReqVote(AMafiaBasePlayerState* InOther);
+
+	UFUNCTION(Client, Reliable)
+	void ClientPreVoteEvent();
+
+	UFUNCTION(Client, Reliable)
+	void ClientResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag);
+
+	UFUNCTION(Client, Reliable)
+	void ClientPostVoteEvent();
+#pragma endregion Vote(투표)
+
 
 private:
 	UFUNCTION(Server, Reliable)
@@ -113,19 +151,8 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerReqSetRoleName(FName InRoleName);
 
-	/** ktw : 능력 사용 관련 함수들. */
-	UFUNCTION(Server, Reliable)
-	void ServerReqUseAbility(class AMafiaPlayerState* InOther);
-
-	UFUNCTION(Client, Reliable)
-	void ClientAffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
-
-	UFUNCTION(Client, Reliable)
-	void ClientPreVoteEvent();
-
-	UFUNCTION(Client, Reliable)
-	void ClientResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag);
-
+protected:
+	class UMafiaBaseGameInstance* GetServerInstance();
 
 protected:
 	UPROPERTY(Replicated)

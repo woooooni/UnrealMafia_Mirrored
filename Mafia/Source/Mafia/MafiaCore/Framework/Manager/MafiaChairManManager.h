@@ -63,8 +63,12 @@ public:
 	UFUNCTION()
 	void AssigningAllPlayersAbility();
 
-	/** ktw : Origin -> Destination으로 향하는 능력 사용 이벤트를 Heap에 임시 저장합니다.  */
-	// InOrigin : 능력 사용 Player, InDestination : 능력에 영향을 받은 Player.
+
+public:
+	/** 
+		ktw : Origin -> Destination으로 향하는 능력 사용 이벤트를 Heap에 임시 저장합니다.  
+		InOrigin : 능력 사용 Player, InDestination : 능력에 영향을 받은 Player.
+	*/
 	UFUNCTION()
 	void AddAbilityEvent(class AMafiaBasePlayerState* InOrigin, class AMafiaBasePlayerState* InDestination);
 

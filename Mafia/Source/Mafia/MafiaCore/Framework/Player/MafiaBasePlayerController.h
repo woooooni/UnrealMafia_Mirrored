@@ -48,7 +48,7 @@ private:
 	void CheatSetReadyForGame(const bool bReady = true);
 #pragma endregion
 
-#pragma region AbilityCheat
+#pragma region Ability & Vote Cheat
 private:
 	UFUNCTION(Exec)
 	void CheatAssignAbility();
@@ -59,8 +59,8 @@ private:
 	UFUNCTION(Exec)
 	void CheatUseAbility(int32 InPlayerNum);
 
-	UFUNCTION(Server, Reliable)
-	void ServerReqUseAbility(class AMafiaBasePlayerState* InMyPlayerState, class AMafiaBasePlayerState* InOtherPlayerState);
+	UFUNCTION(Exec)
+	void CheatVote(int32 InPlayerNum);
 #pragma endregion
 
 #pragma region MaterialCheat

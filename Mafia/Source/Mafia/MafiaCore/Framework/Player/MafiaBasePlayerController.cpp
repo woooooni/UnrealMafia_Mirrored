@@ -227,7 +227,14 @@ void AMafiaBasePlayerController::CheatUseAbility(int32 InPlayerNum)
 			{
 				if (MyPlayerState->GetUniqueId() != OtherPlayerState->GetUniqueId())
 				{
-					ServerReqUseAbility(MyPlayerState, OtherPlayerState);
+					if (UMafiaBaseRoleComponent* RoleComponent = MyPlayerState->GetRoleComponent())
+					{
+						RoleComponent->UseAbility(OtherPlayerState);
+					}
+					else
+					{
+						MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Find Role Component Failed."));
+					}
 				}
 				else
 				{
@@ -240,29 +247,52 @@ void AMafiaBasePlayerController::CheatUseAbility(int32 InPlayerNum)
 #endif
 }
 
+void AMafiaBasePlayerController::CheatVote(int32 InPlayerNum)
+{
+#if ENABLE_CHEAT
+	if (AMafiaBasePlayerState* MyPlayerState = GetPlayerState<AMafiaBasePlayerState>())
+	{
+		UWorld* World = GetWorld();
+
+		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
+		{
+			/** ktw : 본인 제외. */
+			if (1 >= InPlayerNum || GS->PlayerArray.IsValidIndex(InPlayerNum - 1) == false)
+			{
+				MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Invalid Player Number"));
+				return;
+			}
+
+			if (AMafiaBasePlayerState* OtherPlayerState = Cast<AMafiaBasePlayerState>(GS->PlayerArray[InPlayerNum - 1]))
+			{
+				if (MyPlayerState->GetUniqueId() != OtherPlayerState->GetUniqueId())
+				{
+					if (UMafiaBaseRoleComponent* RoleComponent = MyPlayerState->GetRoleComponent())
+					{
+						RoleComponent->Vote(OtherPlayerState);
+					}
+					else
+					{
+						MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Find Role Component Failed."));
+					}
+				}
+				else
+				{
+					MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("That Player is My Player"));
+				}
+			}
+		}
+	}
+#endif
+}
+
+
 void AMafiaBasePlayerController::CheatChangePlayerColor(float InRed, float InGreen, float InBlue, float InAlpha)
 {
 #if ENABLE_CHEAT
 	if (AMafiaBasePlayerState* PS = GetPlayerState<AMafiaBasePlayerState>())
 	{
 		PS->ChangePlayerColor(FLinearColor(InRed, InGreen, InBlue, InAlpha));
-	}
-#endif
-}
-
-
-void AMafiaBasePlayerController::ServerReqUseAbility_Implementation(AMafiaBasePlayerState* InMyPlayerState, AMafiaBasePlayerState* InOtherPlayerState)
-{
-#if ENABLE_CHEAT
-	if (UMafiaBaseGameInstance* MafiaBaseGameInstance = UMafiaBaseGameInstance::Get(this))
-	{
-		if (MafiaBaseGameInstance->IsDedicatedServerInstance())
-		{
-			if (UMafiaChairManManager* MafiaChairManManager = MafiaBaseGameInstance->GetChairMan())
-			{
-				MafiaChairManManager->AddAbilityEvent(InMyPlayerState, InOtherPlayerState);
-			}
-		}
 	}
 #endif
 }

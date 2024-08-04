@@ -89,7 +89,12 @@ void UMafiaBaseRoleComponent::SetRoleName(FName InRoleName)
 }
 
 
-void UMafiaBaseRoleComponent::UseAbility(AMafiaPlayerState* InOther)
+
+
+
+#pragma region Ability
+
+void UMafiaBaseRoleComponent::UseAbility(AMafiaBasePlayerState* InOther)
 {
 	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy == GetOwnerRole())
 	{
@@ -136,6 +141,22 @@ void UMafiaBaseRoleComponent::FlushAbilityEvents()
 		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("서버에서 호출해야합니다."));
 	}
 }
+#pragma endregion Ability
+
+
+#pragma region Vote
+void UMafiaBaseRoleComponent::Vote(AMafiaBasePlayerState* InOther)
+{
+	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy == GetOwnerRole())
+	{
+		ServerReqVote(InOther);
+	}
+	else
+	{
+		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("클라이언트에서 호출해야합니다."));
+	}
+
+}
 
 void UMafiaBaseRoleComponent::PreVoteEvent()
 {
@@ -149,6 +170,7 @@ void UMafiaBaseRoleComponent::PreVoteEvent()
 	}
 }
 
+
 void UMafiaBaseRoleComponent::ResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag)
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
@@ -161,78 +183,24 @@ void UMafiaBaseRoleComponent::ResponseVoteEvent(UMafiaBaseRoleComponent* InCandi
 	}
 }
 
-void UMafiaBaseRoleComponent::ClientAffectedAbilityByOther_Implementation(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
-{
-	/** ktw : 클라이언트에서 실행됩니다. */
-	/** Todo - ktw :  서버가 직접 이벤트를 넣어줄 지 아니면, 클라이언트가 신호를 받아서 이벤트를 넣어 두고 한 번에 Flush? */
-	FAffectedEvent Event;
-	Event.Other = InOther;
-	CachedAffectedEventsHeap.HeapPush(Event);
-}
 
-void UMafiaBaseRoleComponent::ClientPreVoteEvent_Implementation()
+void UMafiaBaseRoleComponent::PostVoteEvent()
 {
-	/** ktw : 클라이언트에서 실행됩니다. */
-	if (OwningPlayerState.IsValid())
+	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
-		if (APlayerController* PC = OwningPlayerState.Get()->GetPlayerController())
-		{
-			if (PC->GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
-			{
-				/** Todo - ktw : 투표 이전 실행할 기능 추가. */
-				
-			}
-		}
+		ClientPostVoteEvent();
+	}
+	else
+	{
+		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("서버에서 호출해야합니다."));
 	}
 }
 
-void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag)
-{
-	/** ktw : 클라이언트에서 실행됩니다. */
-	if (OwningPlayerState.IsValid())
-	{
-		if (APlayerController* PC = (OwningPlayerState.Get()->GetPlayerController()))
-		{
-			if (PC->GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
-			{
-				/** Todo - ktw : 투표 Flag당 실행할 기능 추가. */
-				if (EMafiaVoteFlag::ImpossibleVote == InFlag)
-				{
-
-				}
-				else if(EMafiaVoteFlag::AlreadyVoted == InFlag)
-				{
-
-				}
-				else if (EMafiaVoteFlag::Succeed == InFlag)
-				{
-
-				}
-				else
-				{
-
-				}
-			}
-		}
-	}
-}
-
-void UMafiaBaseRoleComponent::ClientAffectedEventsFlush_Implementation()
-{
-	/** ktw : 자식 클래스에서 override */
-}
-
-void UMafiaBaseRoleComponent::ClientResponsePostUseAbility_Implementation(UMafiaBaseRoleComponent* InOther)
-{
-	/** ktw : 자식 클래스에서 override */
-}
+#pragma endregion Vote
 
 
-
-
-
-
-void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaPlayerState* InOther)
+#pragma region RPC Ability
+void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaBasePlayerState* InOther)
 {
 	/** ktw : 서버에서 실행됩니다. */
 	if (UMafiaBaseGameInstance* GI = GetServerInstance())
@@ -246,6 +214,88 @@ void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaPlayerSta
 		}
 	}
 }
+
+void UMafiaBaseRoleComponent::ClientAffectedAbilityByOther_Implementation(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
+{
+	/** ktw : 클라이언트에서 실행됩니다. */
+	/** Todo - ktw :  서버가 직접 이벤트를 넣어줄 지 아니면, 클라이언트가 신호를 받아서 이벤트를 넣어 두고 한 번에 Flush? */
+	FAffectedEvent Event;
+	Event.Other = InOther;
+	CachedAffectedEventsHeap.HeapPush(Event);
+}
+
+
+void UMafiaBaseRoleComponent::ClientAffectedEventsFlush_Implementation()
+{
+	/** ktw : 파생 클래스에서 override */
+}
+
+void UMafiaBaseRoleComponent::ClientResponsePostUseAbility_Implementation(UMafiaBaseRoleComponent* InOther)
+{
+	/** ktw : 파생 클래스에서 override */
+}
+
+#pragma endregion RPC Ability
+
+#pragma region RPC Vote
+void UMafiaBaseRoleComponent::ServerReqVote_Implementation(AMafiaBasePlayerState* InOther)
+{
+	/** ktw : 서버에서 실행됩니다. */
+		/** ktw : 서버에서 실행됩니다. */
+	if (UMafiaBaseGameInstance* GI = GetServerInstance())
+	{
+		if (OwningPlayerState.IsValid())
+		{
+			if (UMafiaChairManManager* ChairManManager = GI->GetChairMan())
+			{
+				ChairManManager->AddVoteEvent(OwningPlayerState.Get(), InOther);
+			}
+		}
+	}
+}
+
+void UMafiaBaseRoleComponent::ClientPreVoteEvent_Implementation()
+{
+	/** ktw : 클라이언트에서 실행됩니다. */
+
+}
+
+void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag)
+{
+	/** ktw : 클라이언트에서 실행됩니다. */
+	if (OwningPlayerState.IsValid())
+	{
+		/** Todo - ktw : 투표 Flag당 실행할 기능 추가. */
+		if (EMafiaVoteFlag::ImpossibleVote == InFlag)
+		{
+			// EMafiaGameFlow가 Vote가 아니거나 투표를 할 수 없는 상태.
+		}
+		else if (EMafiaVoteFlag::AlreadyVoted == InFlag)
+		{
+			// 중복 투표
+		}
+		else if (EMafiaVoteFlag::Succeed == InFlag)
+		{
+			// 투표 완료.
+		}
+		else
+		{
+
+		}
+	}
+}
+
+void UMafiaBaseRoleComponent::ClientPostVoteEvent_Implementation()
+{
+	/** ktw : 클라이언트에서 실행됩니다. */
+}
+
+#pragma endregion RPC Vote
+
+
+
+
+
 
 
 void UMafiaBaseRoleComponent::ServerReqSetTeam_Implementation(EMafiaTeam InTeam)
@@ -271,6 +321,7 @@ void UMafiaBaseRoleComponent::ServerReqSetRoleName_Implementation(FName InRoleNa
 	/** ktw : 서버에서 실행됩니다. */
 	RoleName = InRoleName;
 }
+
 
 
 
@@ -356,5 +407,4 @@ bool operator < (const FAffectedEvent& A, const FAffectedEvent& B)
 //		}
 //	}*/
 //}
-
 
