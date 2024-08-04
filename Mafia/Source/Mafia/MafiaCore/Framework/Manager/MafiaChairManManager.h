@@ -60,6 +60,9 @@ public:
 	void OnSetMafiaFlowState(EMafiaFlowState InFlowState);
 
 public:
+	UFUNCTION()
+	void AssigningAllPlayersAbility();
+
 	/** ktw : Origin -> Destination으로 향하는 능력 사용 이벤트를 Heap에 임시 저장합니다.  */
 	// InOrigin : 능력 사용 Player, InDestination : 능력에 영향을 받은 Player.
 	UFUNCTION()
@@ -73,9 +76,6 @@ public:
 	FORCEINLINE const TMap<FName, FPlayerVoteData>& GetPlayerVoteMap() { return CachedVoteEventsMap; }
 
 private:
-	UFUNCTION()
-	void AssigningAllPlayersAbility();
-
 	/** ktw : Heap에 저장된 능력 이벤트들을 순회하면서 각 플레이어의 RoleComponent에 이벤트를 전송합니다. */
 	UFUNCTION()
 	void DispatchAbilityEvents();

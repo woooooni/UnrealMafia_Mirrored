@@ -60,31 +60,31 @@ public:
 	
 public:
 	/** 
-		ktw - 서버에서 호출해야합니다.
+		ktw : 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
 	void AffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 
 	/**
-		ktw - 서버에서 호출해야합니다.
+		ktw : 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
 	void ResponsePostUseAbility(UMafiaBaseRoleComponent* InOther);
 	
 	/** 
-		ktw - 서버에서 호출해야합니다.
+		ktw : 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
 	void FlushAbilityEvents();
 
 	/**
-		ktw - 서버에서 호출해야합니다.
+		ktw : 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
 	void PreVoteEvent();
 
 	/** 
-		ktw - 서버에서 호출해야합니다.
+		ktw : 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
 	void ResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag);
@@ -95,10 +95,10 @@ protected:
 
 protected:
 	UFUNCTION(Client, Reliable)
-	virtual void ClientAffectedEventsFlush() PURE_VIRTUAL(UMafiaBaseRoleComponent::ClientAffectedEventsFlush, );
+	virtual void ClientAffectedEventsFlush();
 
 	UFUNCTION(Client, Reliable)
-	virtual void ClientResponsePostUseAbility(UMafiaBaseRoleComponent* InOther) PURE_VIRTUAL(UMafiaBaseRoleComponent::ClientResponseUseAbilityToOther, );
+	virtual void ClientResponsePostUseAbility(UMafiaBaseRoleComponent* InOther);
 
 private:
 	UFUNCTION(Server, Reliable)
@@ -113,7 +113,7 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerReqSetRoleName(FName InRoleName);
 
-	/** ktw - 능력 사용 관련 함수들. */
+	/** ktw : 능력 사용 관련 함수들. */
 	UFUNCTION(Server, Reliable)
 	void ServerReqUseAbility(class AMafiaPlayerState* InOther);
 
@@ -141,10 +141,10 @@ protected:
 	FName RoleName;
 
 protected:
-	/** ktw - 내가 능력을 볼 수 있는 플레이어의 Unique ID. */
+	/** ktw : 내가 능력을 볼 수 있는 플레이어의 Unique ID. */
 	TSet<uint32> VisiblePlayerSet;
 
-	/** ktw - 이번 턴에 내가 처리할 이벤트 목록. */
+	/** ktw : 이번 턴에 내가 처리할 이벤트 목록. */
 	TArray<FAffectedEvent> CachedAffectedEventsHeap;
 
 private:

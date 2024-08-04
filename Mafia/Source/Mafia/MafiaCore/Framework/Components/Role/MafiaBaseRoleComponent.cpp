@@ -217,6 +217,18 @@ void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(UMafiaBaseR
 	}
 }
 
+void UMafiaBaseRoleComponent::ClientAffectedEventsFlush_Implementation()
+{
+	/** ktw : 자식 클래스에서 override */
+}
+
+void UMafiaBaseRoleComponent::ClientResponsePostUseAbility_Implementation(UMafiaBaseRoleComponent* InOther)
+{
+	/** ktw : 자식 클래스에서 override */
+}
+
+
+
 
 
 
@@ -283,6 +295,7 @@ UMafiaBaseGameInstance* UMafiaBaseRoleComponent::GetServerInstance()
 	}
 	return nullptr;
 }
+
 
 bool operator < (const FAffectedEvent& A, const FAffectedEvent& B)
 {

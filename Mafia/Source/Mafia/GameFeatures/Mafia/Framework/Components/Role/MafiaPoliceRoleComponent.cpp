@@ -19,8 +19,10 @@ void UMafiaPoliceRoleComponent::BeginPlay()
 
 void UMafiaPoliceRoleComponent::ClientAffectedEventsFlush_Implementation()
 {
+	
 }
 
 void UMafiaPoliceRoleComponent::ClientResponsePostUseAbility_Implementation(UMafiaBaseRoleComponent* InOther)
 {
+	
 }
