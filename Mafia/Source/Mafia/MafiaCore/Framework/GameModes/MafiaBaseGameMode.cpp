@@ -556,13 +556,13 @@ bool AMafiaBaseGameMode::IsReadyAllUsers() const
 	int32 UserReadyCount = 0;
 	for (const auto& Elem : JoinedUserPlayerStateMap)
 	{
-		const AMafiaBasePlayerState* const UserPleyerState = Elem.Value.Get();
-		if (false == IsValid(UserPleyerState))
+		const AMafiaBasePlayerState* const UserPlayerState = Elem.Value.Get();
+		if (false == IsValid(UserPlayerState))
 		{
 			continue;
 		}
 
-		if (UserPleyerState->IsReadyForGame())
+		if (UserPlayerState->IsReadyForGame())
 		{
 			UserReadyCount++;
 		}

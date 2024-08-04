@@ -50,6 +50,9 @@ public:
 	
 
 protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+protected:
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -67,12 +70,22 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	
 public:
-	void ChangeColor(FLinearColor InColor, uint32 InMaterialIndex);
+	/* ktw : 서버에서 호출해야 합니다. */
+	UFUNCTION()
+	void ChangeColor(FLinearColor InColor);
 
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+protected:
+	UFUNCTION()
+	void OnRepChangeColor();
+
+private:
+	UPROPERTY(ReplicatedUsing = OnRepChangeColor)
+	FLinearColor CharacterColor;
 };
 

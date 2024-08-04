@@ -126,15 +126,12 @@ private:
 	UFUNCTION(Client, Reliable)
 	void ClientResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag);
 
-private:
-	UFUNCTION()
-	virtual void OnRepChangeRoleType();
 
 protected:
 	UPROPERTY(Replicated)
 	EMafiaTeam TeamType;
 
-	UPROPERTY(Replicated, ReplicatedUsing = OnRepChangeRoleType)
+	UPROPERTY(Replicated)
 	EMafiaRole RoleType;
 
 	UPROPERTY(Replicated)

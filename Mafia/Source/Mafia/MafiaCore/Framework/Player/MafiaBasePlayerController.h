@@ -65,7 +65,7 @@ private:
 
 #pragma region MaterialCheat
 	UFUNCTION(Exec)
-	void CheatChangeCharacterColor(int32 InRed, int32 InGreen, int32 InBlue, int32 InAlpha);
+	void CheatChangePlayerColor(float InRed, float InGreen, float InBlue, float InAlpha);
 #pragma endregion
 
 

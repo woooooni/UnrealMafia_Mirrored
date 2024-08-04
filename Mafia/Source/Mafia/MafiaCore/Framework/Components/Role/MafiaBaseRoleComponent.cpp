@@ -314,52 +314,47 @@ bool operator < (const FAffectedEvent& A, const FAffectedEvent& B)
 
 
 
-void UMafiaBaseRoleComponent::OnRepChangeRoleType()
-{
-	if (GetOwnerRole() == ROLE_AutonomousProxy)
-	{
-		if (AMafiaBasePlayerState* PS = GetOwner<AMafiaBasePlayerState>())
-		{
-			if (AMafiaBasePlayerController* PC = Cast<AMafiaBasePlayerController>(PS->GetPlayerController()))
-			{
-				if (AMafiaSampleCharacter* Character = Cast<AMafiaSampleCharacter>(PC->GetPawn()))
-				{
-					switch (RoleType)
-					{
-					case EMafiaRole::Madam:
-						break;
-					case EMafiaRole::Police:
-						Character->ChangeColor(FLinearColor(0, 0, 1), 0);
-						break;
-					case EMafiaRole::Killer:
-						break;
-					case EMafiaRole::Mafia:
-						Character->ChangeColor(FLinearColor(1, 0, 0), 0);
-						break;
-					case EMafiaRole::Vigilante:
-						break;
-					case EMafiaRole::BusDriver:
-						break;
-					case EMafiaRole::Detective:
-						break;
-					case EMafiaRole::Spirit:
-						break;
-					case EMafiaRole::Thief:
-						break;
-					case EMafiaRole::Soldier:
-						break;
-					case EMafiaRole::Doctor:
-						Character->ChangeColor(FLinearColor(1, 1, 0), 0);
-						break;
-					case EMafiaRole::Citizen:
-						break;
-					default:
-						break;
-					}
-				}
-			}
-		}
-	}
-}
+//void UMafiaBaseRoleComponent::OnRepChangeRoleType()
+//{
+//	/*if (GetOwnerRole() == ROLE_AutonomousProxy)
+//	{
+//		if (AMafiaBasePlayerState* PS = GetOwner<AMafiaBasePlayerState>())
+//		{
+//
+//			switch (RoleType)
+//			{
+//			case EMafiaRole::Madam:
+//				break;
+//			case EMafiaRole::Police:
+//				Character->ChangeColor(FLinearColor(0, 0, 1));
+//				break;
+//			case EMafiaRole::Killer:
+//				break;
+//			case EMafiaRole::Mafia:
+//				Character->ChangeColor(FLinearColor(1, 0, 0));
+//				break;
+//			case EMafiaRole::Vigilante:
+//				break;
+//			case EMafiaRole::BusDriver:
+//				break;
+//			case EMafiaRole::Detective:
+//				break;
+//			case EMafiaRole::Spirit:
+//				break;
+//			case EMafiaRole::Thief:
+//				break;
+//			case EMafiaRole::Soldier:
+//				break;
+//			case EMafiaRole::Doctor:
+//				Character->ChangeColor(FLinearColor(1, 1, 0), 0);
+//				break;
+//			case EMafiaRole::Citizen:
+//				break;
+//			default:
+//				break;
+//			}
+//		}
+//	}*/
+//}
 
 

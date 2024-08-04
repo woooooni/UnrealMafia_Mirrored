@@ -35,23 +35,29 @@ private:
 	void PostInitializeRoleComponent();
 
 public:
+	FORCEINLINE UMafiaBaseRoleComponent* GetRoleComponent() { return RoleComponent; }
+
+public:
 	/** ktw - 서버에서 호출해야 합니다. */
 	UFUNCTION()
 	UMafiaBaseRoleComponent* AssignAbility(EMafiaRole InRole);
 
-	UFUNCTION()
-	FORCEINLINE UMafiaBaseRoleComponent* GetRoleComponent() { return RoleComponent; }
-	
 
+public:
+
+	/** ktw - 클라이언트에서 호출해야 합니다. */
+	UFUNCTION()
+	void ChangePlayerColor(FLinearColor InColor);
+	FORCEINLINE FLinearColor GetPlayerColor() { return PlayerColor; }
 
 protected:
-	/** 플레이어 Role Component 생성. AssignAbility에서 호출. */
+	/** ktw : 플레이어 Role Component 생성. AssignAbility에서 호출됩니다. */
 	UFUNCTION()
 	UMafiaBaseRoleComponent* CreateRoleComponent(EMafiaRole InRole);
 
-	
-
-
+protected:
+	UFUNCTION(Server, UnReliable)
+	void ServerChangePlayerColor(FLinearColor InColor);
 
 	
 protected:
@@ -63,8 +69,7 @@ protected:
 	UPROPERTY(Replicated)
 	TObjectPtr<class UMafiaBaseRoleComponent> RoleComponent;
 
-	/** */
+	/** Player Color */
 	UPROPERTY(Replicated)
-	uint8 VoteCount;
-
+	FLinearColor PlayerColor;
 };

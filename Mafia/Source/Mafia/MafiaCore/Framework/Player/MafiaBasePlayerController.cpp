@@ -216,7 +216,8 @@ void AMafiaBasePlayerController::CheatUseAbility(int32 InPlayerNum)
 
 		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
 		{
-			if (0 >= InPlayerNum || GS->PlayerArray.IsValidIndex(InPlayerNum - 1) == false)
+			/** ktw : 본인 제외. */
+			if (1 >= InPlayerNum || GS->PlayerArray.IsValidIndex(InPlayerNum - 1) == false)
 			{
 				MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Invalid Player Number"));
 				return;
@@ -239,15 +240,16 @@ void AMafiaBasePlayerController::CheatUseAbility(int32 InPlayerNum)
 #endif
 }
 
-void AMafiaBasePlayerController::CheatChangeCharacterColor(int32 InRed, int32 InGreen, int32 InBlue, int32 InAlpha)
+void AMafiaBasePlayerController::CheatChangePlayerColor(float InRed, float InGreen, float InBlue, float InAlpha)
 {
 #if ENABLE_CHEAT
-	if (AMafiaSampleCharacter* DefaultCharacter = GetPawn<AMafiaSampleCharacter>())
+	if (AMafiaBasePlayerState* PS = GetPlayerState<AMafiaBasePlayerState>())
 	{
-		DefaultCharacter->ChangeColor(FLinearColor(InRed, InGreen, InBlue, InAlpha), 0);
+		PS->ChangePlayerColor(FLinearColor(InRed, InGreen, InBlue, InAlpha));
 	}
 #endif
 }
+
 
 void AMafiaBasePlayerController::ServerReqUseAbility_Implementation(AMafiaBasePlayerState* InMyPlayerState, AMafiaBasePlayerState* InOtherPlayerState)
 {

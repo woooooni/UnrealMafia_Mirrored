@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -58,6 +59,12 @@ AMafiaSampleCharacter::AMafiaSampleCharacter(const FObjectInitializer& ObjectIni
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -88), FRotator(0, 0, -90));
 }
 
+void AMafiaSampleCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AMafiaSampleCharacter, CharacterColor);
+}
+
 void AMafiaSampleCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -65,7 +72,6 @@ void AMafiaSampleCharacter::BeginPlay()
 
 	// Add Input Mapping Context
 
-	ChangeColor(FLinearColor(1.0, 0.0, 0.0), 0);
 }
 
 void AMafiaSampleCharacter::Tick(float DeltaTime)
@@ -73,11 +79,16 @@ void AMafiaSampleCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AMafiaSampleCharacter::ChangeColor(FLinearColor InColor, uint32 InMaterialIndex)
+void AMafiaSampleCharacter::ChangeColor(FLinearColor InColor)
 {
-	if (GetMesh()->GetMaterial(InMaterialIndex))
+	CharacterColor = InColor;
+}
+
+void AMafiaSampleCharacter::OnRepChangeColor()
+{
+	if (GetMesh()->GetMaterial(0))
 	{
-		GetMesh()->SetVectorParameterValueOnMaterials(TEXT("Tint"), FVector(InColor));
+		GetMesh()->SetVectorParameterValueOnMaterials(TEXT("Tint"), FVector(CharacterColor));
 	}
 }
 

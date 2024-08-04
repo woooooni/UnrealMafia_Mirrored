@@ -2,6 +2,7 @@
 
 
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
+#include "MafiaCore/Framework/GameModes/MafiaBaseGameMode.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameState.h"
 #include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaCitizenRoleComponent.h"
@@ -9,9 +10,11 @@
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaDoctorRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaGodFatherRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Character/MafiaSampleCharacter.h"
+
 #include "Net/UnrealNetwork.h"
 #include "Mafia.h"
 #include "Mafia/Framework/Player/MafiaPlayerController.h"
+
 
 AMafiaBasePlayerState::AMafiaBasePlayerState(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
@@ -25,6 +28,7 @@ void AMafiaBasePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 
 	DOREPLIFETIME(AMafiaBasePlayerState, bReadyForGame);
 	DOREPLIFETIME(AMafiaBasePlayerState, RoleComponent);
+	DOREPLIFETIME(AMafiaBasePlayerState, PlayerColor);
 }
 
 void AMafiaBasePlayerState::BeginPlay()
@@ -66,6 +70,26 @@ UMafiaBaseRoleComponent* AMafiaBasePlayerState::AssignAbility(EMafiaRole InRole)
 	
 	return nullptr;
 }
+
+void AMafiaBasePlayerState::ChangePlayerColor(FLinearColor InColor)
+{
+	ServerChangePlayerColor(InColor);
+}
+
+void AMafiaBasePlayerState::ServerChangePlayerColor_Implementation(FLinearColor InColor)
+{
+	/** ktw : 서버에서 실행됩니다. */
+	PlayerColor = InColor;
+
+	if (AMafiaBasePlayerController* PC = Cast<AMafiaBasePlayerController>(GetPlayerController()))
+	{
+		if (AMafiaSampleCharacter* Character = Cast<AMafiaSampleCharacter>(PC->GetPawn()))
+		{
+			Character->ChangeColor(PlayerColor);
+		}
+	}
+}
+
 
 UMafiaBaseRoleComponent* AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole InRole)
 {
