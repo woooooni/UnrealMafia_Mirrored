@@ -80,6 +80,26 @@ bool AMafiaBasePlayerState::AssignAbility(EMafiaRole InRole)
 	return false;
 }
 
+void AMafiaBasePlayerState::NotifyGameResult_Implementation(EMafiaGameResult InGameResult)
+{
+	/* #Todo - ktw : 게임 결과에 따른 UI 출력. */
+	switch (InGameResult)
+	{
+	case EMafiaGameResult::None:
+		break;
+	case EMafiaGameResult::CitizenWin:
+		break;
+	case EMafiaGameResult::MafiaWin:
+		break;
+	case EMafiaGameResult::NeutralWin:
+		break;
+	case EMafiaGameResult::Invalid:
+		break;
+	default:
+		break;
+	}
+}
+
 void AMafiaBasePlayerState::ChangePlayerColor(FLinearColor InColor)
 {
 	ServerChangePlayerColor(InColor);

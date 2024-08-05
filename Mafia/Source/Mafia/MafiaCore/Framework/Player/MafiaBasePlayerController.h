@@ -42,8 +42,10 @@ protected:
 private:
 	UFUNCTION(Exec)
 	void CheatSetMinPlayerCount(const int32 InMinPlayerCount = 1);
+
 	UFUNCTION(Server, Reliable)
 	void ServerCheatSetMinPlayerCount(const int32 InMinPlayerCount);
+
 	UFUNCTION(Exec)
 	void CheatSetReadyForGame(const bool bReady = true);
 #pragma endregion

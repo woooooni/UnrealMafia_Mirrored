@@ -49,6 +49,9 @@ public:
 	UFUNCTION()
 	bool AssignAbility(EMafiaRole InRole);
 
+	/** ktw - 서버에서 호출해야 합니다. */
+	UFUNCTION(Client, Reliable)
+	void NotifyGameResult(EMafiaGameResult InGameResult);
 
 public:
 

@@ -103,6 +103,9 @@ private:
 	UFUNCTION()
 	EMafiaGameResult CheckGameOver() const;
 
+	UFUNCTION()
+	void NotifyGameOver(EMafiaGameResult InGameResult) const;
+
 
 private:
 	/** ktw : EMafiaRole에 선언된 Role의 값을 순서로 Event를 정렬합니다. */

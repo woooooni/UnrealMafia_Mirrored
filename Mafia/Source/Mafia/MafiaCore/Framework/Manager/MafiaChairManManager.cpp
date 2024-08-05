@@ -365,10 +365,41 @@ EMafiaGameResult UMafiaChairManManager::CheckGameOver() const
 	return EMafiaGameResult::Invalid;
 }
 
+void UMafiaChairManManager::NotifyGameOver(EMafiaGameResult InGameResult) const
+{
+	if (InGameResult == EMafiaGameResult::None)
+	{
+		return;
+	}
+		
+	if (UWorld* World = GetWorld())
+	{
+		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
+		{
+			for (auto& Pair : GS->GetJoinedUserPlayerStateMap())
+			{
+				if (AMafiaBasePlayerState* PS = Pair.Value.Get())
+				{
+					PS->NotifyGameResult(InGameResult);
+				}
+			}
+		}
+	}
+}
+
 void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 {
 	/** ktw : AMafiaBaseGameState::SetMafiaFlowState에서 호출됩니다. */
-	/** #Todo-ktw : CheckGameOver 로직에 추가. */
+	/** 
+		# Todo-ktw : CheckGameOver 로직에 추가.	
+
+		EMafiaGameReuslt GameResult = CheckGameOver();
+		if (GameResult != EMafiaGameResult::None)
+		{
+			NotifyGameOver(GameResult);
+		}
+	*/
+
 	if (EMafiaFlowState::None == InFlowState)
 	{
 		AssigningAllPlayersAbility();
