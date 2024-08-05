@@ -56,19 +56,28 @@ void AMafiaBasePlayerState::PostInitializeComponents()
 	MAFIA_ALOG(LogMafiaPlayerState, Log, TEXT("End"));
 }
 
-UMafiaBaseRoleComponent* AMafiaBasePlayerState::AssignAbility(EMafiaRole InRole)
+
+void AMafiaBasePlayerState::CheatSetRole_Implementation(EMafiaRole InRole)
+{
+#if ENABLE_CHEAT
+	AssignAbility(InRole);
+#endif
+}
+
+
+bool AMafiaBasePlayerState::AssignAbility(EMafiaRole InRole)
 {
 	if (HasAuthority())
 	{
-		RoleComponent = CreateRoleComponent(InRole);
+		CreateRoleComponent(InRole);
 		if (IsValid(RoleComponent))
 		{
 			PostInitializeRoleComponent();
+			return true;
 		}
-		return RoleComponent;
 	}
 	
-	return nullptr;
+	return false;
 }
 
 void AMafiaBasePlayerState::ChangePlayerColor(FLinearColor InColor)
@@ -91,29 +100,29 @@ void AMafiaBasePlayerState::ServerChangePlayerColor_Implementation(FLinearColor 
 }
 
 
-UMafiaBaseRoleComponent* AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole InRole)
+void AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole InRole)
 {
 	if (IsValid(RoleComponent))
 	{
+		RoleComponent->UnregisterComponent();
 		RoleComponent->DestroyComponent();
 		RoleComponent = nullptr;
 	}
 
-	UMafiaBaseRoleComponent* NewRoleComponent = nullptr;
 	switch (InRole)
 	{
 	case EMafiaRole::Citizen:
-		NewRoleComponent = NewObject<UMafiaCitizenRoleComponent>(this);
+		RoleComponent = NewObject<UMafiaCitizenRoleComponent>(this);
 		break;
 	case EMafiaRole::Madam:
 		break;
 	case EMafiaRole::Police:
-		NewRoleComponent = NewObject<UMafiaPoliceRoleComponent>(this);
+		RoleComponent = NewObject<UMafiaPoliceRoleComponent>(this);
 		break;
 	case EMafiaRole::Killer:
 		break;
 	case EMafiaRole::Mafia:
-		NewRoleComponent = NewObject<UMafiaGodFatherRoleComponent>(this);
+		RoleComponent = NewObject<UMafiaGodFatherRoleComponent>(this);
 		break;
 	case EMafiaRole::Vigilante:
 		break;
@@ -128,19 +137,17 @@ UMafiaBaseRoleComponent* AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole I
 	case EMafiaRole::Soldier:
 		break;
 	case EMafiaRole::Doctor:
-		NewRoleComponent = NewObject<UMafiaDoctorRoleComponent>(this);
+		RoleComponent = NewObject<UMafiaDoctorRoleComponent>(this);
 		break;
 	default:
-		return nullptr;
+		return;
 	}
 
-	if (IsValid(NewRoleComponent))
+	if (IsValid(RoleComponent))
 	{
-		NewRoleComponent->SetIsReplicated(true);
-		NewRoleComponent->RegisterComponent();
+		RoleComponent->SetIsReplicated(true);
+		RoleComponent->RegisterComponent();
 	}
-
-	return NewRoleComponent;
 }
 
 void AMafiaBasePlayerState::PostInitializeRoleComponent_Implementation()

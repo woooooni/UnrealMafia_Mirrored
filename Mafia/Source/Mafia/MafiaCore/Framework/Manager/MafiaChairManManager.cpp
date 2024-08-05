@@ -39,11 +39,14 @@ void UMafiaChairManManager::AssigningAllPlayersAbility()
 			if (bMakeSucceed)
 			{
 				int32 Num = 0;
-				for (auto& Iter : GameState->GetJoinedUserPlayerStateMap())
+				for (auto& Pair : GameState->GetJoinedUserPlayerStateMap())
 				{
-					if (Iter.Value.IsValid())
+					if (Pair.Value.IsValid())
 					{
-						Iter.Value.Get()->AssignAbility(ShuffledRoleArray[Num++]);
+						if (Pair.Value.Get()->AssignAbility(ShuffledRoleArray[Num++]) == false)
+						{
+							checkf(false, TEXT("ChairMan Assign Ability Failed."));
+						}
 					}
 				}
 			}
@@ -300,10 +303,72 @@ bool UMafiaChairManManager::IsPossibleVote()
 	return false;
 }
 
+EMafiaGameResult UMafiaChairManManager::CheckGameOver() const
+{
+	UWorld* World = GetWorld();
+
+	if (IsValid(World))
+	{
+		if (AMafiaBaseGameState* GameState = World->GetGameState<AMafiaBaseGameState>())
+		{
+			int8 AliveCitizenCount = 0;
+			int8 AliveMafiaCount = 0;
+
+			for (auto& Pair : GameState->GetJoinedUserPlayerStateMap())
+			{
+				/** 
+					ktw : 마피아팀 승리조건 체크. 
+					1순위 : 마피아팀 -> 2순위 : 시민팀 -> 3순위 : 중립
+				*/
+				if (AMafiaBasePlayerState* PS = Pair.Value.Get())
+				{
+					if (UMafiaBaseRoleComponent* RoleComponent = PS->GetRoleComponent())
+					{
+						if (RoleComponent->IsDead() == false)
+						{
+							EMafiaTeam TeamType = RoleComponent->GetTeamType();
+							if (TeamType == EMafiaTeam::Citizen)
+							{
+								++AliveCitizenCount;
+							}
+							else if (TeamType == EMafiaTeam::Mafia)
+							{
+								++AliveMafiaCount;
+							}
+						}
+					}
+				}
+			}
+
+			if (AliveMafiaCount >= AliveCitizenCount)
+			{
+				return EMafiaGameResult::MafiaWin;
+			}
+			else if (AliveMafiaCount == 0)
+			{
+				if (AliveCitizenCount == 0)
+				{
+					return EMafiaGameResult::NeutralWin;
+				}
+				else
+				{
+					return EMafiaGameResult::CitizenWin;
+				}
+			}
+			else
+			{
+				return EMafiaGameResult::None;
+			}
+		}
+	}
+
+	return EMafiaGameResult::Invalid;
+}
+
 void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 {
 	/** ktw : AMafiaBaseGameState::SetMafiaFlowState에서 호출됩니다. */
-	
+	/** #Todo-ktw : CheckGameOver 로직에 추가. */
 	if (EMafiaFlowState::None == InFlowState)
 	{
 		AssigningAllPlayersAbility();
@@ -320,6 +385,7 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	else if (EMafiaFlowState::Night == InFlowState)
 	{
 		EndVote();
+		CheckGameOver();
 	}
 			
 }

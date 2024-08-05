@@ -100,6 +100,8 @@ private:
 	bool MakeShuffledRoleArray(int32 InPlayerCount, OUT TArray<EMafiaRole>& OutSuffledArray);
 	bool IsPossibleVote();
 
+	UFUNCTION()
+	EMafiaGameResult CheckGameOver() const;
 
 
 private:

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "Mafia.h"
 #include "MafiaBasePlayerState.generated.h"
 
 /**
@@ -35,12 +36,18 @@ private:
 	void PostInitializeRoleComponent();
 
 public:
-	FORCEINLINE UMafiaBaseRoleComponent* GetRoleComponent() { return RoleComponent; }
+	FORCEINLINE class UMafiaBaseRoleComponent* GetRoleComponent() { return RoleComponent; }
+
+#pragma region Cheat
+public:
+	UFUNCTION(Server, Reliable)
+	void CheatSetRole(EMafiaRole InRole);
+#pragma endregion Cheat
 
 public:
 	/** ktw - 서버에서 호출해야 합니다. */
 	UFUNCTION()
-	UMafiaBaseRoleComponent* AssignAbility(EMafiaRole InRole);
+	bool AssignAbility(EMafiaRole InRole);
 
 
 public:
@@ -53,7 +60,7 @@ public:
 protected:
 	/** ktw : 플레이어 Role Component 생성. AssignAbility에서 호출됩니다. */
 	UFUNCTION()
-	UMafiaBaseRoleComponent* CreateRoleComponent(EMafiaRole InRole);
+	void CreateRoleComponent(EMafiaRole InRole);
 
 protected:
 	UFUNCTION(Server, UnReliable)

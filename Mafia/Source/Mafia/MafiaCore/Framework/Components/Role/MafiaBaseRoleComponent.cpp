@@ -42,50 +42,22 @@ void UMafiaBaseRoleComponent::BeginPlay()
 
 void UMafiaBaseRoleComponent::SetTeamType(EMafiaTeam InTeam)
 {
-	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy)
-	{
-		ServerReqSetTeam(InTeam);
-	}
-	else
-	{
-		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("클라이언트에서 호출해야합니다."));
-	}
+	ServerReqSetTeam(InTeam);
 }
 
 void UMafiaBaseRoleComponent::SetRoleType(EMafiaRole InRole)
 {
-	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy)
-	{
-		ServerReqSetRole(InRole);
-	}
-	else
-	{
-		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("클라이언트에서 호출해야합니다."));
-	}
+	ServerReqSetRole(InRole);
 }
 
 void UMafiaBaseRoleComponent::SetDead(bool InDead)
 {
-	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy)
-	{
-		ServerReqSetDead(InDead);
-	}
-	else
-	{
-		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("클라이언트에서 호출해야합니다."));
-	}
+	ServerReqSetDead(InDead);
 }
 
 void UMafiaBaseRoleComponent::SetRoleName(FName InRoleName)
 {
-	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy)
-	{
-		ServerReqSetRoleName(InRoleName);
-	}
-	else
-	{
-		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("클라이언트에서 호출해야합니다."));
-	}
+	ServerReqSetRoleName(InRoleName);
 }
 
 
@@ -96,14 +68,7 @@ void UMafiaBaseRoleComponent::SetRoleName(FName InRoleName)
 
 void UMafiaBaseRoleComponent::UseAbility(AMafiaBasePlayerState* InOther)
 {
-	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy == GetOwnerRole())
-	{
-		ServerReqUseAbility(InOther);
-	}
-	else
-	{
-		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("클라이언트에서 호출해야합니다."));
-	}
+	ServerReqUseAbility(InOther);
 }
 
 void UMafiaBaseRoleComponent::AffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
@@ -147,15 +112,7 @@ void UMafiaBaseRoleComponent::FlushAbilityEvents()
 #pragma region Vote
 void UMafiaBaseRoleComponent::Vote(AMafiaBasePlayerState* InOther)
 {
-	if (ENetRole::ROLE_SimulatedProxy == GetOwnerRole() || ENetRole::ROLE_AutonomousProxy == GetOwnerRole())
-	{
-		ServerReqVote(InOther);
-	}
-	else
-	{
-		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("클라이언트에서 호출해야합니다."));
-	}
-
+	ServerReqVote(InOther);
 }
 
 void UMafiaBaseRoleComponent::PreVoteEvent()

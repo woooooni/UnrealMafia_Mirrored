@@ -39,6 +39,16 @@ enum class EMafiaTeam : uint8
 	Neutral,	/* 중립 */
 };
 
+UENUM()
+enum class EMafiaGameResult
+{
+	None,
+	CitizenWin,
+	MafiaWin,
+	NeutralWin,
+	Invalid,
+};
+
 
 /** 
 	ktw - 능력 처리 우선순위로  정렬되어 선언됨. 숫자가 낮을 수록, 이벤트 처리 우선순위가 높습니다. 

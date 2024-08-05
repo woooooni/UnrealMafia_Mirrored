@@ -286,6 +286,17 @@ void AMafiaBasePlayerController::CheatVote(int32 InPlayerNum)
 #endif
 }
 
+void AMafiaBasePlayerController::CheatChangeRole(const FString& InStrRole)
+{
+#if ENABLE_CHEAT
+	if (AMafiaBasePlayerState* PS = GetPlayerState<AMafiaBasePlayerState>())
+	{
+		EMafiaRole RoleType = GetStringToEnum<EMafiaRole>(InStrRole);
+		PS->CheatSetRole(RoleType);
+	}
+#endif
+}
+
 
 void AMafiaBasePlayerController::CheatChangePlayerColor(float InRed, float InGreen, float InBlue, float InAlpha)
 {

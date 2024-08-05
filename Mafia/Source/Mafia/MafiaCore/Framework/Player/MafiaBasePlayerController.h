@@ -61,6 +61,9 @@ private:
 
 	UFUNCTION(Exec)
 	void CheatVote(int32 InPlayerNum);
+
+	UFUNCTION(Exec)
+	void CheatChangeRole(const FString& InStrRole);
 #pragma endregion
 
 #pragma region MaterialCheat
