@@ -27,7 +27,7 @@ UMafiaChairManManager::UMafiaChairManManager(const FObjectInitializer& ObjectIni
 void UMafiaChairManManager::AssigningAllPlayersAbility()
 {
 	UWorld* World = GetWorld();
-
+	
 	if (IsValid(World))
 	{
 		if (AMafiaBaseGameState* GameState = World->GetGameState<AMafiaBaseGameState>())
@@ -252,7 +252,7 @@ bool UMafiaChairManManager::MakeShuffledRoleArray(int32 InUserCount, OUT TArray<
 	OutSuffledArray.Reserve(InUserCount);
 
 	/** 
-		ktw - 플레이어 수 : 4 ~ 20
+		ktw - 플레이어 수 : 4 ~ 20 (임시로 1명도 플레이 가능.)
 		FMath::IsWithin				: 이상 ~ 미만
 		FMath::IsWithinInclusive	: 이상 ~ 이하
 	*/
@@ -398,6 +398,8 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 		{
 			NotifyGameOver(GameResult);
 		}
+
+		# Todo-ktw : EMafiaFlowState에 물려서 동작하게 하려면, 세분화 해야할 것 같음.
 	*/
 
 	if (EMafiaFlowState::None == InFlowState)
@@ -416,7 +418,6 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	else if (EMafiaFlowState::Night == InFlowState)
 	{
 		EndVote();
-		CheckGameOver();
 	}
 			
 }

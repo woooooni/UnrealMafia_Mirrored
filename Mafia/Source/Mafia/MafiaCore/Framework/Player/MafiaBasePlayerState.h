@@ -31,9 +31,7 @@ public:
 	void ServerReqReady(bool bReady);
 	FORCEINLINE bool IsReadyForGame() const { return bReadyForGame; }
 
-private:
-	UFUNCTION(Client, Reliable)
-	void PostInitializeRoleComponent();
+
 
 public:
 	FORCEINLINE class UMafiaBaseRoleComponent* GetRoleComponent() { return RoleComponent; }
@@ -50,7 +48,7 @@ public:
 	bool AssignAbility(EMafiaRole InRole);
 
 	/** ktw - 서버에서 호출해야 합니다. */
-	UFUNCTION(Client, Reliable)
+	UFUNCTION()
 	void NotifyGameResult(EMafiaGameResult InGameResult);
 
 public:
@@ -65,10 +63,15 @@ protected:
 	UFUNCTION()
 	void CreateRoleComponent(EMafiaRole InRole);
 
-protected:
+private:
 	UFUNCTION(Server, UnReliable)
 	void ServerChangePlayerColor(FLinearColor InColor);
 
+	UFUNCTION(Client, Reliable)
+	void ClientNotifyGameResult(EMafiaGameResult InGameResult);
+
+	UFUNCTION(Client, Reliable)
+	void PostInitializeRoleComponent();
 	
 protected:
 	/** 유저가 Ready버튼을 눌렀을때 */

@@ -28,10 +28,10 @@ class MAFIA_API UMafiaBaseRoleComponent : public UActorComponent
 
 protected:	
 	UMafiaBaseRoleComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	UFUNCTION()
@@ -175,7 +175,6 @@ private:
 	UPROPERTY(Replicated)
 	uint8 bDead : 1;
 
-private:
 	UPROPERTY(Replicated)
 	TWeakObjectPtr<class AMafiaBasePlayerState> OwningPlayerState;
 };

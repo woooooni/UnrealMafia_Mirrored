@@ -35,7 +35,7 @@ void AMafiaBasePlayerState::BeginPlay()
 {
 	MAFIA_ALOG(LogMafiaPlayerState, Log, TEXT("Begin"));
 	Super::BeginPlay();
-	if (HasAuthority())
+	/* if (HasAuthority())
 	{
 		if (UWorld* World = GetWorld())
 		{
@@ -45,7 +45,7 @@ void AMafiaBasePlayerState::BeginPlay()
 				PC->SetPawn(DefaultCharacter);
 			}
 		}
-	}
+	} */
 	MAFIA_ALOG(LogMafiaPlayerState, Log, TEXT("End. GetOwner:%s"), GetOwner() ? *GetOwner()->GetName() : TEXT("Other Client"));
 }
 
@@ -80,9 +80,18 @@ bool AMafiaBasePlayerState::AssignAbility(EMafiaRole InRole)
 	return false;
 }
 
-void AMafiaBasePlayerState::NotifyGameResult_Implementation(EMafiaGameResult InGameResult)
+void AMafiaBasePlayerState::NotifyGameResult(EMafiaGameResult InGameResult)
 {
-	/* #Todo - ktw : 게임 결과에 따른 UI 출력. */
+	if (HasAuthority())
+	{
+		ClientNotifyGameResult(InGameResult);
+	}
+}
+
+void AMafiaBasePlayerState::ClientNotifyGameResult_Implementation(EMafiaGameResult InGameResult)
+{
+	/** ktw : 클라이언트에서 실행됩니다. */
+	/** #Todo - ktw : 게임 결과에 따른 UI 출력. */
 	switch (InGameResult)
 	{
 	case EMafiaGameResult::None:
