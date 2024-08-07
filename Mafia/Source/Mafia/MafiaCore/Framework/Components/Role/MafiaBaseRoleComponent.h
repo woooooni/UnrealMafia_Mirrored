@@ -50,6 +50,7 @@ public:
 	void SetRoleName(FName InRoleName);
 	FORCEINLINE FName GetRoleName() { return RoleName; }
 
+public:
 	UFUNCTION()
 	void UseAbility(class AMafiaBasePlayerState* InOther);
 
@@ -59,10 +60,9 @@ public:
 
 	UFUNCTION()
 	FORCEINLINE class AMafiaBasePlayerState* GetOwningPlayerState() const { return OwningPlayerState.Get(); }
-	
-public:
 
 #pragma region Role Ability(역할 능력 관련)
+public:
 	/** 
 		ktw : 서버에서 호출해야합니다.
 	*/
@@ -83,6 +83,7 @@ public:
 #pragma endregion Role Ability(역할 능력 관련)
 	
 #pragma region Vote(투표)
+public:
 	/**
 		ktw : 서버에서 호출해야합니다.
 	*/

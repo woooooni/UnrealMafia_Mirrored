@@ -10,7 +10,6 @@
 #include "Framework/Components/Role/MafiaBaseRoleComponent.h"
 #include "Framework/UI/Core/MafiaBaseHUD.h"
 #include "Framework/Manager/MafiaChairManManager.h"
-#include "Mafia/Framework/Character/MafiaSampleCharacter.h"
 #include "Mafia.h"
 
 AMafiaBasePlayerController::AMafiaBasePlayerController(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
