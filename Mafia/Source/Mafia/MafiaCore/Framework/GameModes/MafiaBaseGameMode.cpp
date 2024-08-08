@@ -232,14 +232,20 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 	}
 
 	// 최초 투표만 예외
+	
 	if (CurrentFlowState == EMafiaFlowState::None)
 	{
 		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::None, 3.f);
-		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Day, InitialVoteWaitTime);
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::DayBefore, InitialVoteWaitTime);
 		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, InitialVoteWaitTime);
 	}
+	else if (CurrentFlowState == EMafiaFlowState::DayBefore)
+	{	
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Day, 0.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, InitialVoteWaitTime);
+	}		
 	else if (CurrentFlowState == EMafiaFlowState::Day)
-	{
+	{		 
 		if (MyWorld->GetTimerManager().IsTimerActive(MainGameFlowTimerHandle))
 		{
 			MyWorld->GetTimerManager().ClearTimer(MainGameFlowTimerHandle);
@@ -247,17 +253,33 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 
 		// Vote에는 별도의 타이머가 없음
 		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Vote, 0.f);
-	}
-	else if(CurrentFlowState == EMafiaFlowState::Vote)
-	{
+	}		 
+	else if (CurrentFlowState == EMafiaFlowState::DayAfter)
+	{		 
+	}		 
+	else if (CurrentFlowState == EMafiaFlowState::VoteBefore)
+	{		 
+	}		 
+	else if (CurrentFlowState == EMafiaFlowState::Vote)
+	{		 
 		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Night, NightTime);
 		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, NightTime);
-	}
+	}		 
+	else if (CurrentFlowState == EMafiaFlowState::VoteAfter)
+	{		 
+	}		 
+	else if (CurrentFlowState == EMafiaFlowState::NightBefore)
+	{		 
+	}		 
 	else if (CurrentFlowState == EMafiaFlowState::Night)
-	{
+	{		 
 		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Day, DayTime);
 		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, DayTime);
+	}		 
+	else if (CurrentFlowState == EMafiaFlowState::NightAfter)
+	{
 	}
+
 }
 
 void AMafiaBaseGameMode::HandleWaitingPostRound()
@@ -516,6 +538,15 @@ bool AMafiaBaseGameMode::OnPendingMatchStateSetForInProgress(FName NewPendingSta
 			MafiaBaseGameState->SetTotalTimerSeconds(AssigningAbilityTime);
 			MafiaBaseGameState->UpdateTimerStartSeconds();
 			GetWorld()->GetTimerManager().SetTimer(AssignAbilityTimerHandle, this, &AMafiaBaseGameMode::OnEndAssigningAbilityState, AssigningAbilityTime);
+
+			if (UMafiaChairManManager* ChairMan = GetChairMan())
+			{
+				bool Succeed = ChairMan->AssigningAllPlayersAbility();
+				if (Succeed == false)
+				{
+					ensure(Succeed);
+				}
+			}
 			return true;
 		}
 	}
@@ -611,6 +642,15 @@ void AMafiaBaseGameMode::AddGameDuration(const float InAddedSeconds)
 	{
 
 	}
+}
+
+UMafiaChairManManager* AMafiaBaseGameMode::GetChairMan()
+{
+	if (UMafiaBaseGameInstance* GI = GetGameInstance<UMafiaBaseGameInstance>())
+	{
+		return GI->GetChairMan();
+	}
+	return nullptr;
 }
 
 #pragma optimize("", on)

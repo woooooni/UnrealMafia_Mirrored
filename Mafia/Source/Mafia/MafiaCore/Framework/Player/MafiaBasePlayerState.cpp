@@ -91,7 +91,7 @@ void AMafiaBasePlayerState::NotifyGameResult(EMafiaGameResult InGameResult)
 void AMafiaBasePlayerState::ClientNotifyGameResult_Implementation(EMafiaGameResult InGameResult)
 {
 	/** ktw : 클라이언트에서 실행됩니다. */
-	/** #Todo - ktw : 게임 결과에 따른 UI 출력. */
+	/** #Todo - ktw : 게임 결과에 따른 UI 출력 등. */
 	switch (InGameResult)
 	{
 	case EMafiaGameResult::None:
@@ -103,8 +103,6 @@ void AMafiaBasePlayerState::ClientNotifyGameResult_Implementation(EMafiaGameResu
 	case EMafiaGameResult::NeutralWin:
 		break;
 	case EMafiaGameResult::Invalid:
-		break;
-	default:
 		break;
 	}
 }

@@ -89,6 +89,9 @@ public:
 #pragma endregion
 
 protected:
+	class UMafiaChairManManager* GetChairMan();
+
+protected:
 	/** 게임을 시작하기 위한 최소 인원 */
 	UPROPERTY(EditAnywhere, Category = "GameRule", meta = (ClampMin = "1", ClampMax = "12"))
 	int32 GameStartMinPlayerCount;

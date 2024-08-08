@@ -61,7 +61,7 @@ public:
 
 public:
 	UFUNCTION()
-	void AssigningAllPlayersAbility();
+	bool AssigningAllPlayersAbility();
 
 
 public:
@@ -105,7 +105,7 @@ private:
 	EMafiaGameResult CheckGameOver() const;
 
 	UFUNCTION()
-	void NotifyGameOver(EMafiaGameResult InGameResult) const;
+	void NotifyGameResult(EMafiaGameResult InGameResult) const;
 
 
 private:

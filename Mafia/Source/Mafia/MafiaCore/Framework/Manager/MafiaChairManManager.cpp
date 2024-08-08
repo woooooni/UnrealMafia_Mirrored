@@ -24,7 +24,7 @@ UMafiaChairManManager::UMafiaChairManManager(const FObjectInitializer& ObjectIni
 
 
 
-void UMafiaChairManManager::AssigningAllPlayersAbility()
+bool UMafiaChairManManager::AssigningAllPlayersAbility()
 {
 	UWorld* World = GetWorld();
 	
@@ -45,13 +45,21 @@ void UMafiaChairManManager::AssigningAllPlayersAbility()
 					{
 						if (Pair.Value.Get()->AssignAbility(ShuffledRoleArray[Num++]) == false)
 						{
-							checkf(false, TEXT("ChairMan Assign Ability Failed."));
+							return false;
 						}
+					}
+					else
+					{
+						return false;
 					}
 				}
 			}
+
+			return true;
 		}
 	}
+
+	return false;
 }
 
 void UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMafiaBasePlayerState* InDestination)
@@ -78,8 +86,6 @@ void UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMa
 	
 	CachedAbilityEventsHeap.HeapPush(Event);
 }
-
-
 
 void UMafiaChairManManager::DispatchAbilityEvents()
 {
@@ -148,6 +154,7 @@ void UMafiaChairManManager::StartVote()
 			}
 		}
 	}
+	CachedVoteEventsMap.Empty();
 }
 
 void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaBasePlayerState* InCandidate)
@@ -242,6 +249,8 @@ void UMafiaChairManManager::EndVote()
 			}
 		}
 	}
+
+	CachedVoteEventsMap.Empty();
 }
 
 
@@ -365,7 +374,7 @@ EMafiaGameResult UMafiaChairManManager::CheckGameOver() const
 	return EMafiaGameResult::Invalid;
 }
 
-void UMafiaChairManManager::NotifyGameOver(EMafiaGameResult InGameResult) const
+void UMafiaChairManManager::NotifyGameResult(EMafiaGameResult InGameResult) const
 {
 	if (InGameResult == EMafiaGameResult::None)
 	{
@@ -401,23 +410,53 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 
 		# Todo-ktw : EMafiaFlowState에 물려서 동작하게 하려면, 세분화 해야할 것 같음.
 	*/
-
 	if (EMafiaFlowState::None == InFlowState)
 	{
-		AssigningAllPlayersAbility();
+		CachedAbilityEventsHeap.Empty();
+		CachedVoteEventsMap.Empty();
+	}
+	else if (EMafiaFlowState::DayBefore == InFlowState)
+	{
+		EMafiaGameResult Result = CheckGameOver();
+		NotifyGameResult(Result);
 	}
 	else if (EMafiaFlowState::Day == InFlowState)
 	{
 		DispatchAbilityEvents();
 		FlushAbilityEvents();
-	}	
-	else if (EMafiaFlowState::Vote == InFlowState)
+	}
+	else if (EMafiaFlowState::DayAfter == InFlowState)
+	{
+		CachedAbilityEventsHeap.Empty();
+		CachedVoteEventsMap.Empty();
+	}
+	else if (EMafiaFlowState::VoteBefore == InFlowState)
 	{
 		StartVote();
 	}
-	else if (EMafiaFlowState::Night == InFlowState)
+	else if (EMafiaFlowState::Vote == InFlowState)
+	{
+		
+	}
+	else if (EMafiaFlowState::VoteAfter == InFlowState)
 	{
 		EndVote();
+
+		EMafiaGameResult Result = CheckGameOver();
+		NotifyGameResult(Result);
+	}
+	else if (EMafiaFlowState::NightBefore == InFlowState)
+	{
+		
+	}
+	else if (EMafiaFlowState::Night == InFlowState)
+	{
+		
+	}
+	else if (EMafiaFlowState::NightAfter == InFlowState)
+	{
+		EMafiaGameResult Result = CheckGameOver();
+		NotifyGameResult(Result);
 	}
 			
 }
