@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GameFeatures/Mafia/Framework/Character/MafiaSampleCharacter.h"
+#include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -46,8 +47,8 @@ AMafiaSampleCharacter::AMafiaSampleCharacter(const FObjectInitializer& ObjectIni
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
-	/*CameraBoom->bInheritPitch = false;
-	CameraBoom->SetRelativeLocationAndRotation(FVector(0, 0, 44), FRotator(-30, 0, 0));*/
+	CameraBoom->bInheritPitch = false;
+	CameraBoom->SetRelativeLocationAndRotation(FVector(0, 0, 44), FRotator(-30, 0, 0));
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
@@ -78,6 +79,12 @@ void AMafiaSampleCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	// SetPlayerColor
+	if (AMafiaBasePlayerState* PS = GetPlayerState<AMafiaBasePlayerState>())
+	{
+		PS->ChangePlayerColor(PS->GetPlayerColor());
+	}
 }
 
 void AMafiaSampleCharacter::Tick(float DeltaTime)
@@ -87,7 +94,10 @@ void AMafiaSampleCharacter::Tick(float DeltaTime)
 
 void AMafiaSampleCharacter::ChangeColor(FLinearColor InColor)
 {
-	CharacterColor = InColor;
+	if (GetPlayerState()->GetNetMode() == NM_DedicatedServer)
+	{
+		CharacterColor = InColor;
+	}
 }
 
 void AMafiaSampleCharacter::OnRepChangeColor()
@@ -97,6 +107,11 @@ void AMafiaSampleCharacter::OnRepChangeColor()
 		GetMesh()->SetVectorParameterValueOnMaterials(TEXT("Tint"), FVector(CharacterColor));
 	}
 }
+
+
+
+
+
 
 //////////////////////////////////////////////////////////////////////////r
 // Input

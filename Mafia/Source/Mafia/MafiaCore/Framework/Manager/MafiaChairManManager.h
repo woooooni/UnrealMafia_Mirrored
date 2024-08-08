@@ -77,6 +77,7 @@ public:
 	void AddVoteEvent(class AMafiaBasePlayerState* InVotor, class AMafiaBasePlayerState* InCandidate);
 
 public:
+	FORCEINLINE const TArray<FUseAbilityEventData>& GetPlayerAbilityDataHeap() { return CachedAbilityEventsHeap; }
 	FORCEINLINE const TMap<FName, FPlayerVoteData>& GetPlayerVoteMap() { return CachedVoteEventsMap; }
 
 private:

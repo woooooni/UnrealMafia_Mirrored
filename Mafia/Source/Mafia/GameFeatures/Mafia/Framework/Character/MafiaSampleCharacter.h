@@ -70,7 +70,6 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	
 public:
-	/* ktw : 서버에서 호출해야 합니다. */
 	UFUNCTION()
 	void ChangeColor(FLinearColor InColor);
 

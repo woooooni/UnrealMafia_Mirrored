@@ -26,9 +26,18 @@ enum class EMafiaFlowState : uint8
 {
 	/** 메인 플로우 내에서 반복해서 변화되는 State */
 	None,
-	Day, // 아침
-	Vote, // 투표
+
+	DayBefore, // 저녁 -> 아침 이전.
+	Day,
+	DayAfter, // 아침 -> 투표 이전.
+
+	VoteBefore, // 아침 -> 투표 이전.
+	Vote, // 투표.
+	VoteAfter, // 투표 -> 저녁 이전.
+
+	NightBefore, // 투표 -> 저녁 이전.
 	Night, // 저녁
+	NightAfter, // 저녁 -> 아침 이전.
 };
 
 UENUM()
