@@ -25,5 +25,4 @@ protected:
 
 protected:
 	virtual void ClientAffectedEventsFlush_Implementation() override;
-	virtual void ClientResponsePostUseAbility_Implementation(UMafiaBaseRoleComponent* InOther) override;
 };

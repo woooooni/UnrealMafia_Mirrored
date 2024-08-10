@@ -85,7 +85,7 @@ public:
 		ktw : 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
-	void ResponsePostUseAbility(UMafiaBaseRoleComponent* InOther);
+	void ResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag);
 
 	/**
 		ktw : 서버에서 호출해야합니다.
@@ -126,7 +126,7 @@ protected:
 	void ClientAffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 
 	UFUNCTION(Client, Reliable)
-	virtual void ClientResponsePostUseAbility(UMafiaBaseRoleComponent* InOther);
+	virtual void ClientResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag);
 
 	UFUNCTION(Client, Reliable)
 	virtual void ClientAffectedEventsFlush();

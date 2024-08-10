@@ -85,27 +85,57 @@ bool UMafiaChairManManager::AssigningAllPlayersAbility()
 
 void UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMafiaBasePlayerState* InDestination)
 {
-	FUseAbilityEventData Event;
-
-	if (nullptr == InOrigin || nullptr == InDestination)
+	UWorld* World = GetWorld();
+	if (IsValid(World))
 	{
-		MAFIA_ULOG(LogMafiaChairMan, Log, TEXT("UMafiaChairManManager::AddAbilityEvent : InOrigin is Null or InDestination is Null"));
-		return;
+		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
+		{
+			if (IsValid(InOrigin) && IsValid(InDestination))
+			{
+				FUseAbilityEventData Event;
+
+				Event.Role = InOrigin->GetRoleComponent()->GetRoleType();
+				Event.Origin = InOrigin->GetRoleComponent();
+				Event.Destination = InDestination->GetRoleComponent();
+
+				if (Event.Origin.IsValid() == false || Event.Destination.IsValid() == false)
+				{
+					MAFIA_ULOG(LogMafiaChairMan, Log, TEXT("UMafiaChairManManager::AddAbilityEvent : RoleComponent is Invalid."));
+					return;
+				}
+
+				/** 
+					#Todo - ktw : 밤에만 능력사용 가능. 임시로 막아둠.
+				*/
+
+				//if (EMafiaFlowState::Night != GS->GetMafiaFlowState())
+				//{
+				//	MAFIA_ULOG(LogMafiaChairMan, Log, TEXT("UMafiaChairManManager::AddAbilityEvent : Abilities can only be used at Night"));
+				//	Event.Origin->ResponseUseAbility(InDestination->GetRoleComponent(), EMafiaAbilityFlag::ImpossibleUseAbility);
+				//	return;
+				//}
+				
+
+				if (CachedAbilityEventsHeap.Find(Event))
+				{
+					MAFIA_ULOG(LogMafiaChairMan, Log, TEXT("UMafiaChairManManager::AddAbilityEvent : Already Use Ability."));
+					Event.Origin->ResponseUseAbility(InDestination->GetRoleComponent(), EMafiaUseAbilityFlag::AlreadyUseAbility);
+					return;
+				}
+				else
+				{
+					CachedAbilityEventsHeap.HeapPush(Event);
+					Event.Origin->ResponseUseAbility(InDestination->GetRoleComponent(), EMafiaUseAbilityFlag::Succeed);
+					return;
+				}
+			}
+			else
+			{
+				MAFIA_ULOG(LogMafiaChairMan, Log, TEXT("UMafiaChairManManager::AddAbilityEvent : InOrigin is Invalid or InDestination is Invalid."));
+				return;
+			}
+		}
 	}
-		
-
-	Event.Role = InOrigin->GetRoleComponent()->GetRoleType();
-	Event.Origin = InOrigin->GetRoleComponent();
-	Event.Destination = InDestination->GetRoleComponent();
-
-	if (Event.Origin.IsValid() == false || Event.Destination.IsValid() == false)
-	{
-		MAFIA_ULOG(LogMafiaChairMan, Log, TEXT("UMafiaChairManManager::AddAbilityEvent : RoleComponent is Null"));
-		return;
-	}
-
-	
-	CachedAbilityEventsHeap.HeapPush(Event);
 }
 
 void UMafiaChairManManager::CheatChangeRole(AMafiaBasePlayerState* InPlayerState, UMafiaBaseRoleComponent* InNewRoleComponent)
@@ -136,9 +166,7 @@ void UMafiaChairManManager::DispatchAbilityEvents()
 		
 		if (Event.Origin.IsValid() && Event.Destination.IsValid())
 		{
-			/** Todo - ktw :  Response 신호를 언제 뿌려줄지 결정.(ex) 경찰이면, 경찰한테'만' 찍은 플레이어의 팀을 알려줘야 한다.) */
 			Event.Destination.Get()->AffectedAbilityByOther(Event.Role, Event.Origin.Get());
-			Event.Origin.Get()->ResponsePostUseAbility(Event.Destination.Get());
 		}
 	}
 

@@ -84,9 +84,3 @@ void UMafiaCitizenRoleComponent::ClientAffectedEventsFlush_Implementation()
 	}
 
 }
-
-void UMafiaCitizenRoleComponent::ClientResponsePostUseAbility_Implementation(UMafiaBaseRoleComponent* InOther)
-{
-
-	
-}

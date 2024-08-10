@@ -233,6 +233,7 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 
 	// 최초 투표만 예외
 	
+	/** #Todo - ktw : 각 FlowState의 연출시간까지 고려한 WaitTime 설정. */
 	if (CurrentFlowState == EMafiaFlowState::None)
 	{
 		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::None, 3.f);
@@ -242,7 +243,7 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 	else if (CurrentFlowState == EMafiaFlowState::DayBefore)
 	{	
 		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Day, 0.f);
-		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, InitialVoteWaitTime);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 0.f);
 	}		
 	else if (CurrentFlowState == EMafiaFlowState::Day)
 	{		 
@@ -278,6 +279,7 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 	}		 
 	else if (CurrentFlowState == EMafiaFlowState::NightAfter)
 	{
+
 	}
 
 }

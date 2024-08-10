@@ -24,7 +24,3 @@ void UMafiaDoctorRoleComponent::OnRepDead()
 void UMafiaDoctorRoleComponent::ClientAffectedEventsFlush_Implementation()
 {
 }
-
-void UMafiaDoctorRoleComponent::ClientResponsePostUseAbility_Implementation(UMafiaBaseRoleComponent* InOther)
-{
-}

@@ -28,6 +28,11 @@ public:
 	{
 		return Role > Other.Role;
 	}
+
+	FORCEINLINE bool operator== (const FUseAbilityEventData& Other) const
+	{
+		return Role == Other.Role;
+	}
 };
 
 USTRUCT()

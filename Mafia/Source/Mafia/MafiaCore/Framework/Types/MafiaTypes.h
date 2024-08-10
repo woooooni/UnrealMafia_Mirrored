@@ -94,6 +94,14 @@ enum class EMafiaVoteFlag : uint8
 	Succeed,
 };
 
+UENUM()
+enum class EMafiaUseAbilityFlag : uint8
+{
+	ImpossibleUseAbility,
+	AlreadyUseAbility,
+	Succeed,
+};
+
 /** ktw - 게임 플레이 시민팀 필수 직업입니다. */
 const static TArray<EMafiaRole> GCitizenEssentialRoleArray =
 { 

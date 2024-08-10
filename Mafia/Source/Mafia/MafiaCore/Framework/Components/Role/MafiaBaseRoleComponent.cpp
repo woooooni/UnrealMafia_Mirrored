@@ -91,11 +91,11 @@ void UMafiaBaseRoleComponent::AffectedByBusDriver(UMafiaBaseRoleComponent* InBus
 {
 }
 
-void UMafiaBaseRoleComponent::ResponsePostUseAbility(UMafiaBaseRoleComponent* InOther)
+void UMafiaBaseRoleComponent::ResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag)
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
-		ClientResponsePostUseAbility(InOther);
+		ClientResponseUseAbility(InOther, InFlag);
 	}
 	else
 	{
@@ -195,9 +195,9 @@ void UMafiaBaseRoleComponent::ClientAffectedEventsFlush_Implementation()
 	/** ktw : 파생 클래스에서 override */
 }
 
-void UMafiaBaseRoleComponent::ClientResponsePostUseAbility_Implementation(UMafiaBaseRoleComponent* InOther)
+void UMafiaBaseRoleComponent::ClientResponseUseAbility_Implementation(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag)
 {
-	/** ktw : 파생 클래스에서 override */
+	/** #Todo - ktw : Flag에 따른 동작 처리 */
 }
 
 #pragma endregion RPC Ability
