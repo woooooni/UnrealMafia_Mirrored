@@ -17,6 +17,10 @@ void UMafiaGodFatherRoleComponent::BeginPlay()
 	RoleName = TEXT("마피아(대부)");
 }
 
+void UMafiaGodFatherRoleComponent::OnRepDead()
+{
+}
+
 void UMafiaGodFatherRoleComponent::ClientAffectedEventsFlush_Implementation()
 {
 }

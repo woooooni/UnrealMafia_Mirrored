@@ -27,7 +27,8 @@ UMafiaChairManManager::UMafiaChairManManager(const FObjectInitializer& ObjectIni
 bool UMafiaChairManManager::AssigningAllPlayersAbility()
 {
 	UWorld* World = GetWorld();
-	
+	JoinedPlayerRoleComponents.Empty();
+
 	if (IsValid(World))
 	{
 		if (AMafiaBaseGameState* GameState = World->GetGameState<AMafiaBaseGameState>())
@@ -43,7 +44,27 @@ bool UMafiaChairManManager::AssigningAllPlayersAbility()
 				{
 					if (Pair.Value.IsValid())
 					{
-						if (Pair.Value.Get()->AssignAbility(ShuffledRoleArray[Num++]) == false)
+						if (AMafiaBasePlayerState* PS = Pair.Value.Get())
+						{
+							const FString& AccountIdStr = PS->GetUniqueId().ToString();
+							if (AccountIdStr.IsEmpty())
+							{
+								MAFIA_ULOG(LogMafiaChairMan, Warning, TEXT("AccountIdStr is empty"));
+								return false;
+							}
+
+							const FName AccountId = FName(*AccountIdStr);
+							if (JoinedPlayerRoleComponents.Find(AccountId))
+							{
+								return false;
+							}
+							else
+							{
+								UMafiaBaseRoleComponent* NewRoleComponent = Pair.Value.Get()->AssignAbility(ShuffledRoleArray[Num++]);
+								JoinedPlayerRoleComponents.Emplace(AccountId, NewRoleComponent);
+							}
+						}
+						else
 						{
 							return false;
 						}
@@ -87,74 +108,58 @@ void UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMa
 	CachedAbilityEventsHeap.HeapPush(Event);
 }
 
+void UMafiaChairManManager::CheatChangeRole(AMafiaBasePlayerState* InPlayerState, UMafiaBaseRoleComponent* InNewRoleComponent)
+{
+#if ENABLE_CHEAT
+	const FString& AccountIdStr = InPlayerState->GetUniqueId().ToString();
+	if (AccountIdStr.IsEmpty())
+	{
+		MAFIA_ULOG(LogMafiaChairMan, Warning, TEXT("AccountIdStr is empty"));
+		return;
+	}
+
+	const FName AccountId = FName(*AccountIdStr);
+	if (auto Pair = JoinedPlayerRoleComponents.Find(AccountId))
+	{
+		JoinedPlayerRoleComponents.Add(AccountId, InNewRoleComponent);
+	}
+#endif
+}
+
 void UMafiaChairManManager::DispatchAbilityEvents()
 {
-	for (auto& Event : CachedAbilityEventsHeap)
+	/** Todo - ktw :  버스드라이버, 기생 처리 */
+	while (!CachedAbilityEventsHeap.IsEmpty())
 	{
+		FUseAbilityEventData Event;
+		CachedAbilityEventsHeap.HeapPop(Event);
+		
 		if (Event.Origin.IsValid() && Event.Destination.IsValid())
 		{
-			Event.Destination.Get()->AffectedAbilityByOther(Event.Role, Event.Origin.Get());
-
 			/** Todo - ktw :  Response 신호를 언제 뿌려줄지 결정.(ex) 경찰이면, 경찰한테'만' 찍은 플레이어의 팀을 알려줘야 한다.) */
+			Event.Destination.Get()->AffectedAbilityByOther(Event.Role, Event.Origin.Get());
 			Event.Origin.Get()->ResponsePostUseAbility(Event.Destination.Get());
 		}
 	}
+
 	CachedAbilityEventsHeap.Empty();
 }
 
 void UMafiaChairManManager::FlushAbilityEvents() const
 {
-	if (UWorld* World = GetWorld())
+	for (auto& Pair : JoinedPlayerRoleComponents)
 	{
-		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
-		{
-			for (auto& Pair : GS->GetJoinedUserPlayerStateMap())
-			{
-				if (Pair.Value.IsValid())
-				{
-					if (AMafiaBasePlayerState* PS = Pair.Value.Get())
-					{
-						if (UMafiaBaseRoleComponent* RoleComponent = PS->GetRoleComponent())
-						{
-							RoleComponent->FlushAbilityEvents();
-						}
-					}
-				}
-				else
-				{
-					MAFIA_ULOG(LogMafiaChairMan, Error, TEXT("PlayerState Is Invalid."));
-				}
-			}
-		}
+		Pair.Value->AffectedEventsFlush();
 	}
 }
 
 void UMafiaChairManManager::StartVote()
 {
-	if (UWorld* World = GetWorld())
-	{
-		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
-		{
-			for (auto& Pair : GS->GetJoinedUserPlayerStateMap())
-			{
-				if (Pair.Value.IsValid())
-				{
-					if (AMafiaBasePlayerState* PS = Pair.Value.Get())
-					{
-						if (UMafiaBaseRoleComponent* RoleComponent = PS->GetRoleComponent())
-						{
-							RoleComponent->PreVoteEvent();
-						}
-					}
-				}
-				else
-				{
-					MAFIA_ULOG(LogMafiaChairMan, Error, TEXT("PlayerState Is Invalid."));
-				}
-			}
-		}
-	}
 	CachedVoteEventsMap.Empty();
+	for (auto& Pair : JoinedPlayerRoleComponents)
+	{
+		Pair.Value->StartVoteEvent();
+	}
 }
 
 void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaBasePlayerState* InCandidate)
@@ -226,28 +231,9 @@ void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaB
 
 void UMafiaChairManManager::EndVote()
 {
-	if (UWorld* World = GetWorld())
+	for (auto& Pair : JoinedPlayerRoleComponents)
 	{
-		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
-		{
-			for (auto& Pair : GS->GetJoinedUserPlayerStateMap())
-			{
-				if (Pair.Value.IsValid())
-				{
-					if (AMafiaBasePlayerState* PS = Pair.Value.Get())
-					{
-						if (UMafiaBaseRoleComponent* RoleComponent = PS->GetRoleComponent())
-						{
-							RoleComponent->PostVoteEvent();
-						}
-					}
-				}
-				else
-				{
-					MAFIA_ULOG(LogMafiaChairMan, Error, TEXT("PlayerState Is Invalid."));
-				}
-			}
-		}
+		Pair.Value->FinishVoteEvent();
 	}
 
 	CachedVoteEventsMap.Empty();
@@ -323,27 +309,24 @@ EMafiaGameResult UMafiaChairManManager::CheckGameOver() const
 			int8 AliveCitizenCount = 0;
 			int8 AliveMafiaCount = 0;
 
-			for (auto& Pair : GameState->GetJoinedUserPlayerStateMap())
+			for (auto& Pair : JoinedPlayerRoleComponents)
 			{
 				/** 
 					ktw : 마피아팀 승리조건 체크. 
 					1순위 : 마피아팀 -> 2순위 : 시민팀 -> 3순위 : 중립
 				*/
-				if (AMafiaBasePlayerState* PS = Pair.Value.Get())
+				if (UMafiaBaseRoleComponent* RoleComponent = Pair.Value.Get())
 				{
-					if (UMafiaBaseRoleComponent* RoleComponent = PS->GetRoleComponent())
+					if (RoleComponent->IsDead() == false)
 					{
-						if (RoleComponent->IsDead() == false)
+						EMafiaTeam TeamType = RoleComponent->GetTeamType();
+						if (TeamType == EMafiaTeam::Citizen)
 						{
-							EMafiaTeam TeamType = RoleComponent->GetTeamType();
-							if (TeamType == EMafiaTeam::Citizen)
-							{
-								++AliveCitizenCount;
-							}
-							else if (TeamType == EMafiaTeam::Mafia)
-							{
-								++AliveMafiaCount;
-							}
+							++AliveCitizenCount;
+						}
+						else if (TeamType == EMafiaTeam::Mafia)
+						{
+							++AliveMafiaCount;
 						}
 					}
 				}
@@ -399,17 +382,6 @@ void UMafiaChairManManager::NotifyGameResult(EMafiaGameResult InGameResult) cons
 void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 {
 	/** ktw : AMafiaBaseGameState::SetMafiaFlowState에서 호출됩니다. */
-	/** 
-		# Todo-ktw : CheckGameOver 로직에 추가.	
-
-		EMafiaGameReuslt GameResult = CheckGameOver();
-		if (GameResult != EMafiaGameResult::None)
-		{
-			NotifyGameOver(GameResult);
-		}
-
-		# Todo-ktw : EMafiaFlowState에 물려서 동작하게 하려면, 세분화 해야할 것 같음.
-	*/
 	if (EMafiaFlowState::None == InFlowState)
 	{
 		CachedAbilityEventsHeap.Empty();

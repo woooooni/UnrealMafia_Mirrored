@@ -31,6 +31,19 @@ public:
 };
 
 USTRUCT()
+struct FBusDriverPassengers
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	TWeakObjectPtr<class UMafiaBaseRoleComponent> LeftPassenger;
+
+	UPROPERTY()
+	TWeakObjectPtr<class UMafiaBaseRoleComponent> RightPassenger;
+};
+
+USTRUCT()
 struct FPlayerVoteData
 {
 	GENERATED_BODY()
@@ -41,6 +54,8 @@ public:
 	TSet<FName> VotersSet;
 	uint8 VotedCount = 0;
 };
+
+
 
 
 
@@ -80,6 +95,12 @@ public:
 	FORCEINLINE const TArray<FUseAbilityEventData>& GetPlayerAbilityDataHeap() { return CachedAbilityEventsHeap; }
 	FORCEINLINE const TMap<FName, FPlayerVoteData>& GetPlayerVoteMap() { return CachedVoteEventsMap; }
 
+#pragma region Cheat
+public:
+	UFUNCTION()
+	void CheatChangeRole(AMafiaBasePlayerState* InPlayerState, UMafiaBaseRoleComponent* InNewRoleComponent);
+#pragma endregion Cheat
+
 private:
 	/** ktw : Heap에 저장된 능력 이벤트들을 순회하면서 각 플레이어의 RoleComponent에 이벤트를 전송합니다. */
 	UFUNCTION()
@@ -109,7 +130,7 @@ private:
 
 
 private:
-	/** ktw : EMafiaRole에 선언된 Role의 값을 순서로 Event를 정렬합니다. */
+	/** ktw : EMafiaRole에 선언된 Role의 값 순서로 Event를 정렬합니다. */
 	TArray<FUseAbilityEventData> CachedAbilityEventsHeap;
 
 	/** 
@@ -120,4 +141,13 @@ private:
 
 	*/
 	TMap<FName, FPlayerVoteData> CachedVoteEventsMap;
+
+
+	/** 
+		ktw : 버스 승객을 저장합니다.
+	*/
+	FBusDriverPassengers BusPassengers;
+
+private:
+	TMap<FName, TObjectPtr<UMafiaBaseRoleComponent>> JoinedPlayerRoleComponents;
 };

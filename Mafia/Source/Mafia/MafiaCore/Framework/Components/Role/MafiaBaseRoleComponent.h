@@ -73,13 +73,25 @@ public:
 		ktw : 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
+	void AffectedByMadam();
+
+	/**
+		ktw : 서버에서 호출해야합니다.
+	*/
+	UFUNCTION()
+	void AffectedByBusDriver(UMafiaBaseRoleComponent* InBusDriver, UMafiaBaseRoleComponent* InSwitcher);
+
+	/**
+		ktw : 서버에서 호출해야합니다.
+	*/
+	UFUNCTION()
 	void ResponsePostUseAbility(UMafiaBaseRoleComponent* InOther);
 
 	/**
 		ktw : 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
-	void FlushAbilityEvents();
+	void AffectedEventsFlush();
 #pragma endregion Role Ability(역할 능력 관련)
 	
 #pragma region Vote(투표)
@@ -88,7 +100,7 @@ public:
 		ktw : 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
-	void PreVoteEvent();
+	void StartVoteEvent();
 
 	/** 
 		ktw : 서버에서 호출해야합니다.
@@ -100,11 +112,8 @@ public:
 		ktw : 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
-	void PostVoteEvent();
+	void FinishVoteEvent();
 #pragma endregion Vote
-
-
-
 
 
 #pragma region Role Ability RPC
@@ -129,13 +138,13 @@ private:
 	void ServerReqVote(AMafiaBasePlayerState* InOther);
 
 	UFUNCTION(Client, Reliable)
-	void ClientPreVoteEvent();
+	void ClientStartVoteEvent();
 
 	UFUNCTION(Client, Reliable)
 	void ClientResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag);
 
 	UFUNCTION(Client, Reliable)
-	void ClientPostVoteEvent();
+	void ClientFinishVoteEvent();
 #pragma endregion Vote(투표)
 
 
@@ -151,6 +160,10 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void ServerReqSetRoleName(FName InRoleName);
+
+protected:
+	UFUNCTION()
+	virtual void OnRepDead() PURE_VIRTUAL(UMafiaBaseGameInstance::OnRepDead, );
 
 protected:
 	class UMafiaBaseGameInstance* GetServerInstance();
@@ -173,7 +186,7 @@ protected:
 	TArray<FAffectedEvent> CachedAffectedEventsHeap;
 
 private:
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRepDead)
 	uint8 bDead : 1;
 
 	UPROPERTY(Replicated)

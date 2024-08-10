@@ -2,8 +2,10 @@
 
 
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
+#include "MafiaCore/Framework/System/MafiaBaseGameInstance.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameMode.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameState.h"
+#include "Framework/Manager/MafiaChairManManager.h"
 #include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaCitizenRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaPoliceRoleComponent.h"
@@ -61,11 +63,19 @@ void AMafiaBasePlayerState::CheatSetRole_Implementation(EMafiaRole InRole)
 {
 #if ENABLE_CHEAT
 	AssignAbility(InRole);
+	if (UMafiaBaseGameInstance* GI = GetGameInstance<UMafiaBaseGameInstance>())
+	{
+		if (UMafiaChairManManager* ChairMan = GI->GetChairMan())
+		{
+			ChairMan->CheatChangeRole(this, RoleComponent);
+		}
+	}
+	 
 #endif
 }
 
 
-bool AMafiaBasePlayerState::AssignAbility(EMafiaRole InRole)
+UMafiaBaseRoleComponent* AMafiaBasePlayerState::AssignAbility(EMafiaRole InRole)
 {
 	if (HasAuthority())
 	{
@@ -73,11 +83,11 @@ bool AMafiaBasePlayerState::AssignAbility(EMafiaRole InRole)
 		if (IsValid(RoleComponent))
 		{
 			PostInitializeRoleComponent();
-			return true;
+			return RoleComponent;
 		}
 	}
 	
-	return false;
+	return nullptr;
 }
 
 void AMafiaBasePlayerState::NotifyGameResult(EMafiaGameResult InGameResult)

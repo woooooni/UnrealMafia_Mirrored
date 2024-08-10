@@ -36,7 +36,7 @@ void UMafiaBaseRoleComponent::BeginPlay()
 	OwningPlayerState = Cast<AMafiaBasePlayerState>(GetOwner());
 	if (OwningPlayerState.IsValid() == false)
 	{
-		MAFIA_ULOG(LogMafiaPlayerState, Error, TEXT("UMafiaBaseRoleComponent::BeginPlay : OwningPlayerState is Not Valid."));
+		MAFIA_ULOG(LogMafiaPlayerState, Error, TEXT("UMafiaBaseRoleComponent::BeginPlay : OwningPlayerState is Invalid."));
 	}
 }
 
@@ -83,6 +83,14 @@ void UMafiaBaseRoleComponent::AffectedAbilityByOther(EMafiaRole InRole, UMafiaBa
 	}
 }
 
+void UMafiaBaseRoleComponent::AffectedByMadam()
+{
+}
+
+void UMafiaBaseRoleComponent::AffectedByBusDriver(UMafiaBaseRoleComponent* InBusDriver, UMafiaBaseRoleComponent* InSwitcher)
+{
+}
+
 void UMafiaBaseRoleComponent::ResponsePostUseAbility(UMafiaBaseRoleComponent* InOther)
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
@@ -95,7 +103,7 @@ void UMafiaBaseRoleComponent::ResponsePostUseAbility(UMafiaBaseRoleComponent* In
 	}
 }
 
-void UMafiaBaseRoleComponent::FlushAbilityEvents()
+void UMafiaBaseRoleComponent::AffectedEventsFlush()
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
@@ -115,11 +123,11 @@ void UMafiaBaseRoleComponent::Vote(AMafiaBasePlayerState* InOther)
 	ServerReqVote(InOther);
 }
 
-void UMafiaBaseRoleComponent::PreVoteEvent()
+void UMafiaBaseRoleComponent::StartVoteEvent()
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
-		ClientPreVoteEvent();
+		ClientStartVoteEvent();
 	}
 	else
 	{
@@ -141,11 +149,11 @@ void UMafiaBaseRoleComponent::ResponseVoteEvent(UMafiaBaseRoleComponent* InCandi
 }
 
 
-void UMafiaBaseRoleComponent::PostVoteEvent()
+void UMafiaBaseRoleComponent::FinishVoteEvent()
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
-		ClientPostVoteEvent();
+		ClientFinishVoteEvent();
 	}
 	else
 	{
@@ -211,7 +219,7 @@ void UMafiaBaseRoleComponent::ServerReqVote_Implementation(AMafiaBasePlayerState
 	}
 }
 
-void UMafiaBaseRoleComponent::ClientPreVoteEvent_Implementation()
+void UMafiaBaseRoleComponent::ClientStartVoteEvent_Implementation()
 {
 	/** ktw : 클라이언트에서 실행됩니다. */
 
@@ -220,6 +228,8 @@ void UMafiaBaseRoleComponent::ClientPreVoteEvent_Implementation()
 void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag)
 {
 	/** ktw : 클라이언트에서 실행됩니다. */
+
+	// 투표 결과 응답.
 	if (OwningPlayerState.IsValid())
 	{
 		/** Todo - ktw : 투표 Flag당 실행할 기능 추가. */
@@ -242,7 +252,7 @@ void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(UMafiaBaseR
 	}
 }
 
-void UMafiaBaseRoleComponent::ClientPostVoteEvent_Implementation()
+void UMafiaBaseRoleComponent::ClientFinishVoteEvent_Implementation()
 {
 	/** ktw : 클라이언트에서 실행됩니다. */
 }
@@ -278,8 +288,6 @@ void UMafiaBaseRoleComponent::ServerReqSetRoleName_Implementation(FName InRoleNa
 	/** ktw : 서버에서 실행됩니다. */
 	RoleName = InRoleName;
 }
-
-
 
 
 UMafiaBaseGameInstance* UMafiaBaseRoleComponent::GetServerInstance()

@@ -66,15 +66,15 @@ enum class EMafiaGameResult
 UENUM()
 enum class EMafiaRole : uint8
 {
-	Madam,			/* 마담 */
+	Madam,			/* 기생, 마담 */
+
+	BusDriver,		/* 버스기사 */
 
 	Police,			/* 경찰 */
-
 	Killer,			/* 연쇄살인마 */
 	Mafia,			/* 마피아 */
 	Vigilante,		/* 자경단원 */
 
-	BusDriver,		/* 버스기사 */
 	Detective,		/* 탐정 */
 	Spirit,			/* 영매 */
 
