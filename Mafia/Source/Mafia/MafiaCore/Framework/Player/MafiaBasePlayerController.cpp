@@ -307,6 +307,16 @@ void AMafiaBasePlayerController::CheatChangePlayerColor(float InRed, float InGre
 #endif
 }
 
+void AMafiaBasePlayerController::CheatChangePlayerNickname(FName InNickname)
+{
+#if ENABLE_CHEAT
+	if (AMafiaBasePlayerState* PS = GetPlayerState<AMafiaBasePlayerState>())
+	{
+		PS->ChangeNickname(InNickname);
+	}
+#endif
+}
+
 void AMafiaBasePlayerController::ServerReqAssignAbility_Implementation()
 {
 #if ENABLE_CHEAT

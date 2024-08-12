@@ -17,7 +17,7 @@ void UMafiaDoctorRoleComponent::BeginPlay()
 	RoleName = TEXT("의사");
 }
 
-void UMafiaDoctorRoleComponent::OnRepDead()
+void UMafiaDoctorRoleComponent::OnRep_Dead()
 {
 }
 

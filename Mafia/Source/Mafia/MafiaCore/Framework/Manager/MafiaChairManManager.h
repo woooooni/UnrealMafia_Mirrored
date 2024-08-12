@@ -36,19 +36,6 @@ public:
 };
 
 USTRUCT()
-struct FBusDriverPassengers
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseRoleComponent> LeftPassenger;
-
-	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseRoleComponent> RightPassenger;
-};
-
-USTRUCT()
 struct FPlayerVoteData
 {
 	GENERATED_BODY()
@@ -56,8 +43,16 @@ struct FPlayerVoteData
 public:
 	UPROPERTY()
 	TWeakObjectPtr<class UMafiaBaseRoleComponent> Candidate;
+
 	TSet<FName> VotersSet;
 	uint8 VotedCount = 0;
+
+public:
+	/** ktw : Pred Definition */
+	FORCEINLINE bool operator< (const FPlayerVoteData& Other) const
+	{
+		return VotedCount < Other.VotedCount;
+	}
 };
 
 
@@ -74,10 +69,6 @@ class MAFIA_API UMafiaChairManManager final : public UObject
 
 public:
 	UMafiaChairManManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
-public:
-	UFUNCTION()
-	void OnSetMafiaFlowState(EMafiaFlowState InFlowState);
 
 public:
 	UFUNCTION()
@@ -106,6 +97,10 @@ public:
 	void CheatChangeRole(AMafiaBasePlayerState* InPlayerState, UMafiaBaseRoleComponent* InNewRoleComponent);
 #pragma endregion Cheat
 
+public:
+	UFUNCTION()
+	void OnSetMafiaFlowState(EMafiaFlowState InFlowState);
+
 private:
 	/** ktw : Heap에 저장된 능력 이벤트들을 순회하면서 각 플레이어의 RoleComponent에 이벤트를 전송합니다. */
 	UFUNCTION()
@@ -119,6 +114,12 @@ private:
 private:
 	UFUNCTION()
 	void StartVote();
+	
+	UFUNCTION()
+	class UMafiaBaseRoleComponent* FindDeathRow();
+
+	UFUNCTION()
+	void NotifyDeathRow();
 
 	UFUNCTION()
 	void EndVote();
@@ -143,15 +144,8 @@ private:
 
 		Key - 피 투표자 AccountId.
 		Value - FPlayerVoteData.
-
 	*/
 	TMap<FName, FPlayerVoteData> CachedVoteEventsMap;
-
-
-	/** 
-		ktw : 버스 승객을 저장합니다.
-	*/
-	FBusDriverPassengers BusPassengers;
 
 private:
 	TMap<FName, TObjectPtr<UMafiaBaseRoleComponent>> JoinedPlayerRoleComponents;

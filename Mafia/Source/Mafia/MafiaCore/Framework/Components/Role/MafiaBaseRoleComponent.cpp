@@ -22,11 +22,12 @@ void UMafiaBaseRoleComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
-	DOREPLIFETIME(UMafiaBaseRoleComponent, TeamType);
-	DOREPLIFETIME(UMafiaBaseRoleComponent, RoleType);
 	DOREPLIFETIME(UMafiaBaseRoleComponent, bDead);
 	DOREPLIFETIME(UMafiaBaseRoleComponent, RoleName);
+	DOREPLIFETIME(UMafiaBaseRoleComponent, TeamType);
+	DOREPLIFETIME(UMafiaBaseRoleComponent, RoleType);
 	DOREPLIFETIME(UMafiaBaseRoleComponent, OwningPlayerState);
+	DOREPLIFETIME(UMafiaBaseRoleComponent, CachedAffectedEventsHeap);
 }
 
 
@@ -60,6 +61,11 @@ void UMafiaBaseRoleComponent::SetRoleName(FName InRoleName)
 	ServerReqSetRoleName(InRoleName);
 }
 
+void UMafiaBaseRoleComponent::SetAffectedEvents(const TArray<FAffectedEvent>& InEvents)
+{
+	ServerReqSetAffectedEvents(InEvents);
+}
+
 
 
 
@@ -83,13 +89,6 @@ void UMafiaBaseRoleComponent::AffectedAbilityByOther(EMafiaRole InRole, UMafiaBa
 	}
 }
 
-void UMafiaBaseRoleComponent::AffectedByMadam()
-{
-}
-
-void UMafiaBaseRoleComponent::AffectedByBusDriver(UMafiaBaseRoleComponent* InBusDriver, UMafiaBaseRoleComponent* InSwitcher)
-{
-}
 
 void UMafiaBaseRoleComponent::ResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag)
 {
@@ -160,6 +159,8 @@ void UMafiaBaseRoleComponent::FinishVoteEvent()
 		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("서버에서 호출해야합니다."));
 	}
 }
+
+
 
 #pragma endregion Vote
 
@@ -287,6 +288,12 @@ void UMafiaBaseRoleComponent::ServerReqSetRoleName_Implementation(FName InRoleNa
 {
 	/** ktw : 서버에서 실행됩니다. */
 	RoleName = InRoleName;
+}
+
+void UMafiaBaseRoleComponent::ServerReqSetAffectedEvents_Implementation(const TArray<FAffectedEvent>& InEvents)
+{
+	/** ktw : 서버에서 실행됩니다. */
+	CachedAffectedEventsHeap = InEvents;
 }
 
 

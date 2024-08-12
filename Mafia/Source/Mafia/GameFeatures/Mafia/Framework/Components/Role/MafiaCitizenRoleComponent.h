@@ -21,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 protected:
-	virtual void OnRepDead() override;
+	virtual void OnRep_Dead() override;
 
 protected:
 	virtual void ClientAffectedEventsFlush_Implementation() override;

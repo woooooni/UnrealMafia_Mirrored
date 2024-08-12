@@ -18,7 +18,7 @@ void UMafiaCitizenRoleComponent::BeginPlay()
 	RoleName = TEXT("시민");
 }
 
-void UMafiaCitizenRoleComponent::OnRepDead()
+void UMafiaCitizenRoleComponent::OnRep_Dead()
 {
 }
 

@@ -73,5 +73,11 @@ private:
 	void CheatChangePlayerColor(float InRed, float InGreen, float InBlue, float InAlpha);
 #pragma endregion
 
+#pragma region PlayerInfoCheat
+	UFUNCTION(Exec)
+	void CheatChangePlayerNickname(FName InNickname);
+#pragma endregion
+
+
 
 };

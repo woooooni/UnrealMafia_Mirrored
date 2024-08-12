@@ -13,6 +13,7 @@ struct FAffectedEvent
 	GENERATED_BODY()
 
 public:
+	UPROPERTY()
 	TWeakObjectPtr<class UMafiaBaseRoleComponent> Other;
 
 public:
@@ -50,6 +51,10 @@ public:
 	void SetRoleName(FName InRoleName);
 	FORCEINLINE FName GetRoleName() { return RoleName; }
 
+	UFUNCTION()
+	void SetAffectedEvents(const TArray<FAffectedEvent>& InEvents);
+	FORCEINLINE const TArray<FAffectedEvent>& GetAffectedEvents() { return CachedAffectedEventsHeap; }
+
 public:
 	UFUNCTION()
 	void UseAbility(class AMafiaBasePlayerState* InOther);
@@ -73,18 +78,6 @@ public:
 		ktw : 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
-	void AffectedByMadam();
-
-	/**
-		ktw : 서버에서 호출해야합니다.
-	*/
-	UFUNCTION()
-	void AffectedByBusDriver(UMafiaBaseRoleComponent* InBusDriver, UMafiaBaseRoleComponent* InSwitcher);
-
-	/**
-		ktw : 서버에서 호출해야합니다.
-	*/
-	UFUNCTION()
 	void ResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag);
 
 	/**
@@ -92,6 +85,12 @@ public:
 	*/
 	UFUNCTION()
 	void AffectedEventsFlush();
+
+	/**
+		ktw : 서버에서 호출해야 합니다.
+	*/
+	UFUNCTION()
+	virtual void BusDrive() {};
 #pragma endregion Role Ability(역할 능력 관련)
 	
 #pragma region Vote(투표)
@@ -120,6 +119,9 @@ public:
 private:
 	UFUNCTION(Server, Reliable)
 	void ServerReqUseAbility(AMafiaBasePlayerState* InOther);
+
+	UFUNCTION(Server, Reliable)
+	void ServerReqSetAffectedEvents(const TArray<FAffectedEvent>& InEvents);
 
 protected:
 	UFUNCTION(Client, Reliable)
@@ -163,7 +165,7 @@ private:
 
 protected:
 	UFUNCTION()
-	virtual void OnRepDead() PURE_VIRTUAL(UMafiaBaseGameInstance::OnRepDead, );
+	virtual void OnRep_Dead() PURE_VIRTUAL(UMafiaBaseGameInstance::OnRep_Dead, );
 
 protected:
 	class UMafiaBaseGameInstance* GetServerInstance();
@@ -180,13 +182,15 @@ protected:
 
 protected:
 	/** ktw : 내가 능력을 볼 수 있는 플레이어의 Unique ID. */
+	UPROPERTY()
 	TSet<uint32> VisiblePlayerSet;
 
 	/** ktw : 이번 턴에 내가 처리할 이벤트 목록. */
+	UPROPERTY(Replicated)
 	TArray<FAffectedEvent> CachedAffectedEventsHeap;
 
 private:
-	UPROPERTY(ReplicatedUsing = OnRepDead)
+	UPROPERTY(ReplicatedUsing = OnRep_Dead)
 	uint8 bDead : 1;
 
 	UPROPERTY(Replicated)

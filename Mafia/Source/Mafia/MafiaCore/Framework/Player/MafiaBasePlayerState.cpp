@@ -31,6 +31,7 @@ void AMafiaBasePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(AMafiaBasePlayerState, bReadyForGame);
 	DOREPLIFETIME(AMafiaBasePlayerState, RoleComponent);
 	DOREPLIFETIME(AMafiaBasePlayerState, PlayerColor);
+	DOREPLIFETIME(AMafiaBasePlayerState, PlayerNickname);
 }
 
 void AMafiaBasePlayerState::BeginPlay()
@@ -122,6 +123,11 @@ void AMafiaBasePlayerState::ChangePlayerColor(FLinearColor InColor)
 	ServerChangePlayerColor(InColor);
 }
 
+void AMafiaBasePlayerState::ChangeNickname(FName InNickname)
+{
+	ServerChangeNickname(InNickname);
+}
+
 void AMafiaBasePlayerState::ServerChangePlayerColor_Implementation(FLinearColor InColor)
 {
 	/** ktw : 서버에서 실행됩니다. */
@@ -187,6 +193,12 @@ void AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole InRole)
 	}
 }
 
+void AMafiaBasePlayerState::OnRep_ChangePlayerNickname()
+{
+
+}
+
+
 void AMafiaBasePlayerState::PostInitializeRoleComponent_Implementation()
 {
 	/**	
@@ -203,6 +215,12 @@ void AMafiaBasePlayerState::PostInitializeRoleComponent_Implementation()
 void AMafiaBasePlayerState::ServerReqReady_Implementation(bool bReady)
 {
 	bReadyForGame = bReady;
+}
+
+
+void AMafiaBasePlayerState::ServerChangeNickname_Implementation(FName InNickname)
+{
+	PlayerNickname = InNickname;
 }
 
 void AMafiaBasePlayerState::OnSetUniqueId()

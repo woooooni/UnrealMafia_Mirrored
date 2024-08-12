@@ -52,11 +52,13 @@ public:
 	void NotifyGameResult(EMafiaGameResult InGameResult);
 
 public:
-
 	/** ktw - 클라이언트에서 호출해야 합니다. */
 	UFUNCTION()
 	void ChangePlayerColor(FLinearColor InColor);
 	FORCEINLINE FLinearColor GetPlayerColor() { return PlayerColor; }
+
+	UFUNCTION()
+	void ChangeNickname(FName InNickname);
 
 protected:
 	/** ktw : 플레이어 Role Component 생성. AssignAbility에서 호출됩니다. */
@@ -66,6 +68,12 @@ protected:
 private:
 	UFUNCTION(Server, UnReliable)
 	void ServerChangePlayerColor(FLinearColor InColor);
+
+	UFUNCTION(Server, UnReliable)
+	void ServerChangeNickname(FName InNickname);
+
+	UFUNCTION()
+	void OnRep_ChangePlayerNickname();
 
 	UFUNCTION(Client, Reliable)
 	void ClientNotifyGameResult(EMafiaGameResult InGameResult);
@@ -86,5 +94,7 @@ protected:
 	UPROPERTY(Replicated)
 	TObjectPtr<class UMafiaBaseRoleComponent> RoleComponent;
 
-
+	/** Nickname */
+	UPROPERTY(ReplicatedUsing = OnRep_ChangePlayerNickname)
+	FName PlayerNickname;
 };

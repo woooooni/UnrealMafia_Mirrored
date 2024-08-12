@@ -166,7 +166,14 @@ void UMafiaChairManManager::DispatchAbilityEvents()
 		
 		if (Event.Origin.IsValid() && Event.Destination.IsValid())
 		{
-			Event.Destination.Get()->AffectedAbilityByOther(Event.Role, Event.Origin.Get());
+			if (Event.Role == EMafiaRole::BusDriver)
+			{
+				Event.Origin.Get()->BusDrive();
+			}
+			else
+			{
+				Event.Destination.Get()->AffectedAbilityByOther(Event.Role, Event.Origin.Get());
+			}
 		}
 	}
 
@@ -188,6 +195,17 @@ void UMafiaChairManManager::StartVote()
 	{
 		Pair.Value->StartVoteEvent();
 	}
+}
+
+UMafiaBaseRoleComponent* UMafiaChairManManager::FindDeathRow()
+{
+	UMafiaBaseRoleComponent* DeathRowPlayer = nullptr;
+	
+	return DeathRowPlayer;
+}
+
+void UMafiaChairManManager::NotifyDeathRow()
+{
 }
 
 void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaBasePlayerState* InCandidate)
@@ -415,7 +433,7 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 		CachedAbilityEventsHeap.Empty();
 		CachedVoteEventsMap.Empty();
 	}
-	else if (EMafiaFlowState::DayBefore == InFlowState)
+	else if (EMafiaFlowState::BeforeDay == InFlowState)
 	{
 		EMafiaGameResult Result = CheckGameOver();
 		NotifyGameResult(Result);
@@ -425,12 +443,12 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 		DispatchAbilityEvents();
 		FlushAbilityEvents();
 	}
-	else if (EMafiaFlowState::DayAfter == InFlowState)
+	else if (EMafiaFlowState::AfterDay == InFlowState)
 	{
 		CachedAbilityEventsHeap.Empty();
 		CachedVoteEventsMap.Empty();
 	}
-	else if (EMafiaFlowState::VoteBefore == InFlowState)
+	else if (EMafiaFlowState::BeforeVote == InFlowState)
 	{
 		StartVote();
 	}
@@ -438,14 +456,14 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	{
 		
 	}
-	else if (EMafiaFlowState::VoteAfter == InFlowState)
+	else if (EMafiaFlowState::AfterVote == InFlowState)
 	{
 		EndVote();
 
 		EMafiaGameResult Result = CheckGameOver();
 		NotifyGameResult(Result);
 	}
-	else if (EMafiaFlowState::NightBefore == InFlowState)
+	else if (EMafiaFlowState::BeforeNight == InFlowState)
 	{
 		
 	}
@@ -453,7 +471,7 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	{
 		
 	}
-	else if (EMafiaFlowState::NightAfter == InFlowState)
+	else if (EMafiaFlowState::AfterNight == InFlowState)
 	{
 		EMafiaGameResult Result = CheckGameOver();
 		NotifyGameResult(Result);

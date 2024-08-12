@@ -27,17 +27,20 @@ enum class EMafiaFlowState : uint8
 	/** 메인 플로우 내에서 반복해서 변화되는 State */
 	None,
 
-	DayBefore, // 저녁 -> 아침 이전.
+	BeforeDay, // 저녁 -> 아침 이전.
 	Day,
-	DayAfter, // 아침 -> 투표 이전.
+	AfterDay, // 아침 -> 투표 이전.
+	EndDay,
 
-	VoteBefore, // 아침 -> 투표 이전.
+	BeforeVote, // 아침 -> 투표 이전.
 	Vote, // 투표.
-	VoteAfter, // 투표 -> 저녁 이전.
+	AfterVote, // 투표 -> 저녁 이전.
+	EndVote,
 
-	NightBefore, // 투표 -> 저녁 이전.
+	BeforeNight, // 투표 -> 저녁 이전.
 	Night, // 저녁
-	NightAfter, // 저녁 -> 아침 이전.
+	AfterNight, // 저녁 -> 아침 이전.
+	EndNight,
 };
 
 UENUM()
@@ -102,38 +105,39 @@ enum class EMafiaUseAbilityFlag : uint8
 	Succeed,
 };
 
-/** ktw - 게임 플레이 시민팀 필수 직업입니다. */
-const static TArray<EMafiaRole> GCitizenEssentialRoleArray =
-{ 
-	EMafiaRole::Citizen,
-	EMafiaRole::Police
-};
-
-/** ktw - 게임 플레이 시민팀 특수 직업입니다. */
-const static TArray<EMafiaRole> GCitizenSpecialRoleArray =
-{
-	EMafiaRole::Doctor,
-	EMafiaRole::Vigilante,
-	EMafiaRole::Killer,
-	EMafiaRole::BusDriver,
-	EMafiaRole::Detective,
-	EMafiaRole::Spirit,
-	EMafiaRole::Soldier
-};
-
-/** ktw - 게임 플레이 마피아 팀 필수 직업입니다. */
-const static TArray<EMafiaRole> GMafiaEssentialRoleArray =
-{
-	EMafiaRole::Mafia
-};
-
-/** ktw - 게임 플레이 마피아 팀 특수 직업입니다. */
-const static TArray<EMafiaRole> GMafiaSpecialRoleArray =
-{
-	EMafiaRole::Madam,
-	EMafiaRole::Thief
-};
-
+#pragma region Deprecated.
+///** ktw - 게임 플레이 시민팀 필수 직업입니다. */
+//const static TArray<EMafiaRole> GCitizenEssentialRoleArray =
+//{ 
+//	EMafiaRole::Citizen,
+//	EMafiaRole::Police
+//};
+//
+///** ktw - 게임 플레이 시민팀 특수 직업입니다. */
+//const static TArray<EMafiaRole> GCitizenSpecialRoleArray =
+//{
+//	EMafiaRole::Doctor,
+//	EMafiaRole::Vigilante,
+//	EMafiaRole::Killer,
+//	EMafiaRole::BusDriver,
+//	EMafiaRole::Detective,
+//	EMafiaRole::Spirit,
+//	EMafiaRole::Soldier
+//};
+//
+///** ktw - 게임 플레이 마피아 팀 필수 직업입니다. */
+//const static TArray<EMafiaRole> GMafiaEssentialRoleArray =
+//{
+//	EMafiaRole::Mafia
+//};
+//
+///** ktw - 게임 플레이 마피아 팀 특수 직업입니다. */
+//const static TArray<EMafiaRole> GMafiaSpecialRoleArray =
+//{
+//	EMafiaRole::Madam,
+//	EMafiaRole::Thief
+//};
+#pragma endregion
 
 /** ktw - 인원수에 따른 마피아 팀 직업 부여 */
 const static TArray<EMafiaRole> GMafiaAssignRoleArray =
