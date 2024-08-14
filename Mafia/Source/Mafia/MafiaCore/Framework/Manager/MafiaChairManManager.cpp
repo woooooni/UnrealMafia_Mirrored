@@ -213,7 +213,7 @@ UMafiaBaseRoleComponent* UMafiaChairManManager::FindDeathRow()
 	TArray<FPlayerVoteData> VoteArray;
 	CachedVoteEventsMap.GenerateValueArray(VoteArray);
 
-	/** 2. 가장 득표수가 많은 Data를 찾고, 무효표 수와 비교. */
+	/** 2. 가장 득표수가 많은 Data를 찾고, 무효표 수와 비교해 처형할 사람을 정한다. */
 	if (VoteArray.Num() > 0)
 	{
 		VoteArray.Sort([](const FPlayerVoteData& Left, const FPlayerVoteData& Right)
