@@ -105,7 +105,10 @@ public:
 		ktw : 서버에서 호출해야합니다.
 	*/
 	UFUNCTION()
-	void ResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag);
+	void ResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag);
+
+	UFUNCTION()
+	void ReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag);
 
 	/**
 		ktw : 서버에서 호출해야합니다.
@@ -143,7 +146,10 @@ private:
 	void ClientStartVoteEvent();
 
 	UFUNCTION(Client, Reliable)
-	void ClientResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag);
+	void ClientResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag);
+
+	UFUNCTION(Client, Reliable)
+	void ClientReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag);
 
 	UFUNCTION(Client, Reliable)
 	void ClientFinishVoteEvent();

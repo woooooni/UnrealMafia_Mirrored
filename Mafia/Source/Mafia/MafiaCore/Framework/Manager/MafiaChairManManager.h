@@ -42,9 +42,12 @@ struct FPlayerVoteData
 
 public:
 	UPROPERTY()
+	TWeakObjectPtr<class UMafiaBaseRoleComponent> Votor;
+
+	UPROPERTY()
 	TWeakObjectPtr<class UMafiaBaseRoleComponent> Candidate;
 
-	TSet<FName> VotersSet;
+	UPROPERTY()
 	uint8 VotedCount = 0;
 
 public:
@@ -146,6 +149,9 @@ private:
 		Value - FPlayerVoteData.
 	*/
 	TMap<FName, FPlayerVoteData> CachedVoteEventsMap;
+
+	/** ktw : 피 투표자를 저장합니다. */
+	TSet<FName> CachedAlreadyVotersSet;
 
 private:
 	TMap<FName, TObjectPtr<UMafiaBaseRoleComponent>> JoinedPlayerRoleComponents;

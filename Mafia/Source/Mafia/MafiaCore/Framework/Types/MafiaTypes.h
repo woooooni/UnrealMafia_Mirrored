@@ -90,6 +90,14 @@ enum class EMafiaRole : uint8
 };
 
 UENUM()
+enum class EMafiaUseAbilityFlag : uint8
+{
+	ImpossibleUseAbility,
+	AlreadyUseAbility,
+	Succeed,
+};
+
+UENUM()
 enum class EMafiaVoteFlag : uint8
 {
 	ImpossibleVote,
@@ -98,12 +106,13 @@ enum class EMafiaVoteFlag : uint8
 };
 
 UENUM()
-enum class EMafiaUseAbilityFlag : uint8
+enum class EMafiaVoteResultFlag : uint8
 {
-	ImpossibleUseAbility,
-	AlreadyUseAbility,
-	Succeed,
+	NoDeathPlayer,
+	SomeoneDying,
 };
+
+
 
 #pragma region Deprecated.
 ///** ktw - 게임 플레이 시민팀 필수 직업입니다. */

@@ -135,11 +135,24 @@ void UMafiaBaseRoleComponent::StartVoteEvent()
 }
 
 
-void UMafiaBaseRoleComponent::ResponseVoteEvent(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag)
+void UMafiaBaseRoleComponent::ResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag)
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
 		ClientResponseVoteEvent(InCandidate, InFlag);
+	}
+	else
+	{
+		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("서버에서 호출해야합니다."));
+	}
+}
+
+void UMafiaBaseRoleComponent::ReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag)
+{
+	
+	if (ENetRole::ROLE_Authority == GetOwnerRole())
+	{
+		ClientReceiveVoteResult(InDeathRow, InFlag);
 	}
 	else
 	{
@@ -226,10 +239,13 @@ void UMafiaBaseRoleComponent::ClientStartVoteEvent_Implementation()
 
 }
 
-void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(UMafiaBaseRoleComponent* InCandidate, EMafiaVoteFlag InFlag)
+void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag)
 {
-	/** ktw : 클라이언트에서 실행됩니다. */
-
+	/** 
+		ktw : 클라이언트에서 실행됩니다. 
+				InCandidate는 nullptr일 수 있습니다.
+	*/
+	
 	// 투표 결과 응답.
 	if (OwningPlayerState.IsValid())
 	{
@@ -251,6 +267,21 @@ void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(UMafiaBaseR
 
 		}
 	}
+}
+
+void UMafiaBaseRoleComponent::ClientReceiveVoteResult_Implementation(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag)
+{
+	/** #Todo - ktw : 통지된 사형수가 있는지 체크해서 별도의 동작을 수행. */
+	
+	if (InFlag == EMafiaVoteResultFlag::NoDeathPlayer)
+	{
+
+	}
+	else if (InFlag == EMafiaVoteResultFlag::SomeoneDying)
+	{
+
+	}
+	
 }
 
 void UMafiaBaseRoleComponent::ClientFinishVoteEvent_Implementation()
@@ -379,4 +410,5 @@ bool operator < (const FAffectedEvent& A, const FAffectedEvent& B)
 //		}
 //	}*/
 //}
+
 

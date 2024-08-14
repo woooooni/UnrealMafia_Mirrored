@@ -190,7 +190,10 @@ void UMafiaChairManManager::FlushAbilityEvents() const
 
 void UMafiaChairManManager::StartVote()
 {
+	CachedAbilityEventsHeap.Empty();
 	CachedVoteEventsMap.Empty();
+	CachedAlreadyVotersSet.Empty();
+
 	for (auto& Pair : JoinedPlayerRoleComponents)
 	{
 		Pair.Value->StartVoteEvent();
@@ -199,33 +202,93 @@ void UMafiaChairManManager::StartVote()
 
 UMafiaBaseRoleComponent* UMafiaChairManManager::FindDeathRow()
 {
-	UMafiaBaseRoleComponent* DeathRowPlayer = nullptr;
+	/** ktw : 투표로 처형할 사람을 찾습니다. */
 	
-	return DeathRowPlayer;
+	/** 
+		1. 무효표 수 계산. 무효 데이터 수 한 개 빼야 함.
+			(전체 플레이어 수 - 투표한 사람 수 + 1)
+	*/
+	uint16 NullVoteCount = JoinedPlayerRoleComponents.Num() - (CachedVoteEventsMap.Num() + 1);
+
+	TArray<FPlayerVoteData> VoteArray;
+	CachedVoteEventsMap.GenerateValueArray(VoteArray);
+
+	/** 2. 가장 득표수가 많은 Data를 찾고, 무효표 수와 비교. */
+	if (VoteArray.Num() > 0)
+	{
+		VoteArray.Sort([](const FPlayerVoteData& Left, const FPlayerVoteData& Right)
+		{
+			return Left.VotedCount > Right.VotedCount;
+		});
+
+
+		FPlayerVoteData MaxCountVoteData;
+		for (auto Event : VoteArray)
+		{
+			if (Event.Candidate.IsValid())
+			{
+				MaxCountVoteData = Event.VotedCount > MaxCountVoteData.VotedCount ? Event : MaxCountVoteData;
+			}
+			else
+			{
+				NullVoteCount += Event.VotedCount;
+			}
+		}
+
+		
+		if (NullVoteCount >= MaxCountVoteData.VotedCount)
+		{
+			/** 2-1. 무효표와 같거나 적다 */
+			return nullptr;
+		}
+
+		FPlayerVoteData SecondaryCountVoteData = VoteArray.Num() > 2 ? VoteArray[1] : FPlayerVoteData();
+		if (SecondaryCountVoteData.VotedCount == MaxCountVoteData.VotedCount)
+		{
+			/** 2-2. 가장 많은 득표수와 그 다음 득표수가 같다. */
+			return nullptr;
+		}
+
+		if (MaxCountVoteData.Candidate.IsValid())
+		{
+			return MaxCountVoteData.Candidate.Get();
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+
+	return nullptr;
 }
 
 void UMafiaChairManManager::NotifyDeathRow()
 {
+	UMafiaBaseRoleComponent* DeathRow = FindDeathRow();
+	EMafiaVoteResultFlag Flag = IsValid(DeathRow) ? EMafiaVoteResultFlag::SomeoneDying : EMafiaVoteResultFlag::NoDeathPlayer;
+	
+	for (auto& Pair : JoinedPlayerRoleComponents)
+	{
+		Pair.Value->ReceiveVoteResult(DeathRow, Flag);
+	}
+	
 }
 
 void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaBasePlayerState* InCandidate)
 {
-	if (IsValid(InVotor) && IsValid(InCandidate))
+	if (IsValid(InVotor))
 	{
 		/** ktw : 1. AccountId & RoleComponent 유효성 체크. */
 		const FString& VotorAccountIdStr = InVotor->GetUniqueId().ToString();
-		const FString& CandidateAccountIdStr = InCandidate->GetUniqueId().ToString();
 
-		if (CandidateAccountIdStr.IsEmpty() || VotorAccountIdStr.IsEmpty())
+		if (VotorAccountIdStr.IsEmpty())
 		{
 			MAFIA_ULOG(LogMafiaChairMan, Warning, TEXT("AccountIdStr is empty"));
 			return;
 		}
 
 		UMafiaBaseRoleComponent* VotorRoleComponent = InVotor->GetRoleComponent();
-		UMafiaBaseRoleComponent* CandidateRoleComponent = InCandidate->GetRoleComponent();
-
-		if (IsValid(VotorRoleComponent) == false || IsValid(CandidateRoleComponent) == false)
+		if (IsValid(VotorRoleComponent) == false)
 		{
 			MAFIA_ULOG(LogMafiaChairMan, Warning, TEXT("RoleComponent is Invalid."));
 			return;
@@ -234,44 +297,80 @@ void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaB
 
 		/** ktw : 2. 중복 투표 체크. */
 		const FName VotorAccountId = FName(*VotorAccountIdStr);
-		const FName CandidateAccountId = FName(*CandidateAccountIdStr);
-		EMafiaVoteFlag Flag = EMafiaVoteFlag::ImpossibleVote;
-		
-		if (auto Pair = CachedVoteEventsMap.Find(CandidateAccountId))
+		if (CachedAlreadyVotersSet.Find(VotorAccountId))
 		{
-			if (Pair->VotersSet.Find(VotorAccountId))
-			{
-				Flag = EMafiaVoteFlag::AlreadyVoted;
-				VotorRoleComponent->ResponseVoteEvent(CandidateRoleComponent, Flag);
-				return;
-			}
+			VotorRoleComponent->ResponseVoteEvent(InCandidate, EMafiaVoteFlag::AlreadyVoted);
+			return;
 		}
 
 
 		/** ktw : 3. 투표가 가능한 상태인지 체크. */
 		if (IsPossibleVote())
 		{
-			FPlayerVoteData* Pair = CachedVoteEventsMap.Find(CandidateAccountId);
-			if (Pair)
+			if (IsValid(InCandidate))
 			{
-				/** Todo - ktw : 필요하면, 예외처리 추가. */
-				Pair->VotersSet.Emplace(VotorAccountId);
-				Pair->VotedCount++;
+				/** ktw : 피 투표자가 존재할 경우. */
+				const FString & CandidateAccountIdStr = InCandidate->GetUniqueId().ToString();
+				if (CandidateAccountIdStr.IsEmpty())
+				{
+					MAFIA_ULOG(LogMafiaChairMan, Warning, TEXT("AccountIdStr is empty"));
+					return;
+				}
+				const FName CandidateAccountId = FName(*CandidateAccountIdStr);
+
+				
+				UMafiaBaseRoleComponent* CandidateRoleComponent = InCandidate->GetRoleComponent();
+				if (IsValid(CandidateRoleComponent))
+				{
+					FPlayerVoteData* Pair = CachedVoteEventsMap.Find(CandidateAccountId);
+					if (Pair)
+					{
+						Pair->VotedCount++;
+						CachedAlreadyVotersSet.Emplace(VotorAccountId);
+					}
+					else
+					{
+						FPlayerVoteData VoteData;
+						VoteData.Candidate = CandidateRoleComponent;
+						VoteData.VotedCount = 1;
+
+						CachedAlreadyVotersSet.Emplace(VotorAccountId);
+						CachedVoteEventsMap.Emplace(CandidateAccountId, VoteData);
+					}
+				}
+				else
+				{
+					VotorRoleComponent->ResponseVoteEvent(InCandidate, EMafiaVoteFlag::ImpossibleVote);
+					return;
+				}
 			}
 			else
 			{
-				FPlayerVoteData VoteData;
-				VoteData.VotersSet.Emplace(VotorAccountId);
-				VoteData.VotedCount = 1;
-				VoteData.Candidate = CandidateRoleComponent;
-				
-				CachedVoteEventsMap.Emplace(CandidateAccountId, VoteData);
+				/** ktw : 무효표 일 경우. */
+				FPlayerVoteData* Pair = CachedVoteEventsMap.Find(TEXT("NullVote"));
+				if (Pair)
+				{
+					Pair->VotedCount++;
+					CachedAlreadyVotersSet.Emplace(VotorAccountId);
+				}
+				else
+				{
+					FPlayerVoteData VoteData;
+					VoteData.Candidate = nullptr;
+					VoteData.VotedCount = 1;
+
+					CachedAlreadyVotersSet.Emplace(VotorAccountId);
+					CachedVoteEventsMap.Emplace(TEXT("NullVote"), VoteData);
+				}
 			}
 
-			Flag = EMafiaVoteFlag::Succeed;
+			VotorRoleComponent->ResponseVoteEvent(InCandidate, EMafiaVoteFlag::Succeed);
 		}
-
-		VotorRoleComponent->ResponseVoteEvent(CandidateRoleComponent, Flag);
+		else
+		{
+			VotorRoleComponent->ResponseVoteEvent(InCandidate, EMafiaVoteFlag::ImpossibleVote);
+			return;
+		}
 	}
 }
 
@@ -280,9 +379,11 @@ void UMafiaChairManManager::EndVote()
 	for (auto& Pair : JoinedPlayerRoleComponents)
 	{
 		Pair.Value->FinishVoteEvent();
-	}
+	}	
 
+	CachedAbilityEventsHeap.Empty();
 	CachedVoteEventsMap.Empty();
+	CachedAlreadyVotersSet.Empty();
 }
 
 
