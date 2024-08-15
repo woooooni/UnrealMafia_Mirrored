@@ -291,8 +291,65 @@ void AMafiaBasePlayerController::CheatChangeRole(const FString& InStrRole)
 	if (AMafiaBasePlayerState* PS = GetPlayerState<AMafiaBasePlayerState>())
 	{
 		EMafiaRole RoleType = GetStringToEnum<EMafiaRole>(InStrRole);
-		PS->CheatSetRole(RoleType);
+		if (static_cast<uint8>(RoleType) == -1)
+		{
+			if(InStrRole == TEXT("기생"))
+			{
+				RoleType = EMafiaRole::Madam;
+			}
+			else if(InStrRole == TEXT("버스기사"))
+			{
+				RoleType = EMafiaRole::BusDriver;
+			}
+			else if(InStrRole == TEXT("경찰"))
+			{
+				RoleType = EMafiaRole::Police;
+			}
+			else if(InStrRole == TEXT("연쇄살인마"))
+			{
+				RoleType = EMafiaRole::Killer;
+			}
+			else if(InStrRole == TEXT("마피아"))
+			{
+				RoleType = EMafiaRole::Mafia;
+			}
+			else if(InStrRole == TEXT("자경단원"))
+			{
+				RoleType = EMafiaRole::Vigilante;
+			}
+			else if(InStrRole == TEXT("탐정"))
+			{
+				RoleType = EMafiaRole::Detective;
+			}
+			else if(InStrRole == TEXT("영매"))
+			{
+				RoleType = EMafiaRole::Spirit;
+			}
+			else if(InStrRole == TEXT("도둑"))
+			{
+				RoleType = EMafiaRole::Thief;
+			}
+			else if(InStrRole == TEXT("군인"))
+			{
+				RoleType = EMafiaRole::Soldier;
+			}
+			else if(InStrRole == TEXT("의사"))
+			{
+				RoleType = EMafiaRole::Doctor;
+			}
+			else if (InStrRole == TEXT("시민"))
+			{
+				RoleType = EMafiaRole::Citizen;
+			}
+		}
+
+		if (static_cast<uint8>(RoleType) >= 0)
+		{
+			PS->CheatSetRole(RoleType);
+		}
 	}
+
+	
 #endif
 }
 

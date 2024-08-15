@@ -10,12 +10,14 @@
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaCitizenRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaPoliceRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaDoctorRoleComponent.h"
+#include "GameFeatures/Mafia/Framework/Components/Role/MafiaBusDriverRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaGodFatherRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Character/MafiaSampleCharacter.h"
 
 #include "Net/UnrealNetwork.h"
 #include "Mafia.h"
 #include "Mafia/Framework/Player/MafiaPlayerController.h"
+#include "Framework/System/MafiaGameEvents.h"
 
 
 AMafiaBasePlayerState::AMafiaBasePlayerState(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -63,12 +65,11 @@ void AMafiaBasePlayerState::PostInitializeComponents()
 void AMafiaBasePlayerState::CheatSetRole_Implementation(EMafiaRole InRole)
 {
 #if ENABLE_CHEAT
-	AssignAbility(InRole);
 	if (UMafiaBaseGameInstance* GI = GetGameInstance<UMafiaBaseGameInstance>())
 	{
 		if (UMafiaChairManManager* ChairMan = GI->GetChairMan())
 		{
-			ChairMan->CheatChangeRole(this, RoleComponent);
+			ChairMan->CheatChangeRole(this, AssignAbility(InRole));
 		}
 	}
 	 
@@ -170,6 +171,7 @@ void AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole InRole)
 	case EMafiaRole::Vigilante:
 		break;
 	case EMafiaRole::BusDriver:
+		RoleComponent = NewObject<UMafiaBusDriverRoleComponent>(this);
 		break;
 	case EMafiaRole::Detective:
 		break;

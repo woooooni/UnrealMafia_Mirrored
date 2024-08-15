@@ -17,10 +17,10 @@ struct FBusPassengers
 
 public:
 	UPROPERTY()
-	UMafiaBaseRoleComponent* FirstPassenger;
+	TWeakObjectPtr<AMafiaBasePlayerState> First;
 
 	UPROPERTY()
-	UMafiaBaseRoleComponent* SecondPassenger;
+	TWeakObjectPtr<AMafiaBasePlayerState> Second;
 };
 
 UCLASS()
@@ -33,15 +33,29 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
+	virtual void UseAbility(class AMafiaBasePlayerState* InOther) override;	
 	virtual void BusDrive() override;
 
 protected:
 	virtual void OnRep_Dead() override;
 
 protected:
+	virtual void ClientNotifyResultAbility_Implementation(UMafiaBaseRoleComponent* InOther) override;
 	virtual void ClientAffectedEventsFlush_Implementation() override;
+	
+
+private:
+	UFUNCTION()
+	void ChoicePassenger(class AMafiaBasePlayerState* InOther);
+
+	UFUNCTION(Server, Reliable)
+	void ServerReqChoicePassenger(class AMafiaBasePlayerState* InOther);
+
+
+
 
 private:
 	UPROPERTY(Replicated)

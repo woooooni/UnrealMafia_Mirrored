@@ -113,6 +113,7 @@ protected:
 
 	int32 CurrentNumRound;
 	FName PendingMatchState;
+
 protected:
 	FTimerHandle InProgressTimeTimerHandle;
 	FTimerHandle AssignAbilityTimerHandle;

@@ -72,14 +72,15 @@ private:
 	UFUNCTION(Server, UnReliable)
 	void ServerChangeNickname(FName InNickname);
 
-	UFUNCTION()
-	void OnRep_ChangePlayerNickname();
-
 	UFUNCTION(Client, Reliable)
 	void ClientNotifyGameResult(EMafiaGameResult InGameResult);
 
 	UFUNCTION(Client, Reliable)
 	void PostInitializeRoleComponent();
+
+private:
+	UFUNCTION()
+	void OnRep_ChangePlayerNickname();
 	
 protected:
 	/** 유저가 Ready버튼을 눌렀을때 */

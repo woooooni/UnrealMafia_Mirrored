@@ -23,6 +23,10 @@ void UMafiaCitizenRoleComponent::OnRep_Dead()
 }
 
 
+void UMafiaCitizenRoleComponent::ClientNotifyResultAbility_Implementation(UMafiaBaseRoleComponent* InOther)
+{
+}
+
 void UMafiaCitizenRoleComponent::ClientAffectedEventsFlush_Implementation()
 {
 	/** ktw : 내가 능력을 볼 수 있는 플레이어의 Unique ID. */

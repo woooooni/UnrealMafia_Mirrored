@@ -33,7 +33,8 @@ protected:
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+	virtual void OnUnregister() override;
+#pragma region Getter & Setter
 public:
 	UFUNCTION()
 	void SetTeamType(EMafiaTeam InTeam);
@@ -55,19 +56,32 @@ public:
 	void SetAffectedEvents(const TArray<FAffectedEvent>& InEvents);
 	FORCEINLINE const TArray<FAffectedEvent>& GetAffectedEvents() { return CachedAffectedEventsHeap; }
 
+	UFUNCTION()
+	FORCEINLINE class AMafiaBasePlayerState* GetOwningPlayerState() const { return OwningPlayerState.Get(); }
+#pragma endregion Getter & Setter
+
+
 public:
 	UFUNCTION()
-	void UseAbility(class AMafiaBasePlayerState* InOther);
+	virtual void UseAbility(class AMafiaBasePlayerState* InOther);
+
+	UFUNCTION()
+	virtual void SendOfferMafiaTeam(class AMafiaBasePlayerState* InOther);
 
 	UFUNCTION()
 	void Vote(class AMafiaBasePlayerState* InOther);
 	
 
-	UFUNCTION()
-	FORCEINLINE class AMafiaBasePlayerState* GetOwningPlayerState() const { return OwningPlayerState.Get(); }
+	
 
 #pragma region Role Ability(역할 능력 관련)
 public:
+	/**
+		ktw : 서버에서 호출해야합니다.
+	*/
+	UFUNCTION()
+	void ResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag);
+
 	/** 
 		ktw : 서버에서 호출해야합니다.
 	*/
@@ -75,10 +89,10 @@ public:
 	void AffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 
 	/**
-		ktw : 서버에서 호출해야합니다.
+		ktw : 서버에서 호출해야 합니다.
 	*/
 	UFUNCTION()
-	void ResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag);
+	virtual void RecieveOfferMafiaTeam(UMafiaBaseRoleComponent* InMafiaComponent);
 
 	/**
 		ktw : 서버에서 호출해야합니다.
@@ -87,10 +101,22 @@ public:
 	void AffectedEventsFlush();
 
 	/**
+		ktw : 서버에서 호출해야합니다.
+	*/
+	UFUNCTION()
+	void NotifyResultAbility(UMafiaBaseRoleComponent* InOther);
+
+	/**
 		ktw : 서버에서 호출해야 합니다.
 	*/
 	UFUNCTION()
 	virtual void BusDrive() {};
+
+	/**
+		ktw : 서버에서 호출해야 합니다.
+	*/
+	UFUNCTION()
+	void BusRide(const TArray<FAffectedEvent>& InEventArray);
 #pragma endregion Role Ability(역할 능력 관련)
 	
 #pragma region Vote(투표)
@@ -124,6 +150,9 @@ private:
 	void ServerReqUseAbility(AMafiaBasePlayerState* InOther);
 
 	UFUNCTION(Server, Reliable)
+	void ServerReqSendOfferMafiaTeam(AMafiaBasePlayerState* InOther);
+
+	UFUNCTION(Server, Reliable)
 	void ServerReqSetAffectedEvents(const TArray<FAffectedEvent>& InEvents);
 
 protected:
@@ -131,10 +160,19 @@ protected:
 	void ClientAffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 
 	UFUNCTION(Client, Reliable)
+	virtual void ClientNotifyResultAbility(UMafiaBaseRoleComponent* InOther);
+
+	UFUNCTION(Client, Reliable)
 	virtual void ClientResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag);
 
 	UFUNCTION(Client, Reliable)
 	virtual void ClientAffectedEventsFlush();
+
+	UFUNCTION(Client, Reliable)
+	virtual void ClientRecieveOfferMafiaTeam(UMafiaBaseRoleComponent* InMafiaComponent);
+
+	UFUNCTION(Client, Reliable)
+	void ClientBusRide(const TArray<FAffectedEvent>& InEventArray);
 #pragma endregion Role Ability RPC
 
 #pragma region Vote(투표) RPC
@@ -173,6 +211,9 @@ protected:
 	UFUNCTION()
 	virtual void OnRep_Dead() PURE_VIRTUAL(UMafiaBaseGameInstance::OnRep_Dead, );
 
+	UFUNCTION()
+	virtual void OnChangedMafiaFlowState(const EMafiaFlowState& InMafiaFlowState);
+
 protected:
 	class UMafiaBaseGameInstance* GetServerInstance();
 
@@ -201,4 +242,7 @@ private:
 
 	UPROPERTY(Replicated)
 	TWeakObjectPtr<class AMafiaBasePlayerState> OwningPlayerState;
+
+private:
+	FDelegateHandle OnChangedMafiaFlowStateHandle;
 };

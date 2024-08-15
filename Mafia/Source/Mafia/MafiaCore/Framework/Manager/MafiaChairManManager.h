@@ -14,24 +14,28 @@ struct FUseAbilityEventData
 	GENERATED_BODY()
 
 public:
-	EMafiaRole Role;
-
+	/** ktw : 능력을 사용한 플레이어의 역할 */
 	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseRoleComponent> Origin;
+	EMafiaRole OriginRole;
 
+	/** ktw : 능력을 사용한 플레이어 */
 	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseRoleComponent> Destination;
+	TWeakObjectPtr<class UMafiaBaseRoleComponent> OriginPlayer;
+
+	/** ktw : 능력에 영향받는 플레이어 */
+	UPROPERTY()
+	TWeakObjectPtr<class UMafiaBaseRoleComponent> DestPlayer;
 
 public:
 	/** ktw : Pred Definition */
 	FORCEINLINE bool operator< (const FUseAbilityEventData& Other) const
 	{
-		return Role > Other.Role;
+		return OriginRole > Other.OriginRole;
 	}
 
 	FORCEINLINE bool operator== (const FUseAbilityEventData& Other) const
 	{
-		return Role == Other.Role;
+		return OriginRole == Other.OriginRole;
 	}
 };
 
@@ -122,7 +126,7 @@ private:
 	class UMafiaBaseRoleComponent* FindDeathRow();
 
 	UFUNCTION()
-	void NotifyDeathRow();
+	EMafiaVoteResultFlag NotifyDeathRow();
 
 	UFUNCTION()
 	void EndVote();
@@ -131,8 +135,9 @@ private:
 	bool MakeShuffledRoleArray(int32 InPlayerCount, OUT TArray<EMafiaRole>& OutSuffledArray);
 	bool IsPossibleVote();
 
+private:
 	UFUNCTION()
-	EMafiaGameResult CheckGameOver() const;
+	EMafiaGameResult CheckGameResult() const;
 
 	UFUNCTION()
 	void NotifyGameResult(EMafiaGameResult InGameResult) const;
@@ -140,6 +145,7 @@ private:
 
 private:
 	/** ktw : EMafiaRole에 선언된 Role의 값 순서로 Event를 정렬합니다. */
+	UPROPERTY()
 	TArray<FUseAbilityEventData> CachedAbilityEventsHeap;
 
 	/** 
@@ -148,11 +154,15 @@ private:
 		Key - 피 투표자 AccountId.
 		Value - FPlayerVoteData.
 	*/
+	UPROPERTY()
 	TMap<FName, FPlayerVoteData> CachedVoteEventsMap;
 
 	/** ktw : 피 투표자를 저장합니다. */
+	UPROPERTY()
 	TSet<FName> CachedAlreadyVotersSet;
 
 private:
+	UPROPERTY()
 	TMap<FName, TObjectPtr<UMafiaBaseRoleComponent>> JoinedPlayerRoleComponents;
+
 };
