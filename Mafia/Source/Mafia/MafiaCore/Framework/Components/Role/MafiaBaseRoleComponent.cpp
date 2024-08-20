@@ -433,45 +433,56 @@ void UMafiaBaseRoleComponent::OnChangedMafiaFlowState(const EMafiaFlowState& InM
 	/** #Todo - ktw : Flow에 따른 연출 및 UI 출력. */
 	if (InMafiaFlowState == EMafiaFlowState::None)
 	{
-		uint8 Test = 0;
+		
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::BeforeDay)
 	{
+
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::Day)
 	{
+
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::AfterDay)
 	{
+
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::EndDay)
 	{
+
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::BeforeVote)
 	{
+
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::Vote)
 	{
+
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::AfterVote)
 	{
+
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::EndVote)
 	{
+
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::BeforeNight)
 	{
+
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::Night)
 	{
+
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::AfterNight)
 	{
+
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::EndNight)
 	{
+
 	}
-	
 }
 
 

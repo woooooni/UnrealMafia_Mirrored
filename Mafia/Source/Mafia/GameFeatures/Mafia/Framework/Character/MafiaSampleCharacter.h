@@ -12,6 +12,8 @@ class UCameraComponent;
 class USkeletalMeshComponent;
 class UInputMappingContext;
 class UInputAction;
+class UWidgetComponent;
+
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -45,6 +47,10 @@ class AMafiaSampleCharacter : public AMafiaBaseCharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	/** PlayerName */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Player, meta = (AllowPrivateAccess = "true"))
+	UWidgetComponent* PlayerNameComponent;
+
 public:
 	AMafiaSampleCharacter(const FObjectInitializer& ObjectInitializer);
 	
@@ -73,6 +79,9 @@ public:
 	UFUNCTION()
 	void ChangeColor(FLinearColor InColor);
 
+	UFUNCTION()
+	void ChangePlayerName(const FName& InNewPlayerName);
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -83,8 +92,14 @@ protected:
 	UFUNCTION()
 	void OnRepChangeColor();
 
+	UFUNCTION()
+	void OnRepChangePlayerName();
+
 private:
 	UPROPERTY(ReplicatedUsing = OnRepChangeColor)
 	FLinearColor CharacterColor;
+
+	UPROPERTY(ReplicatedUsing = OnRepChangePlayerName)
+	FName PlayerName;
 };
 

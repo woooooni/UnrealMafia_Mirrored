@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "MafiaCore/Framework/Types/MafiaTypes.h"
+#include "MafiaCore/Framework/Character/MafiaBaseCharacter.h"
 #include "MafiaGameEvents.generated.h"
 
 /**
@@ -28,6 +29,9 @@ public:
 
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnChangedMafiaFlowState, const EMafiaFlowState&);
 	FOnChangedMafiaFlowState OnChangedMafiaFlowState;
+
+	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnChangedPlayerName, const AMafiaBaseCharacter* InCharacter, const FName& InPlayerNewName);
+	FOnChangedPlayerName OnChangedPlayerName;
 };
 
 

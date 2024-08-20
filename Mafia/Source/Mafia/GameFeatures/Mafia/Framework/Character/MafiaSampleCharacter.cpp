@@ -1,17 +1,25 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GameFeatures/Mafia/Framework/Character/MafiaSampleCharacter.h"
+#include "Mafia/Framework/UI/InGame/MafiaPlayerNameActionGroupWidget.h"
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
 #include "Engine/LocalPlayer.h"
+
+
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
+
+
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
+
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Net/UnrealNetwork.h"
+
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -58,12 +66,26 @@ AMafiaSampleCharacter::AMafiaSampleCharacter(const FObjectInitializer& ObjectIni
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -88), FRotator(0, 0, -90));
+
+	PlayerNameComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("PlayerNameWidget"));
+	PlayerNameComponent->SetupAttachment(RootComponent);
+	PlayerNameComponent->SetRelativeLocation(FVector(0.f, 0.f, 125.f));
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> PlayerNameWidgetRef = TEXT("/Game/UI/ActionGruopWidget/InGame/WBP_MafiaPlayerNameActionGroupWidget.WBP_MafiaPlayerNameActionGroupWidget_C");
+	if (PlayerNameWidgetRef.Succeeded())
+	{
+		PlayerNameComponent->SetWidgetClass(PlayerNameWidgetRef.Class);
+		PlayerNameComponent->SetWidgetSpace(EWidgetSpace::Screen);
+		PlayerNameComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		PlayerNameComponent->SetVisibility(true);
+	}
 }
 
 void AMafiaSampleCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AMafiaSampleCharacter, CharacterColor);
+	DOREPLIFETIME(AMafiaSampleCharacter, PlayerName);
 }
 
 void AMafiaSampleCharacter::BeginPlay()
@@ -90,6 +112,17 @@ void AMafiaSampleCharacter::BeginPlay()
 void AMafiaSampleCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// 카메라 위치와의 거리 계산
+	FVector CameraLocation = GetWorld()->GetFirstPlayerController()->PlayerCameraManager->GetCameraLocation();
+	float Distance = FVector::Dist(CameraLocation, GetActorLocation());
+
+	// 거리에 따른 크기 계산 (예시: 가까울수록 크기 큼)
+	float ScaleFactor = FMath::Clamp(Distance / 100.f, 0.2f, 2.0f);
+
+	// 위젯 크기 적용
+	PlayerNameComponent->SetWorldScale3D(PlayerNameComponent->GetDrawSize() * ScaleFactor);
+
 }
 
 void AMafiaSampleCharacter::ChangeColor(FLinearColor InColor)
@@ -100,11 +133,34 @@ void AMafiaSampleCharacter::ChangeColor(FLinearColor InColor)
 	}
 }
 
+void AMafiaSampleCharacter::ChangePlayerName(const FName& InNewPlayerName)
+{
+	if (GetPlayerState()->GetNetMode() == NM_DedicatedServer)
+	{
+		PlayerName = InNewPlayerName;
+	}
+}
+
 void AMafiaSampleCharacter::OnRepChangeColor()
 {
 	if (GetMesh()->GetMaterial(0))
 	{
 		GetMesh()->SetVectorParameterValueOnMaterials(TEXT("Tint"), FVector(CharacterColor));
+	}
+
+	UMafiaPlayerNameActionGroupWidget* NameWidget = Cast<UMafiaPlayerNameActionGroupWidget>(PlayerNameComponent->GetWidget());
+	if (IsValid(NameWidget))
+	{
+		NameWidget->SetTextColor(CharacterColor);
+	}
+}
+
+void AMafiaSampleCharacter::OnRepChangePlayerName()
+{
+	UMafiaPlayerNameActionGroupWidget* NameWidget = Cast<UMafiaPlayerNameActionGroupWidget>(PlayerNameComponent->GetWidget());
+	if (IsValid(NameWidget))
+	{
+		NameWidget->SetPlayerName(PlayerName);
 	}
 }
 

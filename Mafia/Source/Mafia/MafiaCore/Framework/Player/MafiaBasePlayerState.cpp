@@ -40,8 +40,8 @@ void AMafiaBasePlayerState::BeginPlay()
 {
 	MAFIA_ALOG(LogMafiaPlayerState, Log, TEXT("Begin"));
 	Super::BeginPlay();
-	/* if (HasAuthority())
-	{
+	 /*if (HasAuthority())
+	 { 
 		if (UWorld* World = GetWorld())
 		{
 			if (APlayerController* PC = GetPlayerController())
@@ -50,7 +50,8 @@ void AMafiaBasePlayerState::BeginPlay()
 				PC->SetPawn(DefaultCharacter);
 			}
 		}
-	} */
+	 }*/
+	
 	MAFIA_ALOG(LogMafiaPlayerState, Log, TEXT("End. GetOwner:%s"), GetOwner() ? *GetOwner()->GetName() : TEXT("Other Client"));
 }
 
@@ -144,6 +145,20 @@ void AMafiaBasePlayerState::ServerChangePlayerColor_Implementation(FLinearColor 
 }
 
 
+void AMafiaBasePlayerState::ServerChangeNickname_Implementation(FName InNickname)
+{
+	PlayerNickname = InNickname;
+
+	if (AMafiaBasePlayerController* PC = Cast<AMafiaBasePlayerController>(GetPlayerController()))
+	{
+		if (AMafiaSampleCharacter* Character = Cast<AMafiaSampleCharacter>(PC->GetPawn()))
+		{
+			Character->ChangePlayerName(InNickname);
+		}
+	}
+}
+
+
 void AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole InRole)
 {
 	if (IsValid(RoleComponent))
@@ -197,7 +212,7 @@ void AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole InRole)
 
 void AMafiaBasePlayerState::OnRep_ChangePlayerNickname()
 {
-
+	SendGameEvent_TwoParams(OnChangedPlayerName, GetPlayerController()->GetPawn<AMafiaSampleCharacter>(), PlayerNickname);
 }
 
 
@@ -220,10 +235,6 @@ void AMafiaBasePlayerState::ServerReqReady_Implementation(bool bReady)
 }
 
 
-void AMafiaBasePlayerState::ServerChangeNickname_Implementation(FName InNickname)
-{
-	PlayerNickname = InNickname;
-}
 
 void AMafiaBasePlayerState::OnSetUniqueId()
 {
