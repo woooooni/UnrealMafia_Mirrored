@@ -231,6 +231,7 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 		}
 	}
 
+	
 	// 최초 투표만 예외
 	
 	/** #Todo - ktw : 각 FlowState의 연출시간까지 고려한 WaitTime 설정. */
@@ -244,6 +245,7 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 	{	
 		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Day, 0.f);
 		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 0.f);
+
 	}		
 	else if (CurrentFlowState == EMafiaFlowState::Day)
 	{		 
@@ -268,9 +270,15 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 	}		 
 	else if (CurrentFlowState == EMafiaFlowState::AfterVote)
 	{		 
+
 	}		 
+	else if (CurrentFlowState == EMafiaFlowState::EndVote)
+	{
+		
+	}
 	else if (CurrentFlowState == EMafiaFlowState::BeforeNight)
 	{		 
+
 	}		 
 	else if (CurrentFlowState == EMafiaFlowState::Night)
 	{		 
@@ -653,6 +661,16 @@ UMafiaChairManManager* AMafiaBaseGameMode::GetChairMan()
 		return GI->GetChairMan();
 	}
 	return nullptr;
+}
+
+UE_NODISCARD
+bool AMafiaBaseGameMode::CheckGameOver()
+{
+	if (UMafiaChairManManager* ChairMan = GetChairMan())
+	{
+		return EMafiaGameResult::None != ChairMan->CheckGameResult();
+	}
+	return true;
 }
 
 #pragma optimize("", on)

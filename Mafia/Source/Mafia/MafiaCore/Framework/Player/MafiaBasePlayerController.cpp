@@ -348,8 +348,6 @@ void AMafiaBasePlayerController::CheatChangeRole(const FString& InStrRole)
 			PS->CheatSetRole(RoleType);
 		}
 	}
-
-	
 #endif
 }
 

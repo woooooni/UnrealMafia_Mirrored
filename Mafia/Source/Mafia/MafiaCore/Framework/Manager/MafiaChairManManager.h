@@ -81,8 +81,6 @@ public:
 	UFUNCTION()
 	bool AssigningAllPlayersAbility();
 
-
-public:
 	/** 
 		ktw : Origin -> Destination으로 향하는 능력 사용 이벤트를 Heap에 임시 저장합니다.  
 		InOrigin : 능력 사용 Player, InDestination : 능력에 영향을 받은 Player.
@@ -93,6 +91,9 @@ public:
 	/** ktw : InVotor - 투표자, InCandidate - 피투표자 */
 	UFUNCTION()
 	void AddVoteEvent(class AMafiaBasePlayerState* InVotor, class AMafiaBasePlayerState* InCandidate);
+
+	UFUNCTION()
+	EMafiaGameResult CheckGameResult() const;
 
 public:
 	FORCEINLINE const TArray<FUseAbilityEventData>& GetPlayerAbilityDataHeap() { return CachedAbilityEventsHeap; }
@@ -107,6 +108,7 @@ public:
 public:
 	UFUNCTION()
 	void OnSetMafiaFlowState(EMafiaFlowState InFlowState);
+	
 
 private:
 	/** ktw : Heap에 저장된 능력 이벤트들을 순회하면서 각 플레이어의 RoleComponent에 이벤트를 전송합니다. */
@@ -136,9 +138,6 @@ private:
 	bool IsPossibleVote();
 
 private:
-	UFUNCTION()
-	EMafiaGameResult CheckGameResult() const;
-
 	UFUNCTION()
 	void NotifyGameResult(EMafiaGameResult InGameResult) const;
 

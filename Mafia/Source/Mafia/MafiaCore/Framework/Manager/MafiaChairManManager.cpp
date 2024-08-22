@@ -586,8 +586,7 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	}
 	else if (InFlowState == EMafiaFlowState::BeforeDay) 
 	{
-		EMafiaGameResult Result = CheckGameResult();
-		NotifyGameResult(Result);
+		
 	}
 	else if(InFlowState == EMafiaFlowState::Day)
 	{
@@ -627,8 +626,7 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	}
 	else if(InFlowState == EMafiaFlowState::EndVote)
 	{
-		EMafiaGameResult Result = CheckGameResult();
-		NotifyGameResult(Result);
+		
 	}
 	else if(InFlowState == EMafiaFlowState::BeforeNight)
 	{

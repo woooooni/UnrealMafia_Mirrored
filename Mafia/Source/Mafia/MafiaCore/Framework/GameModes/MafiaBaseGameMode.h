@@ -90,6 +90,7 @@ public:
 
 protected:
 	class UMafiaChairManManager* GetChairMan();
+	bool CheckGameOver();
 
 protected:
 	/** 게임을 시작하기 위한 최소 인원 */
