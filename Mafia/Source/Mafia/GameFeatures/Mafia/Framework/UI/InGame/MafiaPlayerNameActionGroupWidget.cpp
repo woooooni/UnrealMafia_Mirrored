@@ -49,6 +49,22 @@ void UMafiaPlayerNameActionGroupWidget::SetPlayerName(const FName& InNewPlayerNa
 	}
 }
 
+void UMafiaPlayerNameActionGroupWidget::SetFontSize(const float InFontSize, const float InDeltaTime)
+{
+	
+	if (FMath::IsWithin(InFontSize, 5.f, 32.f))
+	{
+		SetVisibility(ESlateVisibility::HitTestInvisible);
+		FSlateFontInfo FontInfo = TB_PlayerName->GetFont();
+		FontInfo.Size = FMath::Lerp(FontInfo.Size, InFontSize, FMath::Clamp(InDeltaTime * 150.f, 0.f, 1.f));
+		TB_PlayerName->SetFont(FontInfo);
+	}
+	else
+	{
+		SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
 void UMafiaPlayerNameActionGroupWidget::SetTextColor(const FLinearColor& InColor)
 {
 	if (IsValid(TB_PlayerName))

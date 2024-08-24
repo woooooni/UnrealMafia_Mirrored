@@ -64,8 +64,6 @@ public:
 
 
 
-
-
 /**
  *	ktw : Server에 존재하는 GameInstance만 이 객체를 가지고 있습니다. 따라서, 멤버 함수는 서버에서만 호출됩니다.
  */
@@ -163,5 +161,6 @@ private:
 private:
 	UPROPERTY()
 	TMap<FName, TObjectPtr<UMafiaBaseRoleComponent>> JoinedPlayerRoleComponents;
-
+	
+	
 };

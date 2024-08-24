@@ -61,6 +61,13 @@ public:
 #pragma endregion Getter & Setter
 
 
+protected:
+	UFUNCTION()
+	virtual void BindDelegates();
+
+	UFUNCTION()
+	virtual void UnBindDelegates();
+
 public:
 	UFUNCTION()
 	virtual void UseAbility(class AMafiaBasePlayerState* InOther);

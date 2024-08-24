@@ -50,10 +50,7 @@ void UMafiaBusDriverRoleComponent::BusDrive()
 	}
 }
 
-void UMafiaBusDriverRoleComponent::OnRep_Dead()
-{
 
-}
 
 void UMafiaBusDriverRoleComponent::ClientNotifyResultAbility_Implementation(UMafiaBaseRoleComponent* InOther)
 {
@@ -61,6 +58,11 @@ void UMafiaBusDriverRoleComponent::ClientNotifyResultAbility_Implementation(UMaf
 }
 
 void UMafiaBusDriverRoleComponent::ClientAffectedEventsFlush_Implementation()
+{
+
+}
+
+void UMafiaBusDriverRoleComponent::OnRep_Dead()
 {
 
 }

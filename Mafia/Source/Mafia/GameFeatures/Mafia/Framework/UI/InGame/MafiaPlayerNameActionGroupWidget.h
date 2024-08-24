@@ -27,6 +27,7 @@ private:
 
 public:
 	void SetPlayerName(const FName& InNewPlayerName);
+	void SetFontSize(const float InFontSize, const float InDeltaTime);
 	void SetTextColor(const FLinearColor& InColor);
 
 

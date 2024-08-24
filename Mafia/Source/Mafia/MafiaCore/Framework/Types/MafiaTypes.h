@@ -21,6 +21,48 @@ namespace MafiaMatchState
 	extern MAFIA_API const FName WaitingPostRound;
 }
 
+UENUM(BlueprintType)
+enum class EMafiaColor : uint8
+{
+	Red,
+	Blue,
+	Green,
+	Yellow,
+	Orange,
+	Purple,
+	Brown,
+	Gray,
+	Black,
+	SkyBlue,
+	LimeGreen,
+	Teal,
+	Beige,
+	Navy,
+	Mint,
+	Lavender,
+};
+
+const static TArray<FLinearColor> GPlayerColors = {
+	FLinearColor(1.0f, 0.0f, 0.0f),  // Red
+	FLinearColor(0.0f, 0.0f, 1.0f),  // Blue
+	FLinearColor(0.0f, 1.0f, 0.0f),  // Green
+	FLinearColor(1.0f, 1.0f, 0.0f),  // Yellow
+	FLinearColor(1.0f, 0.5f, 0.0f),  // Orange
+	FLinearColor(0.5f, 0.0f, 0.5f),  // Purple
+	FLinearColor(0.6f, 0.3f, 0.0f),  // Brown
+	FLinearColor(0.5f, 0.5f, 0.5f),  // Gray
+	FLinearColor(0.0f, 0.0f, 0.0f),  // Black
+	FLinearColor(0.53f, 0.81f, 0.92f), // Sky Blue
+	FLinearColor(0.7f, 1.0f, 0.0f),  // Lime Green
+	FLinearColor(0.0f, 0.5f, 0.5f),  // Teal
+	FLinearColor(0.96f, 0.96f, 0.86f), // Beige
+	FLinearColor(0.0f, 0.0f, 0.5f),  // Navy
+	FLinearColor(0.74f, 1.0f, 0.78f),  // Mint
+	FLinearColor(0.9f, 0.9f, 0.98f)   // Lavender
+};
+
+
+
 UENUM()
 enum class EMafiaFlowState : uint8
 {

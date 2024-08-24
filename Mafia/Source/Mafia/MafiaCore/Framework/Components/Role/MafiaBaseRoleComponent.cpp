@@ -34,7 +34,10 @@ void UMafiaBaseRoleComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 void UMafiaBaseRoleComponent::OnUnregister()
 {
 	Super::OnUnregister();
-	UnbindGameEvent(OnChangedMafiaFlowState, OnChangedMafiaFlowStateHandle);
+	if (GetOwnerRole() != ROLE_Authority)
+	{
+		UnBindDelegates();
+	}
 }
 
 
@@ -48,8 +51,10 @@ void UMafiaBaseRoleComponent::BeginPlay()
 		MAFIA_ULOG(LogMafiaPlayerState, Error, TEXT("UMafiaBaseRoleComponent::BeginPlay : OwningPlayerState is Invalid."));
 	}
 
-	OnChangedMafiaFlowStateHandle = BindGameEvent(OnChangedMafiaFlowState, &UMafiaBaseRoleComponent::OnChangedMafiaFlowState);
-	
+	if (GetOwnerRole() != ROLE_Authority)
+	{
+		BindDelegates();
+	}
 }
 
 void UMafiaBaseRoleComponent::SetTeamType(EMafiaTeam InTeam)
@@ -82,6 +87,18 @@ void UMafiaBaseRoleComponent::SetAffectedEvents(const TArray<FAffectedEvent>& In
 
 
 #pragma region Ability
+
+void UMafiaBaseRoleComponent::BindDelegates()
+{
+	OnChangedMafiaFlowStateHandle = BindGameEvent(OnChangedMafiaFlowState, &UMafiaBaseRoleComponent::OnChangedMafiaFlowState);
+}
+
+void UMafiaBaseRoleComponent::UnBindDelegates()
+{
+	UnbindGameEvent(OnChangedMafiaFlowState, OnChangedMafiaFlowStateHandle);
+}
+
+
 
 void UMafiaBaseRoleComponent::UseAbility(AMafiaBasePlayerState* InOther)
 {
@@ -372,7 +389,6 @@ void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(AMafiaBaseP
 void UMafiaBaseRoleComponent::ClientReceiveVoteResult_Implementation(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag)
 {
 	/** #Todo - ktw : 통지된 사형수가 있는지 체크해서 별도의 동작을 수행. */
-	
 	if (InFlag == EMafiaVoteResultFlag::NoDeathPlayer)
 	{
 
