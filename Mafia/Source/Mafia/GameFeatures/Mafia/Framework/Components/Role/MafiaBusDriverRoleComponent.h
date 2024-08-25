@@ -10,19 +10,6 @@
  * 
  */
 
-USTRUCT()
-struct FBusPassengers
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY()
-	TWeakObjectPtr<AMafiaBasePlayerState> First;
-
-	UPROPERTY()
-	TWeakObjectPtr<AMafiaBasePlayerState> Second;
-};
-
 UCLASS()
 class MAFIA_API UMafiaBusDriverRoleComponent : public UMafiaBaseRoleComponent
 {
@@ -37,7 +24,6 @@ protected:
 
 public:
 	virtual void UseAbility(class AMafiaBasePlayerState* InOther) override;	
-	virtual void BusDrive() override;
 
 
 
@@ -47,20 +33,7 @@ protected:
 
 protected:
 	virtual void OnRep_Dead() override;
-	
-
-private:
-	UFUNCTION()
-	void ChoicePassenger(class AMafiaBasePlayerState* InOther);
-
-	UFUNCTION(Server, Reliable)
-	void ServerReqChoicePassenger(class AMafiaBasePlayerState* InOther);
 
 
-
-
-private:
-	UPROPERTY(Replicated)
-	FBusPassengers Passengers;
 
 };

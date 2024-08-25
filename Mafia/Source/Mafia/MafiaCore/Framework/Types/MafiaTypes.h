@@ -69,20 +69,23 @@ enum class EMafiaFlowState : uint8
 	/** 메인 플로우 내에서 반복해서 변화되는 State */
 	None,
 
-	BeforeDay, // 저녁 -> 아침 이전.
-	Day,
-	AfterDay, // 아침 -> 투표 이전.
-	EndDay,
+	BeforeDay,		// 아침 이전.
+	Day,			// 아침
+	AfterDay,		// 아침 이후
+	EndDay,			// 아침 -> 투표 이전.
 
-	BeforeVote, // 아침 -> 투표 이전.
-	Vote, // 투표.
-	AfterVote, // 투표 -> 저녁 이전.
-	EndVote,
+	BeforeVote,		// 투표 이전
+	Vote,			// 투표.
+	AfterVote,		// 투표 이후
+	EndVote,		// 투표 -> 저녁 이전.
 
-	BeforeNight, // 투표 -> 저녁 이전.
-	Night, // 저녁
-	AfterNight, // 저녁 -> 아침 이전.
-	EndNight,
+	BeforeNight,	// 저녁 시작 전
+	Night,			// 저녁
+	AfterNight,		// 저녁 이후
+	EndNight,		// 저녁 -> 아침 이전.
+
+
+	GameOver,		// 게임 오버
 };
 
 UENUM()
@@ -218,11 +221,11 @@ const static TArray<EMafiaTeam> GTeamDistributionArray =
 	EMafiaTeam::Citizen,
 	EMafiaTeam::Citizen,
 	EMafiaTeam::Mafia,
-	EMafiaTeam::Mafia,
-	EMafiaTeam::Mafia,
 	EMafiaTeam::Neutral,
+	EMafiaTeam::Mafia,
 	EMafiaTeam::Citizen,
 	EMafiaTeam::Citizen,
+	EMafiaTeam::Mafia,
 	EMafiaTeam::Citizen,
 	EMafiaTeam::Citizen,
 	EMafiaTeam::Citizen,

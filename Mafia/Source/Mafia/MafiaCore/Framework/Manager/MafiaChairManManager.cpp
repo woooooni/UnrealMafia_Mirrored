@@ -165,21 +165,6 @@ void UMafiaChairManManager::CheatChangeRole(AMafiaBasePlayerState* InPlayerState
 
 void UMafiaChairManManager::DispatchAbilityEvents()
 {
-
-	/** ktw : 버스기사 출발. */
-	FUseAbilityEventData* BusDriverData = CachedAbilityEventsHeap.FindByPredicate([](const FUseAbilityEventData& Event) {
-		return Event.OriginRole == EMafiaRole::BusDriver;
-	});
-
-	if (BusDriverData)
-	{
-		if (BusDriverData->OriginPlayer.IsValid())
-		{
-			BusDriverData->OriginPlayer.Get()->BusDrive();
-		}
-	}
-	
-
 	/** ktw : 능력사용 결과 통지를 위한 복사. */
 	const TArray<FUseAbilityEventData> CopiedArray = CachedAbilityEventsHeap;
 
@@ -218,10 +203,6 @@ void UMafiaChairManManager::FlushAbilityEvents() const
 	PlayerComponentsArray.HeapSort();
 	for (auto RoleComponent : PlayerComponentsArray)
 	{
-		if (RoleComponent->GetRoleType() == EMafiaRole::BusDriver)
-		{
-			RoleComponent->BusDrive();
-		}
 		RoleComponent->AffectedEventsFlush();
 	}
 }
@@ -238,11 +219,9 @@ void UMafiaChairManManager::StartVote()
 	}
 }
 
-UMafiaBaseRoleComponent* UMafiaChairManManager::FindDeathRow()
+UMafiaBaseRoleComponent* UMafiaChairManManager::FindDeadMan()
 {
 	/** ktw : 투표로 처형할 사람을 찾습니다. */
-	
-
 	TArray<FPlayerVoteData> VoteArray;
 	CachedVoteEventsMap.GenerateValueArray(VoteArray);
 
@@ -277,7 +256,6 @@ UMafiaBaseRoleComponent* UMafiaChairManManager::FindDeathRow()
 				/** 무효표 카운트 */
 				NullVoteCount += Event.VotedCount;
 			}
-
 			Sum += Event.VotedCount;
 		}
 
@@ -312,7 +290,7 @@ UMafiaBaseRoleComponent* UMafiaChairManManager::FindDeathRow()
 
 EMafiaVoteResultFlag UMafiaChairManManager::NotifyDeathRow()
 {
-	UMafiaBaseRoleComponent* DeathRow = FindDeathRow();
+	UMafiaBaseRoleComponent* DeathRow = FindDeadMan();
 	EMafiaVoteResultFlag Flag = IsValid(DeathRow) ? EMafiaVoteResultFlag::SomeoneDying : EMafiaVoteResultFlag::NoDeathPlayer;
 	
 	for (auto& Pair : JoinedPlayerRoleComponents)
@@ -504,12 +482,13 @@ EMafiaGameResult UMafiaChairManManager::CheckGameResult() const
 		{
 			int8 AliveCitizenCount = 0;
 			int8 AliveMafiaCount = 0;
+			int8 AliveNeutralCount = 0;
 
 			for (auto& Pair : JoinedPlayerRoleComponents)
 			{
 				/** 
 					ktw : 마피아팀 승리조건 체크. 
-					1순위 : 마피아팀 -> 2순위 : 시민팀 -> 3순위 : 중립
+					1순위 : 마피아팀 -> 2순위 : 중립 -> 3순위 : 시민팀
 				*/
 				if (UMafiaBaseRoleComponent* RoleComponent = Pair.Value.Get())
 				{
@@ -524,19 +503,30 @@ EMafiaGameResult UMafiaChairManManager::CheckGameResult() const
 						{
 							++AliveMafiaCount;
 						}
+						else if (TeamType == EMafiaTeam::Neutral)
+						{
+							++AliveNeutralCount;
+						}
 					}
 				}
 			}
 
-			if (AliveMafiaCount >= AliveCitizenCount)
+			if (AliveMafiaCount >= AliveCitizenCount + AliveNeutralCount)
 			{
 				return EMafiaGameResult::MafiaWin;
 			}
 			else if (AliveMafiaCount == 0)
 			{
-				if (AliveCitizenCount == 0)
+				if (AliveNeutralCount > 0)
 				{
-					return EMafiaGameResult::NeutralWin;
+					if (AliveCitizenCount == 0)
+					{
+						return EMafiaGameResult::NeutralWin;
+					}
+					else
+					{
+						return EMafiaGameResult::None;
+					}
 				}
 				else
 				{

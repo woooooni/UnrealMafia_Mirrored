@@ -51,8 +51,7 @@ void UMafiaPlayerNameActionGroupWidget::SetPlayerName(const FName& InNewPlayerNa
 
 void UMafiaPlayerNameActionGroupWidget::SetFontSize(const float InFontSize, const float InDeltaTime)
 {
-	
-	if (FMath::IsWithin(InFontSize, 5.f, 32.f))
+	if (FMath::IsWithinInclusive(InFontSize, 5.f, 32.f))
 	{
 		SetVisibility(ESlateVisibility::HitTestInvisible);
 		FSlateFontInfo FontInfo = TB_PlayerName->GetFont();

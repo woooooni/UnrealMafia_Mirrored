@@ -112,18 +112,6 @@ public:
 	*/
 	UFUNCTION()
 	void NotifyResultAbility(UMafiaBaseRoleComponent* InOther);
-
-	/**
-		ktw : 서버에서 호출해야 합니다.
-	*/
-	UFUNCTION()
-	virtual void BusDrive() {};
-
-	/**
-		ktw : 서버에서 호출해야 합니다.
-	*/
-	UFUNCTION()
-	void BusRide(const TArray<FAffectedEvent>& InEventArray);
 #pragma endregion Role Ability(역할 능력 관련)
 	
 #pragma region Vote(투표)

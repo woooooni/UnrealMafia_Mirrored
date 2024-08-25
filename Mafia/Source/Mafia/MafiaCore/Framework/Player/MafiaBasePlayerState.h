@@ -45,7 +45,7 @@ public:
 public:
 	/** ktw - 서버에서 호출해야 합니다. */
 	UFUNCTION()
-	UMafiaBaseRoleComponent* AssignAbility(EMafiaRole InRole);
+	class UMafiaBaseRoleComponent* AssignAbility(EMafiaRole InRole);
 
 	/** ktw - 서버에서 호출해야 합니다. */
 	UFUNCTION()

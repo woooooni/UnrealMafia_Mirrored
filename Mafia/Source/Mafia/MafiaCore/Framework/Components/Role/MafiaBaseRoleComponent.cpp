@@ -170,17 +170,6 @@ void UMafiaBaseRoleComponent::Vote(AMafiaBasePlayerState* InOther)
 	ServerReqVote(InOther);
 }
 
-void UMafiaBaseRoleComponent::BusRide(const TArray<FAffectedEvent>& InEventArray)
-{
-	if (ENetRole::ROLE_Authority == GetOwnerRole())
-	{
-		ClientBusRide(InEventArray);
-	}
-	else
-	{
-		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("서버에서 호출해야합니다."));
-	}
-}
 
 void UMafiaBaseRoleComponent::RecieveOfferMafiaTeam(UMafiaBaseRoleComponent* InMafiaComponent)
 {
@@ -541,50 +530,5 @@ bool operator < (const FAffectedEvent& A, const FAffectedEvent& B)
 	return false;
 }
 
-
-
-
-//void UMafiaBaseRoleComponent::OnRepChangeRoleType()
-//{
-//	/*if (GetOwnerRole() == ROLE_AutonomousProxy)
-//	{
-//		if (AMafiaBasePlayerState* PS = GetOwner<AMafiaBasePlayerState>())
-//		{
-//
-//			switch (RoleType)
-//			{
-//			case EMafiaRole::Madam:
-//				break;
-//			case EMafiaRole::Police:
-//				Character->ChangeColor(FLinearColor(0, 0, 1));
-//				break;
-//			case EMafiaRole::Killer:
-//				break;
-//			case EMafiaRole::Mafia:
-//				Character->ChangeColor(FLinearColor(1, 0, 0));
-//				break;
-//			case EMafiaRole::Vigilante:
-//				break;
-//			case EMafiaRole::BusDriver:
-//				break;
-//			case EMafiaRole::Detective:
-//				break;
-//			case EMafiaRole::Spirit:
-//				break;
-//			case EMafiaRole::Thief:
-//				break;
-//			case EMafiaRole::Soldier:
-//				break;
-//			case EMafiaRole::Doctor:
-//				Character->ChangeColor(FLinearColor(1, 1, 0), 0);
-//				break;
-//			case EMafiaRole::Citizen:
-//				break;
-//			default:
-//				break;
-//			}
-//		}
-//	}*/
-//}
 
 

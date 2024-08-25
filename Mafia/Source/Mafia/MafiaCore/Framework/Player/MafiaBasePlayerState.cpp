@@ -63,6 +63,7 @@ void AMafiaBasePlayerState::PostInitializeComponents()
 }
 
 
+#pragma region Cheat
 void AMafiaBasePlayerState::CheatSetRole_Implementation(EMafiaRole InRole)
 {
 #if ENABLE_CHEAT
@@ -76,9 +77,10 @@ void AMafiaBasePlayerState::CheatSetRole_Implementation(EMafiaRole InRole)
 	 
 #endif
 }
+#pragma endregion
 
 
-UMafiaBaseRoleComponent* AMafiaBasePlayerState::AssignAbility(EMafiaRole InRole)
+UE_NODISCARD UMafiaBaseRoleComponent* AMafiaBasePlayerState::AssignAbility(EMafiaRole InRole)
 {
 	if (HasAuthority())
 	{

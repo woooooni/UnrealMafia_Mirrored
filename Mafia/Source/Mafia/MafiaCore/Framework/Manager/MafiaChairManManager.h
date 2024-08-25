@@ -123,7 +123,7 @@ private:
 	void StartVote();
 	
 	UFUNCTION()
-	class UMafiaBaseRoleComponent* FindDeathRow();
+	class UMafiaBaseRoleComponent* FindDeadMan();
 
 	UFUNCTION()
 	EMafiaVoteResultFlag NotifyDeathRow();
@@ -154,7 +154,7 @@ private:
 	UPROPERTY()
 	TMap<FName, FPlayerVoteData> CachedVoteEventsMap;
 
-	/** ktw : 피 투표자를 저장합니다. */
+	/** ktw : 투표자를 저장합니다. */
 	UPROPERTY()
 	TSet<FName> CachedAlreadyVotersSet;
 
