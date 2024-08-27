@@ -76,21 +76,20 @@ public:
 	UMafiaChairManManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
-	UFUNCTION()
-	bool AssigningAllPlayersAbility();
+	bool StartGame();
 
+	void EndGame();
+
+public:
 	/** 
 		ktw : Origin -> Destination으로 향하는 능력 사용 이벤트를 Heap에 임시 저장합니다.  
 		InOrigin : 능력 사용 Player, InDestination : 능력에 영향을 받은 Player.
 	*/
-	UFUNCTION()
 	void AddAbilityEvent(class AMafiaBasePlayerState* InOrigin, class AMafiaBasePlayerState* InDestination);
 
 	/** ktw : InVotor - 투표자, InCandidate - 피투표자 */
-	UFUNCTION()
 	void AddVoteEvent(class AMafiaBasePlayerState* InVotor, class AMafiaBasePlayerState* InCandidate);
 
-	UFUNCTION()
 	EMafiaGameResult CheckGameResult() const;
 
 public:
@@ -104,31 +103,28 @@ public:
 #pragma endregion Cheat
 
 public:
-	UFUNCTION()
 	void OnSetMafiaFlowState(EMafiaFlowState InFlowState);
 	
 
 private:
+	bool AssignAllPlayersAbility();
+	bool MakePlayersSeat();
+
+private:
 	/** ktw : Heap에 저장된 능력 이벤트들을 순회하면서 각 플레이어의 RoleComponent에 이벤트를 전송합니다. */
-	UFUNCTION()
-	void DispatchAbilityEvents();
+	void BroadCastAbilityEvents();
 
 	/** ktw : RoleComponent에 전송한 이벤트를 실행하는 신호를 보냅니다. */
-	UFUNCTION()
 	void FlushAbilityEvents() const;
 
 
 private:
-	UFUNCTION()
 	void StartVote();
 	
-	UFUNCTION()
 	class UMafiaBaseRoleComponent* FindDeadMan();
 
-	UFUNCTION()
-	EMafiaVoteResultFlag NotifyDeathRow();
+	EMafiaVoteResultFlag NotifyDeadMan();
 
-	UFUNCTION()
 	void EndVote();
 
 private:
@@ -136,21 +132,12 @@ private:
 	bool IsPossibleVote();
 
 private:
-	UFUNCTION()
 	void NotifyGameResult(EMafiaGameResult InGameResult) const;
 
-
 private:
-	/** ktw : EMafiaRole에 선언된 Role의 값 순서로 Event를 정렬합니다. */
 	UPROPERTY()
-	TArray<FUseAbilityEventData> CachedAbilityEventsHeap;
+	TMap<EMafiaColor, TObjectPtr<class UMafiaBasePlayerSeat>> PlayerSeats;
 
-	/** 
-		ktw : 피 투표자를 저장합니다. 
-
-		Key - 피 투표자 AccountId.
-		Value - FPlayerVoteData.
-	*/
 	UPROPERTY()
 	TMap<FName, FPlayerVoteData> CachedVoteEventsMap;
 
@@ -158,9 +145,7 @@ private:
 	UPROPERTY()
 	TSet<FName> CachedAlreadyVotersSet;
 
-private:
 	UPROPERTY()
-	TMap<FName, TObjectPtr<UMafiaBaseRoleComponent>> JoinedPlayerRoleComponents;
-	
+	TArray<FUseAbilityEventData> CachedAbilityEventsHeap;
 	
 };

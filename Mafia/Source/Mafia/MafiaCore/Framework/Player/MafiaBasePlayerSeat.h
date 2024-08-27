@@ -19,25 +19,31 @@ protected:
 
 
 public:
-	bool SetOwner(class AMafiaBasePlayerState* InPlayerState);
-
-	FORCEINLINE class UMafiaBaseRoleComponent* GetAffectedRoleComponent() { return AffectedRoleComponent.Get(); }
-	FORCEINLINE class UMafiaBaseRoleComponent* GetOwnerRoleComponent() { return AffectedRoleComponent.Get(); }
-
-
+	UFUNCTION()
+	bool Initialize(const FLinearColor& InSeatColor, class AMafiaBasePlayerState* InPlayerState);
 
 public:
-	void RoundReset();
+	FORCEINLINE class AMafiaBasePlayerState* GetOriginPlayerState() { return OriginPlayer.Get(); }
+	FORCEINLINE class UMafiaBaseRoleComponent* GetOriginRoleComponent() { return OriginRoleComponent.Get(); }
+	FORCEINLINE class UMafiaBaseRoleComponent* GetAffectedRoleComponent() { return AffectedRoleComponent.Get(); }
+	
+
+public:
+	void ResetForNextRound();
 	void ResetAll();
 
-
 private:
+	UPROPERTY()
+	FLinearColor SeatColor;
 
 	UPROPERTY()
-	TWeakObjectPtr<class AMafiaBasePlayerState> OwnerPlayer;
+	uint8 bInitialized : 1 = false;
 
 	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseRoleComponent> OwnerRoleComponent;
+	TWeakObjectPtr<class AMafiaBasePlayerState> OriginPlayer;
+
+	UPROPERTY()
+	TWeakObjectPtr<class UMafiaBaseRoleComponent> OriginRoleComponent;
 
 	UPROPERTY()
 	TWeakObjectPtr<class UMafiaBaseRoleComponent> AffectedRoleComponent;

@@ -102,12 +102,19 @@ protected:
 	/** 연출 이후 능력 부여 + 시작 연출 타이머 시간 */
 	UPROPERTY(EditAnywhere, Category = "Timer", meta = (ClampMin = "5", ClampMax = "60"))
 	float AssigningAbilityTime;
+
+protected:
 	/** 최초 투표까지의 시간 */
 	UPROPERTY(EditAnywhere, Category = "Timer", meta = (ClampMin = "5", ClampMax = "60"))
 	float InitialVoteWaitTime;
 	/** 공통 낮 시간 */
 	UPROPERTY(EditAnywhere, Category = "Timer", meta = (ClampMin = "5", ClampMax = "60"))
 	float DayTime;
+
+	/** 공통 투표 시간 */
+	UPROPERTY(EditAnywhere, Category = "Timer", meta = (ClampMin = "5", ClampMax = "60"))
+	float VoteTime;
+
 	/** 공통 밤 시간 */
 	UPROPERTY(EditAnywhere, Category = "Timer", meta = (ClampMin = "5", ClampMax = "60"))
 	float NightTime;

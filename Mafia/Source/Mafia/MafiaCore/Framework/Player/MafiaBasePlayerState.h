@@ -52,7 +52,6 @@ public:
 	void NotifyGameResult(EMafiaGameResult InGameResult);
 
 public:
-	/** ktw - 클라이언트에서 호출해야 합니다. */
 	UFUNCTION()
 	void ChangePlayerColor(FLinearColor InColor);
 	FORCEINLINE FLinearColor GetPlayerColor() { return PlayerColor; }

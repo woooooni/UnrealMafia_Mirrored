@@ -195,12 +195,12 @@ void AMafiaBasePlayerController::CheatSetReadyForGame(const bool bReady /*= true
 #endif
 }
 
-void AMafiaBasePlayerController::CheatAssignAbility()
+void AMafiaBasePlayerController::CheatStartGame()
 {
 #if ENABLE_CHEAT
 	if (GetLocalRole()== ROLE_AutonomousProxy)
 	{
-		ServerReqAssignAbility();
+		ServerReqStartGame();
 	}
 	
 #endif
@@ -372,7 +372,7 @@ void AMafiaBasePlayerController::CheatChangePlayerNickname(FName InNickname)
 #endif
 }
 
-void AMafiaBasePlayerController::ServerReqAssignAbility_Implementation()
+void AMafiaBasePlayerController::ServerReqStartGame_Implementation()
 {
 #if ENABLE_CHEAT
 	if (UMafiaBaseGameInstance* MafiaBaseGameInstance = UMafiaBaseGameInstance::Get(this))
@@ -381,7 +381,7 @@ void AMafiaBasePlayerController::ServerReqAssignAbility_Implementation()
 		{
 			if (UMafiaChairManManager* MafiaChairManManager = MafiaBaseGameInstance->GetChairMan())
 			{
-				MafiaChairManManager->AssigningAllPlayersAbility();
+				MafiaChairManManager->StartGame();
 			}
 		}
 	}

@@ -29,6 +29,7 @@ AMafiaBaseGameMode::AMafiaBaseGameMode()
 	AssigningAbilityTime = 30.f;
 	InitialVoteWaitTime = 30.f;
 	NightTime = 30.f;
+	VoteTime = 30.f;
 	DayTime = 60.f;
 }
 
@@ -259,7 +260,10 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 	}		 
 	else if (CurrentFlowState == EMafiaFlowState::AfterDay)
 	{		 
-	}		 
+	}		
+	else if (CurrentFlowState == EMafiaFlowState::EndDay)
+	{
+	}
 	else if (CurrentFlowState == EMafiaFlowState::BeforeVote)
 	{		 
 	}		 
@@ -286,6 +290,10 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, DayTime);
 	}		 
 	else if (CurrentFlowState == EMafiaFlowState::AfterNight)
+	{
+
+	}
+	else if (CurrentFlowState == EMafiaFlowState::EndNight)
 	{
 
 	}
@@ -551,7 +559,7 @@ bool AMafiaBaseGameMode::OnPendingMatchStateSetForInProgress(FName NewPendingSta
 
 			if (UMafiaChairManManager* ChairMan = GetChairMan())
 			{
-				bool Succeed = ChairMan->AssigningAllPlayersAbility();
+				bool Succeed = ChairMan->StartGame();
 				if (Succeed == false)
 				{
 					ensure(Succeed);

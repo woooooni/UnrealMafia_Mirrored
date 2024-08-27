@@ -53,10 +53,10 @@ private:
 #pragma region Ability & Vote Cheat
 private:
 	UFUNCTION(Exec)
-	void CheatAssignAbility();
+	void CheatStartGame();
 
 	UFUNCTION(Server, Reliable)
-	void ServerReqAssignAbility();
+	void ServerReqStartGame();
 
 	UFUNCTION(Exec)
 	void CheatUseAbility(int32 InPlayerNum);

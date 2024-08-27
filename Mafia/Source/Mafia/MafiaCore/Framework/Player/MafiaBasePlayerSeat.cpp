@@ -11,25 +11,38 @@ UMafiaBasePlayerSeat::UMafiaBasePlayerSeat(const FObjectInitializer& ObjectIniti
 }
 
 
-bool UMafiaBasePlayerSeat::SetOwner(AMafiaBasePlayerState* InPlayerState)
+bool UMafiaBasePlayerSeat::Initialize(const FLinearColor& InSeatColor, AMafiaBasePlayerState* InPlayerState)
 {
-	OwnerPlayer = InPlayerState;
-	OwnerRoleComponent = InPlayerState->GetRoleComponent();
-	AffectedRoleComponent = OwnerRoleComponent.Get();
+	ResetAll();
+	if (IsValid(InPlayerState))
+	{
+		if (UMafiaBaseRoleComponent* RoleComponent = InPlayerState->GetRoleComponent())
+		{
+			InPlayerState->ChangePlayerColor(InSeatColor);
 
-	return OwnerPlayer.IsValid() && OwnerRoleComponent.IsValid() && AffectedRoleComponent.IsValid();
+			bInitialized = true;
+			OriginPlayer = InPlayerState;
+			OriginRoleComponent = RoleComponent;
+			AffectedRoleComponent = RoleComponent;
+
+			return true;
+		}
+	}
+	
+	return false;
 }
 
-void UMafiaBasePlayerSeat::RoundReset()
+
+void UMafiaBasePlayerSeat::ResetForNextRound()
 {
-	AffectedRoleComponent = OwnerRoleComponent;
+	AffectedRoleComponent = OriginRoleComponent;
 }
 
 
 void UMafiaBasePlayerSeat::ResetAll()
 {
-	RoundReset();
+	bInitialized = false;
+	OriginPlayer = nullptr;
+	OriginRoleComponent = nullptr;
 	AffectedRoleComponent = nullptr;
-	OwnerRoleComponent = nullptr;
-	OwnerPlayer = nullptr;
 }

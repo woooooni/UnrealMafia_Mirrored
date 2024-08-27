@@ -5,6 +5,7 @@
 #include "MafiaCore/Framework/System/MafiaLogChannels.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameMode.h"
 #include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
+#include "MafiaCore/Framework/Player/MafiaBasePlayerSeat.h"
 #include "Framework/GameModes/MafiaBaseGameState.h"
 #include "GameFeatures/Mafia/Framework/Player/MafiaPlayerState.h"
 #include "Algo/RandomShuffle.h"
@@ -12,19 +13,24 @@
 
 
 UMafiaChairManManager::UMafiaChairManManager(const FObjectInitializer& ObjectInitializer)
-{
-	/**
-		ktw - TArray를 Heap으로 사용할 경우, Heapify를 먼저 호출해야합니다.
-		https://dev.epicgames.com/documentation/ko-kr/unreal-engine/array-containers-in-unreal-engine
-	*/
-	
+{	
 	CachedAbilityEventsHeap.Reserve(16);
 	CachedAbilityEventsHeap.Heapify();
 }
 
+bool UMafiaChairManManager::StartGame()
+{
+	return AssignAllPlayersAbility() && MakePlayersSeat();
+}
+
+void UMafiaChairManManager::EndGame()
+{
+	PlayerSeats.Empty();
+}
 
 
-bool UMafiaChairManManager::AssigningAllPlayersAbility()
+
+bool UMafiaChairManManager::AssignAllPlayersAbility()
 {
 	UWorld* World = GetWorld();
 	JoinedPlayerRoleComponents.Empty();
@@ -83,6 +89,42 @@ bool UMafiaChairManManager::AssigningAllPlayersAbility()
 	return false;
 }
 
+bool UMafiaChairManManager::MakePlayersSeat()
+{
+	UWorld* World = GetWorld();
+	PlayerSeats.Empty();
+
+	if (IsValid(World))
+	{
+		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
+		{
+			uint8 Count = 0;
+
+			for (auto& Pair : GS->GetJoinedUserPlayerStateMap())
+			{
+				if (UMafiaBasePlayerSeat* PlayerSeat = NewObject<UMafiaBasePlayerSeat>())
+				{
+					if (PlayerSeat->Initialize(GPlayerColors[Count], Pair.Value.Get()) == false)
+					{
+						return false;
+					}
+
+					PlayerSeats.Emplace(EMafiaColor(Count), PlayerSeat);
+				}
+				else
+				{
+					return false;
+				}
+				++Count;
+			}
+
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 void UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMafiaBasePlayerState* InDestination)
 {
 	UWorld* World = GetWorld();
@@ -138,6 +180,7 @@ void UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMa
 	}
 }
 
+#pragma region Cheat
 void UMafiaChairManManager::CheatChangeRole(AMafiaBasePlayerState* InPlayerState, UMafiaBaseRoleComponent* InNewRoleComponent)
 {
 #if ENABLE_CHEAT
@@ -163,11 +206,11 @@ void UMafiaChairManManager::CheatChangeRole(AMafiaBasePlayerState* InPlayerState
 #endif
 }
 
-void UMafiaChairManManager::DispatchAbilityEvents()
+#pragma endregion Cheat
+
+void UMafiaChairManManager::BroadCastAbilityEvents()
 {
 	/** ktw : 능력사용 결과 통지를 위한 복사. */
-	const TArray<FUseAbilityEventData> CopiedArray = CachedAbilityEventsHeap;
-
 	while (!CachedAbilityEventsHeap.IsEmpty())
 	{
 		FUseAbilityEventData Event;
@@ -175,19 +218,7 @@ void UMafiaChairManManager::DispatchAbilityEvents()
 		
 		if (Event.OriginPlayer.IsValid() && Event.DestPlayer.IsValid())
 		{
-			/** ktw : BusDriver는 처리하지 않는다. */
-			if (Event.OriginRole != EMafiaRole::BusDriver)
-			{
-				Event.DestPlayer.Get()->AffectedAbilityByOther(Event.OriginRole, Event.OriginPlayer.Get());
-			}
-		}
-	}
-
-	for (auto& Event : CopiedArray)
-	{
-		if (Event.OriginPlayer.IsValid() && Event.DestPlayer.IsValid())
-		{
-			Event.OriginPlayer.Get()->NotifyResultAbility(Event.DestPlayer.Get());
+			Event.DestPlayer.Get()->AffectedAbilityByOther(Event.OriginRole, Event.OriginPlayer.Get());
 		}
 	}
 
@@ -196,7 +227,6 @@ void UMafiaChairManManager::DispatchAbilityEvents()
 
 void UMafiaChairManManager::FlushAbilityEvents() const
 {
-	/** Todo - ktw :  버스기사, 기생 처리 */
 	TArray<TObjectPtr<UMafiaBaseRoleComponent>> PlayerComponentsArray;
 	JoinedPlayerRoleComponents.GenerateValueArray(PlayerComponentsArray);
 
@@ -288,7 +318,7 @@ UMafiaBaseRoleComponent* UMafiaChairManManager::FindDeadMan()
 	return nullptr;
 }
 
-EMafiaVoteResultFlag UMafiaChairManManager::NotifyDeathRow()
+EMafiaVoteResultFlag UMafiaChairManManager::NotifyDeadMan()
 {
 	UMafiaBaseRoleComponent* DeathRow = FindDeadMan();
 	EMafiaVoteResultFlag Flag = IsValid(DeathRow) ? EMafiaVoteResultFlag::SomeoneDying : EMafiaVoteResultFlag::NoDeathPlayer;
@@ -603,7 +633,7 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	else if(InFlowState == EMafiaFlowState::AfterVote)
 	{
 		EndVote();
-		EMafiaVoteResultFlag VoteFlag = NotifyDeathRow();
+		EMafiaVoteResultFlag VoteFlag = NotifyDeadMan();
 		if (VoteFlag == EMafiaVoteResultFlag::SomeoneDying)
 		{
 
@@ -628,11 +658,10 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	}
 	else if(InFlowState == EMafiaFlowState::AfterNight)
 	{
-		DispatchAbilityEvents();
+		BroadCastAbilityEvents();
 	}
 	else if(InFlowState == EMafiaFlowState::EndNight)
 	{
 		FlushAbilityEvents();
 	}
-
 }
