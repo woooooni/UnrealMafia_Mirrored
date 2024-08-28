@@ -323,10 +323,10 @@ EMafiaVoteResultFlag UMafiaChairManManager::NotifyDeadMan()
 	UMafiaBaseRoleComponent* DeathRow = FindDeadMan();
 	EMafiaVoteResultFlag Flag = IsValid(DeathRow) ? EMafiaVoteResultFlag::SomeoneDying : EMafiaVoteResultFlag::NoDeathPlayer;
 	
-	for (auto& Pair : JoinedPlayerRoleComponents)
+	/*for (auto& Pair : JoinedPlayerRoleComponents)
 	{
 		Pair.Value->ReceiveVoteResult(DeathRow, Flag);
-	}
+	}*/
 	
 	return Flag;
 }

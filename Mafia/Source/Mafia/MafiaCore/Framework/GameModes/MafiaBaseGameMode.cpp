@@ -204,7 +204,7 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 	MAFIA_ALOG(LogMafiaGameMode, Warning, TEXT("HandleInProgressMafia"));
 	AMafiaBaseGameState* MafiaBaseGameState = GetGameState<AMafiaBaseGameState>();
 	
-	if (false == IsValid(MafiaBaseGameState))
+	if (IsValid(MafiaBaseGameState) == false)
 	{
 		ensure(false);
 		return;
@@ -212,7 +212,7 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 
 
 	UWorld* MyWorld = GetWorld();
-	if (false == IsValid(MyWorld))
+	if (IsValid(MyWorld) == false)
 	{
 		ensure(false);
 		return;
@@ -232,6 +232,12 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 		}
 	}
 
+	UMafiaChairManManager* ChairMan = GetChairMan();
+	if (IsValid(ChairMan) == false)
+	{
+		ensure(false);
+		return;
+	}
 	
 	// 최초 투표만 예외
 	
@@ -244,58 +250,68 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 	}
 	else if (CurrentFlowState == EMafiaFlowState::BeforeDay)
 	{	
-		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Day, 0.f);
-		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 0.f);
-
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Day, DayTime);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, DayTime);
 	}		
 	else if (CurrentFlowState == EMafiaFlowState::Day)
 	{		 
-		if (MyWorld->GetTimerManager().IsTimerActive(MainGameFlowTimerHandle))
-		{
-			MyWorld->GetTimerManager().ClearTimer(MainGameFlowTimerHandle);
-		}
+		//if (MyWorld->GetTimerManager().IsTimerActive(MainGameFlowTimerHandle))
+		//{
+		//	MyWorld->GetTimerManager().ClearTimer(MainGameFlowTimerHandle);
+		//}
 
-		// Vote에는 별도의 타이머가 없음
-		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Vote, 0.f);
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::AfterDay, 1.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
 	}		 
 	else if (CurrentFlowState == EMafiaFlowState::AfterDay)
-	{		 
+	{	
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::EndDay, 1.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
 	}		
 	else if (CurrentFlowState == EMafiaFlowState::EndDay)
 	{
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::BeforeVote, 1.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
 	}
 	else if (CurrentFlowState == EMafiaFlowState::BeforeVote)
-	{		 
+	{	
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Vote, VoteTime);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, VoteTime);
 	}		 
 	else if (CurrentFlowState == EMafiaFlowState::Vote)
+	{		 
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::AfterVote, 1.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
+	}		 
+	else if (CurrentFlowState == EMafiaFlowState::AfterVote)
+	{		 
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::EndVote, 1.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
+	}		 
+	else if (CurrentFlowState == EMafiaFlowState::EndVote)
+	{
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::BeforeNight, 1.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
+	}
+	else if (CurrentFlowState == EMafiaFlowState::BeforeNight)
 	{		 
 		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Night, NightTime);
 		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, NightTime);
 	}		 
-	else if (CurrentFlowState == EMafiaFlowState::AfterVote)
-	{		 
-
-	}		 
-	else if (CurrentFlowState == EMafiaFlowState::EndVote)
-	{
-		
-	}
-	else if (CurrentFlowState == EMafiaFlowState::BeforeNight)
-	{		 
-
-	}		 
 	else if (CurrentFlowState == EMafiaFlowState::Night)
 	{		 
-		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Day, DayTime);
-		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, DayTime);
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::AfterNight, 1.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
 	}		 
 	else if (CurrentFlowState == EMafiaFlowState::AfterNight)
 	{
-
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::EndNight, 1.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
 	}
 	else if (CurrentFlowState == EMafiaFlowState::EndNight)
 	{
-
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::BeforeDay, 1.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
 	}
 
 }

@@ -141,6 +141,9 @@ private:
 	UPROPERTY()
 	TMap<FName, FPlayerVoteData> CachedVoteEventsMap;
 
+	UPROPERTY()
+	TMap<FName, TObjectPtr<class UMafiaBaseRoleComponent>> JoinedPlayerRoleComponents;
+
 	/** ktw : 투표자를 저장합니다. */
 	UPROPERTY()
 	TSet<FName> CachedAlreadyVotersSet;
