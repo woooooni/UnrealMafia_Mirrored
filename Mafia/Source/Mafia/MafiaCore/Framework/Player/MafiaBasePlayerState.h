@@ -52,9 +52,10 @@ public:
 	void NotifyGameResult(EMafiaGameResult InGameResult);
 
 public:
+
 	UFUNCTION()
-	void ChangePlayerColor(FLinearColor InColor);
-	FORCEINLINE FLinearColor GetPlayerColor() { return PlayerColor; }
+	void ChangePlayerColor(EMafiaColor InColor);
+	FORCEINLINE EMafiaColor GetPlayerColor() { return PlayerColor; }
 
 	UFUNCTION()
 	void ChangeNickname(FName InNickname);
@@ -65,8 +66,9 @@ protected:
 	void CreateRoleComponent(EMafiaRole InRole);
 
 private:
+
 	UFUNCTION(Server, UnReliable)
-	void ServerChangePlayerColor(FLinearColor InColor);
+	void ServerChangePlayerColor(EMafiaColor InColor);
 
 	UFUNCTION(Server, UnReliable)
 	void ServerChangeNickname(FName InNickname);
@@ -88,7 +90,7 @@ protected:
 
 	/** Player Color */
 	UPROPERTY(Replicated)
-	FLinearColor PlayerColor;
+	EMafiaColor PlayerColor;
 
 	/** Mafia Role */
 	UPROPERTY(Replicated)

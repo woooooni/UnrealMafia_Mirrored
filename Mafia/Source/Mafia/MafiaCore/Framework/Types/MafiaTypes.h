@@ -135,6 +135,13 @@ enum class EMafiaRole : uint8
 };
 
 UENUM()
+enum class EMafiaAbilityEventType : uint8 
+{
+	Instant,
+	Deffered,
+};
+
+UENUM()
 enum class EMafiaUseAbilityFlag : uint8
 {
 	ImpossibleUseAbility,

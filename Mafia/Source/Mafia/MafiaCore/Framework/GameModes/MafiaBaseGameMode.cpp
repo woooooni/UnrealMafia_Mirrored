@@ -578,7 +578,7 @@ bool AMafiaBaseGameMode::OnPendingMatchStateSetForInProgress(FName NewPendingSta
 				bool Succeed = ChairMan->StartGame();
 				if (Succeed == false)
 				{
-					ensure(Succeed);
+					check(Succeed);
 				}
 			}
 			return true;

@@ -122,7 +122,9 @@ void AMafiaBasePlayerState::ClientNotifyGameResult_Implementation(EMafiaGameResu
 	}
 }
 
-void AMafiaBasePlayerState::ChangePlayerColor(FLinearColor InColor)
+
+
+void AMafiaBasePlayerState::ChangePlayerColor(EMafiaColor InColor)
 {
 	ServerChangePlayerColor(InColor);
 }
@@ -132,7 +134,7 @@ void AMafiaBasePlayerState::ChangeNickname(FName InNickname)
 	ServerChangeNickname(InNickname);
 }
 
-void AMafiaBasePlayerState::ServerChangePlayerColor_Implementation(FLinearColor InColor)
+void AMafiaBasePlayerState::ServerChangePlayerColor_Implementation(EMafiaColor InColor)
 {
 	/** ktw : 서버에서 실행됩니다. */
 	PlayerColor = InColor;
@@ -141,7 +143,11 @@ void AMafiaBasePlayerState::ServerChangePlayerColor_Implementation(FLinearColor 
 	{
 		if (AMafiaSampleCharacter* Character = Cast<AMafiaSampleCharacter>(PC->GetPawn()))
 		{
-			Character->ChangeColor(PlayerColor);
+			uint8 ColorIndex = uint8(InColor);
+			if (GPlayerColors.IsValidIndex(ColorIndex))
+			{
+				Character->ChangeColor(GPlayerColors[ColorIndex]);
+			}
 		}
 	}
 }
@@ -211,6 +217,8 @@ void AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole InRole)
 		RoleComponent->RegisterComponent();
 	}
 }
+
+
 
 void AMafiaBasePlayerState::OnRep_ChangePlayerNickname()
 {

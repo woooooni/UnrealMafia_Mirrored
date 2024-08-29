@@ -70,7 +70,7 @@ private:
 
 #pragma region MaterialCheat
 	UFUNCTION(Exec)
-	void CheatChangePlayerColor(float InRed, float InGreen, float InBlue, float InAlpha);
+	void CheatChangePlayerColor(const EMafiaColor& InColor);
 #pragma endregion
 
 #pragma region PlayerInfoCheat

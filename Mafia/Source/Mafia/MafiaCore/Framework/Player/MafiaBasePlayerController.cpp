@@ -352,12 +352,12 @@ void AMafiaBasePlayerController::CheatChangeRole(const FString& InStrRole)
 }
 
 
-void AMafiaBasePlayerController::CheatChangePlayerColor(float InRed, float InGreen, float InBlue, float InAlpha)
+void AMafiaBasePlayerController::CheatChangePlayerColor(const EMafiaColor& InColor)
 {
 #if ENABLE_CHEAT
 	if (AMafiaBasePlayerState* PS = GetPlayerState<AMafiaBasePlayerState>())
 	{
-		PS->ChangePlayerColor(FLinearColor(InRed, InGreen, InBlue, InAlpha));
+		PS->ChangePlayerColor(InColor);
 	}
 #endif
 }

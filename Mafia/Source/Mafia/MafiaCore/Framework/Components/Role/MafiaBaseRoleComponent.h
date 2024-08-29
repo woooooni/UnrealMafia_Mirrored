@@ -142,7 +142,7 @@ public:
 #pragma region Role Ability RPC
 private:
 	UFUNCTION(Server, Reliable)
-	void ServerReqUseAbility(AMafiaBasePlayerState* InOther);
+	void ServerReqUseAbility(AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType);
 
 	UFUNCTION(Server, Reliable)
 	void ServerReqSendOfferMafiaTeam(AMafiaBasePlayerState* InOther);
@@ -230,6 +230,8 @@ protected:
 	/** ktw : 이번 턴에 내가 처리할 이벤트 목록. */
 	UPROPERTY(Replicated)
 	TArray<FAffectedEvent> CachedAffectedEventsHeap;
+
+
 
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_Dead)

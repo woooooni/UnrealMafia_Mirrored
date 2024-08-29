@@ -98,16 +98,17 @@ void UMafiaBaseRoleComponent::UnBindDelegates()
 	UnbindGameEvent(OnChangedMafiaFlowState, OnChangedMafiaFlowStateHandle);
 }
 
-
-
 void UMafiaBaseRoleComponent::UseAbility(AMafiaBasePlayerState* InOther)
 {
-	ServerReqUseAbility(InOther);
+	ServerReqUseAbility(InOther, EMafiaAbilityEventType::Deffered);
 }
 
 void UMafiaBaseRoleComponent::SendOfferMafiaTeam(AMafiaBasePlayerState* InOther)
 {
-	ServerReqSendOfferMafiaTeam(InOther);
+	if (RoleType == EMafiaRole::Mafia)
+	{
+		ServerReqSendOfferMafiaTeam(InOther);
+	}
 }
 
 void UMafiaBaseRoleComponent::AffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
@@ -240,7 +241,7 @@ void UMafiaBaseRoleComponent::FinishVoteEvent()
 
 
 #pragma region RPC Ability
-void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaBasePlayerState* InOther)
+void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType)
 {
 	/** ktw : 서버에서 실행됩니다. */
 	if (UMafiaBaseGameInstance* GI = GetServerInstance())
@@ -249,25 +250,32 @@ void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaBasePlaye
 		{
 			if (UMafiaChairManManager* ChairManManager = GI->GetChairMan())
 			{
-				ChairManManager->AddAbilityEvent(OwningPlayerState.Get(), InOther);
+				ChairManManager->AddAbilityEvent(OwningPlayerState.Get(), InOther, InEventType);
 			}
 		}
 	}
 }
 
+/*if (OwningPlayerState.IsValid())
+{
+	if (UMafiaChairManManager* ChairManManager = GI->GetChairMan())
+	{
+		ChairManManager->AddAbilityEvent(OwningPlayerState.Get(), InOther);
+	}
+}*/
 void UMafiaBaseRoleComponent::ServerReqSendOfferMafiaTeam_Implementation(AMafiaBasePlayerState* InOther)
 {
 	if (RoleType == EMafiaRole::Mafia)
 	{
 		if (UMafiaBaseGameInstance* GI = GetServerInstance())
 		{
-			/*if (OwningPlayerState.IsValid())
+			if (OwningPlayerState.IsValid())
 			{
 				if (UMafiaChairManManager* ChairManManager = GI->GetChairMan())
 				{
-					ChairManManager->AddAbilityEvent(OwningPlayerState.Get(), InOther);
+					ChairManManager->AddAbilityEvent(OwningPlayerState.Get(), InOther, EMafiaAbilityEventType::Instant);
 				}
-			}*/
+			}
 		}
 	}
 	
@@ -278,7 +286,6 @@ void UMafiaBaseRoleComponent::ServerReqSendOfferMafiaTeam_Implementation(AMafiaB
 void UMafiaBaseRoleComponent::ClientAffectedAbilityByOther_Implementation(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther)
 {
 	/** ktw : 클라이언트에서 실행됩니다. */
-	/** Todo - ktw :  서버가 직접 이벤트를 넣어줄 지 아니면, 클라이언트가 신호를 받아서 이벤트를 넣어 두고 한 번에 Flush? */
 	if (IsValid(InOther))
 	{
 		FAffectedEvent Event;
