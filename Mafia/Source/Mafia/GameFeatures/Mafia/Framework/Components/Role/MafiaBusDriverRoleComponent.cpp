@@ -36,6 +36,11 @@ void UMafiaBusDriverRoleComponent::ClientAffectedEventsFlush_Implementation()
 
 }
 
+void UMafiaBusDriverRoleComponent::ClientRecieveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther)
+{
+
+}
+
 void UMafiaBusDriverRoleComponent::OnRep_Dead()
 {
 

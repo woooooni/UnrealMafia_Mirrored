@@ -83,12 +83,6 @@ public:
 
 #pragma region Role Ability(역할 능력 관련)
 public:
-	/**
-		ktw : 서버에서 호출해야합니다.
-	*/
-	UFUNCTION()
-	void ResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag);
-
 	/** 
 		ktw : 서버에서 호출해야합니다.
 	*/
@@ -99,13 +93,8 @@ public:
 		ktw : 서버에서 호출해야 합니다.
 	*/
 	UFUNCTION()
-	virtual void RecieveOfferMafiaTeam(UMafiaBaseRoleComponent* InMafiaComponent);
+	void RecieveInstantEvent(UMafiaBaseRoleComponent* InOther);
 
-	/**
-		ktw : 서버에서 호출해야합니다.
-	*/
-	UFUNCTION()
-	void AffectedEventsFlush();
 
 	/**
 		ktw : 서버에서 호출해야합니다.
@@ -138,9 +127,8 @@ public:
 	void FinishVoteEvent();
 #pragma endregion Vote
 
-
 #pragma region Role Ability RPC
-private:
+protected:
 	UFUNCTION(Server, Reliable)
 	void ServerReqUseAbility(AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType);
 
@@ -158,20 +146,17 @@ protected:
 	virtual void ClientNotifyResultAbility(UMafiaBaseRoleComponent* InOther);
 
 	UFUNCTION(Client, Reliable)
-	virtual void ClientResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag);
+	virtual void ClientResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType);
 
 	UFUNCTION(Client, Reliable)
 	virtual void ClientAffectedEventsFlush();
 
 	UFUNCTION(Client, Reliable)
-	virtual void ClientRecieveOfferMafiaTeam(UMafiaBaseRoleComponent* InMafiaComponent);
-
-	UFUNCTION(Client, Reliable)
-	void ClientBusRide(const TArray<FAffectedEvent>& InEventArray);
+	virtual void ClientRecieveInstantEvent(UMafiaBaseRoleComponent* InOther);
 #pragma endregion Role Ability RPC
 
 #pragma region Vote(투표) RPC
-private:
+protected:
 	UFUNCTION(Server, Reliable)
 	void ServerReqVote(AMafiaBasePlayerState* InOther);
 
@@ -188,6 +173,9 @@ private:
 	void ClientFinishVoteEvent();
 #pragma endregion Vote(투표)
 
+
+protected:
+	class UMafiaChairManManager* GetChairMan();
 
 private:
 	UFUNCTION(Server, Reliable)
@@ -208,9 +196,6 @@ protected:
 
 	UFUNCTION()
 	virtual void OnChangedMafiaFlowState(const EMafiaFlowState& InMafiaFlowState);
-
-protected:
-	class UMafiaBaseGameInstance* GetServerInstance();
 
 protected:
 	UPROPERTY(Replicated)

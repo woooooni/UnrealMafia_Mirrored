@@ -104,20 +104,38 @@ bool UMafiaChairManManager::MakePlayersAbilityPipeline()
 
 			for (auto& Pair : GS->GetJoinedUserPlayerStateMap())
 			{
-				if (UMafiaBaseAbilityPipeline* PlayerDwelling = NewObject<UMafiaBaseAbilityPipeline>())
+				if (Pair.Value.IsValid())
 				{
-					if (PlayerDwelling->Initialize(EMafiaColor(Count), Pair.Value.Get()) == false)
+					if (AMafiaBasePlayerState* PS = Pair.Value.Get())
 					{
-						return false;
-					}
+						const FString& AccoutIdStr = PS->GetUniqueId().ToString();
+						if (AccoutIdStr.IsEmpty())
+						{
+							MAFIA_ULOG(LogMafiaChairMan, Error, TEXT("Empty AccoutId"));
+							return false;
+						}
+						const FName& AccoutId = FName(*AccoutIdStr);
+						if (UMafiaBaseAbilityPipeline* PlayerPipeline = NewObject<UMafiaBaseAbilityPipeline>())
+						{
+							if (PlayerPipeline->Initialize(EMafiaColor(Count), PS) == false)
+							{
+								return false;
+							}
 
-					JoinedPlayerAbilityPipelines.Emplace(EMafiaColor(Count), PlayerDwelling);
+							JoinedPlayerAbilityPipelines.Emplace(AccoutId, PlayerPipeline);
+						}
+						else
+						{
+							return false;
+						}
+						++Count;
+					}
 				}
 				else
 				{
 					return false;
 				}
-				++Count;
+				
 			}
 
 			return true;
@@ -127,42 +145,47 @@ bool UMafiaChairManManager::MakePlayersAbilityPipeline()
 	return false;
 }
 
-void UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMafiaBasePlayerState* InDestination, EMafiaAbilityEventType InEventType)
+
+EMafiaUseAbilityFlag UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMafiaBasePlayerState* InDestination, EMafiaAbilityEventType InEventType)
 {
 	UWorld* World = GetWorld();
 	if (IsValid(World))
 	{
 		if (IsValid(InOrigin) && IsValid(InDestination))
 		{
-			const FString& PlayerAccountIdStr = InOrigin->GetUniqueId().ToString();
+			const FString& OriginAccountIdStr = InOrigin->GetUniqueId().ToString();
+			const FString& DestinationAccountIdStr = InDestination->GetUniqueId().ToString();
 
-			if (PlayerAccountIdStr.IsEmpty())
+			if (OriginAccountIdStr.IsEmpty() || DestinationAccountIdStr.IsEmpty())
 			{
 				MAFIA_ULOG(LogMafiaChairMan, Warning, TEXT("AccountIdStr is empty"));
-				return;
+				return EMafiaUseAbilityFlag::ImpossibleUseAbility;
 			}
 
-			const FName PlayerAccountId = FName(*PlayerAccountIdStr);
-			if (CachedAlreadyAbillityPlayerSet.Find(PlayerAccountId))
+			const FName OriginAccountId = FName(*OriginAccountIdStr);
+			const FName DestinationAccountId = FName(*DestinationAccountIdStr);
+
+			if (CachedAlreadyAbillityPlayerSet.Find(OriginAccountId))
 			{
-				if (UMafiaBaseRoleComponent* OriginPlayerComponent = InOrigin->GetRoleComponent())
+				return EMafiaUseAbilityFlag::AlreadyUseAbility;
+			}
+			
+			if (UMafiaBaseAbilityPipeline* DestPipeline = JoinedPlayerAbilityPipelines.Find(DestinationAccountId)->Get())
+			{
+				if (InEventType == EMafiaAbilityEventType::InstantEvent)
 				{
-					OriginPlayerComponent->ResponseUseAbility(InDestination->GetRoleComponent(), EMafiaUseAbilityFlag::AlreadyUseAbility);
+					return DestPipeline->DispatchInstantEvent(InOrigin->GetRoleComponent(), InEventType);
 				}
-				return;
+				else
+				{
+					CachedAlreadyAbillityPlayerSet.Emplace(OriginAccountId);
+					return DestPipeline->AddDeferredAbilityEvent(InOrigin->GetRoleComponent(), InEventType);
+				}
 			}
-			else
-			{
-				EMafiaColor DestPlayerColor = InDestination->GetPlayerColor();
-				JoinedPlayerAbilityPipelines.Find(DestPlayerColor);
-			}
-		}
-		else
-		{
-			MAFIA_ULOG(LogMafiaChairMan, Log, TEXT("UMafiaChairManManager::AddAbilityEvent : InOrigin is Invalid or InDestination is Invalid."));
-			return;
 		}
 	}
+
+	return EMafiaUseAbilityFlag::ImpossibleUseAbility;
 }
 
 #pragma region Cheat
@@ -242,7 +265,7 @@ void UMafiaChairManManager::PostBroadcastAbilityEvents()
 	}
 }
 
-void UMafiaChairManManager::EndAbilityEvent()
+void UMafiaChairManManager::EndAbilityEvents()
 {
 	for (auto& Pair : JoinedPlayerAbilityPipelines)
 	{
@@ -664,7 +687,7 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	}
 	else if(InFlowState == EMafiaFlowState::BeforeNight)
 	{
-		
+		StartAbilityEvent();
 	}
 	else if(InFlowState == EMafiaFlowState::Night)
 	{
@@ -672,10 +695,12 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	}
 	else if(InFlowState == EMafiaFlowState::AfterNight)
 	{
+		PreBroadcastAbilityEvents();
 		BroadcastAbilityEvents();
 	}
 	else if(InFlowState == EMafiaFlowState::EndNight)
 	{
-
+		PostBroadcastAbilityEvents();
+		EndAbilityEvents();
 	}
 }

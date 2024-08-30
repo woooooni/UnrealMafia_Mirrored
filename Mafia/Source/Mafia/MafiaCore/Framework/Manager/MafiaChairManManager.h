@@ -72,7 +72,7 @@ public:
 		ktw : Origin -> Destination으로 향하는 능력 사용 이벤트를 Heap에 임시 저장합니다.  
 		InOrigin : 능력 사용 Player, InDestination : 능력에 영향을 받은 Player.
 	*/
-	void AddAbilityEvent(class AMafiaBasePlayerState* InOrigin, class AMafiaBasePlayerState* InDestination, EMafiaAbilityEventType InEventType);
+	EMafiaUseAbilityFlag AddAbilityEvent(class AMafiaBasePlayerState* InOrigin, class AMafiaBasePlayerState* InDestination, EMafiaAbilityEventType InEventType);
 
 	/** ktw : InVotor - 투표자, InCandidate - 피투표자 */
 	void AddVoteEvent(class AMafiaBasePlayerState* InVotor, class AMafiaBasePlayerState* InCandidate);
@@ -90,7 +90,6 @@ public:
 
 public:
 	void OnSetMafiaFlowState(EMafiaFlowState InFlowState);
-	
 
 private:
 	bool AssignAllPlayersAbility();
@@ -102,7 +101,7 @@ private:
 	void BusDrive();
 	void BroadcastAbilityEvents();
 	void PostBroadcastAbilityEvents();
-	void EndAbilityEvent();
+	void EndAbilityEvents();
 
 
 private:
@@ -137,7 +136,7 @@ private:
 
 private:
 	UPROPERTY()
-	TMap<EMafiaColor, TObjectPtr<class UMafiaBaseAbilityPipeline>> JoinedPlayerAbilityPipelines;
+	TMap<FName, TObjectPtr<class UMafiaBaseAbilityPipeline>> JoinedPlayerAbilityPipelines;
 
 	UPROPERTY()
 	TMap<FName, TObjectPtr<class UMafiaBaseRoleComponent>> JoinedPlayerRoleComponents;

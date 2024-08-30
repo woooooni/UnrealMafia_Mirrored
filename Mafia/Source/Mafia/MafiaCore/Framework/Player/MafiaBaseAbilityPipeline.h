@@ -4,10 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "MafiaCore/Framework/Types/MafiaTypes.h"
 #include "MafiaBaseAbilityPipeline.generated.h"
 
 
+USTRUCT()
+struct FAbilityEvent
+{
+	GENERATED_BODY()
 
+public:
+	UPROPERTY()
+	TWeakObjectPtr<class UMafiaBaseRoleComponent> AbilityUser;
+
+	UPROPERTY()
+	uint8 bIgnoreChange : 1 = false;
+};
 
 /**
  * 
@@ -26,7 +38,9 @@ public:
 	bool Initialize(const EMafiaColor& InColorEnum, class AMafiaBasePlayerState* InPlayerState);
 
 public:
-	void BroadcastAffectedAbility();
+	EMafiaUseAbilityFlag DispatchInstantEvent(class UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType);
+	EMafiaUseAbilityFlag AddDeferredAbilityEvent(class UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType);
+	void BroadcastDeferredAbilityEvent();
 
 public:
 	bool SetAffectedPlayer(class AMafiaBasePlayerState* InAffectedPlayerState);
@@ -35,24 +49,29 @@ public:
 	FORCEINLINE class AMafiaBasePlayerState* GetAffectedPlayerState() { return AffectedPlayer.Get(); }
 
 
+	FORCEINLINE void SetDeferredEventArray(const TArray<FAbilityEvent>& InEventArray) { DeferredEventsArray = InEventArray; }
+	FORCEINLINE const TArray<FAbilityEvent>& GetDeferredEventArray() const { return DeferredEventsArray; }
+
+
 public:
 	void ResetForNextRound();
 	void ResetAll();
 
 private:
 	UPROPERTY()
-	TArray<TWeakObjectPtr<class UMafiaBaseRoleComponent>> AffectedEventsArray;
+	TArray<FAbilityEvent> DeferredEventsArray;
 
 private:
+	/** ktw : 원래 주인 플레이어 */
 	UPROPERTY()
 	TWeakObjectPtr<class AMafiaBasePlayerState> OriginPlayer;
 
+	/** ktw : 이번 턴에 영향 받는 플레이어 */
 	UPROPERTY()
 	TWeakObjectPtr<class AMafiaBasePlayerState> AffectedPlayer;
 
-private:
 	UPROPERTY()
-	EMafiaColor DwellingColor;
+	EMafiaColor PipelineColor;
 
 	UPROPERTY()
 	uint8 bInitialized : 1 = false;

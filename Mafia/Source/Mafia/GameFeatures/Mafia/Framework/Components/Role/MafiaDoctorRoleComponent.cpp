@@ -28,3 +28,7 @@ void UMafiaDoctorRoleComponent::ClientNotifyResultAbility_Implementation(UMafiaB
 void UMafiaDoctorRoleComponent::ClientAffectedEventsFlush_Implementation()
 {
 }
+
+void UMafiaDoctorRoleComponent::ClientRecieveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther)
+{
+}

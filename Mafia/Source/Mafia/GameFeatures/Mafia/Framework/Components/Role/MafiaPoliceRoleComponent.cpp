@@ -52,3 +52,7 @@ void UMafiaPoliceRoleComponent::ClientAffectedEventsFlush_Implementation()
 	
 }
 
+void UMafiaPoliceRoleComponent::ClientRecieveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther)
+{
+}
+

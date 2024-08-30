@@ -137,8 +137,8 @@ enum class EMafiaRole : uint8
 UENUM()
 enum class EMafiaAbilityEventType : uint8 
 {
-	Instant,
-	Deffered,
+	InstantEvent,
+	DefferedEvent,
 };
 
 UENUM()

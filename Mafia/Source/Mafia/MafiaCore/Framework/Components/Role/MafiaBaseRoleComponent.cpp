@@ -100,7 +100,7 @@ void UMafiaBaseRoleComponent::UnBindDelegates()
 
 void UMafiaBaseRoleComponent::UseAbility(AMafiaBasePlayerState* InOther)
 {
-	ServerReqUseAbility(InOther, EMafiaAbilityEventType::Deffered);
+	ServerReqUseAbility(InOther, EMafiaAbilityEventType::DefferedEvent);
 }
 
 void UMafiaBaseRoleComponent::SendOfferMafiaTeam(AMafiaBasePlayerState* InOther)
@@ -124,32 +124,6 @@ void UMafiaBaseRoleComponent::AffectedAbilityByOther(EMafiaRole InRole, UMafiaBa
 }
 
 
-void UMafiaBaseRoleComponent::ResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag)
-{
-	if (ENetRole::ROLE_Authority == GetOwnerRole())
-	{
-		ClientResponseUseAbility(InOther, InFlag);
-	}
-	else
-	{
-		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("서버에서 호출해야합니다."));
-	}
-}
-
-
-
-void UMafiaBaseRoleComponent::AffectedEventsFlush()
-{
-	if (ENetRole::ROLE_Authority == GetOwnerRole())
-	{
-		ClientAffectedEventsFlush();
-	}
-	else
-	{
-		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("서버에서 호출해야합니다."));
-	}
-}
-
 void UMafiaBaseRoleComponent::NotifyResultAbility(UMafiaBaseRoleComponent* InOther)
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
@@ -172,17 +146,19 @@ void UMafiaBaseRoleComponent::Vote(AMafiaBasePlayerState* InOther)
 }
 
 
-void UMafiaBaseRoleComponent::RecieveOfferMafiaTeam(UMafiaBaseRoleComponent* InMafiaComponent)
+
+void UMafiaBaseRoleComponent::RecieveInstantEvent(UMafiaBaseRoleComponent* InOther)
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
-		ClientRecieveOfferMafiaTeam(InMafiaComponent);
+		ClientRecieveInstantEvent(InOther);
 	}
 	else
 	{
 		MAFIA_ULOG(LogMafiaCharacter, Warning, TEXT("서버에서 호출해야합니다."));
 	}
 }
+
 
 
 void UMafiaBaseRoleComponent::StartVoteEvent()
@@ -244,37 +220,26 @@ void UMafiaBaseRoleComponent::FinishVoteEvent()
 void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType)
 {
 	/** ktw : 서버에서 실행됩니다. */
-	if (UMafiaBaseGameInstance* GI = GetServerInstance())
+	if (UMafiaChairManManager* ChairManManager = GetChairMan())
 	{
 		if (OwningPlayerState.IsValid())
 		{
-			if (UMafiaChairManManager* ChairManManager = GI->GetChairMan())
-			{
-				ChairManManager->AddAbilityEvent(OwningPlayerState.Get(), InOther, InEventType);
-			}
+			EMafiaUseAbilityFlag Flag = ChairManManager->AddAbilityEvent(OwningPlayerState.Get(), InOther, InEventType);
+			ClientResponseUseAbility(InOther->GetRoleComponent(), Flag, InEventType);
 		}
 	}
 }
 
-/*if (OwningPlayerState.IsValid())
-{
-	if (UMafiaChairManManager* ChairManManager = GI->GetChairMan())
-	{
-		ChairManManager->AddAbilityEvent(OwningPlayerState.Get(), InOther);
-	}
-}*/
+
 void UMafiaBaseRoleComponent::ServerReqSendOfferMafiaTeam_Implementation(AMafiaBasePlayerState* InOther)
 {
 	if (RoleType == EMafiaRole::Mafia)
 	{
-		if (UMafiaBaseGameInstance* GI = GetServerInstance())
+		if (UMafiaChairManManager* ChairManManager = GetChairMan())
 		{
 			if (OwningPlayerState.IsValid())
 			{
-				if (UMafiaChairManManager* ChairManManager = GI->GetChairMan())
-				{
-					ChairManManager->AddAbilityEvent(OwningPlayerState.Get(), InOther, EMafiaAbilityEventType::Instant);
-				}
+				ChairManManager->AddAbilityEvent(OwningPlayerState.Get(), InOther, EMafiaAbilityEventType::InstantEvent);
 			}
 		}
 	}
@@ -298,7 +263,7 @@ void UMafiaBaseRoleComponent::ClientAffectedAbilityByOther_Implementation(EMafia
 	}
 }
 
-void UMafiaBaseRoleComponent::ClientResponseUseAbility_Implementation(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag)
+void UMafiaBaseRoleComponent::ClientResponseUseAbility_Implementation(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
 {
 	/** #Todo - ktw : 파생 클래스에서 override. Flag에 따른 동작 처리. */
 
@@ -314,16 +279,11 @@ void UMafiaBaseRoleComponent::ClientAffectedEventsFlush_Implementation()
 	/** ktw : 파생 클래스에서 override. */
 }
 
-void UMafiaBaseRoleComponent::ClientRecieveOfferMafiaTeam_Implementation(UMafiaBaseRoleComponent* InMafiaComponent)
+void UMafiaBaseRoleComponent::ClientRecieveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther)
 {
-	/** #Todo - ktw : 파생 클래스에서 override. 마피아 영입 제안 */
+	/** ktw : 파생 클래스에서 override. */
 }
 
-void UMafiaBaseRoleComponent::ClientBusRide_Implementation(const TArray<FAffectedEvent>& InNewEventArray)
-{
-	/** #Todo - ktw : 버스기사에 영향을 받은 후 사운드 출력, UI 출력 등. Event는 아직 Relicated 되기 이전. */
-	ServerReqSetAffectedEvents(InNewEventArray);
-}
 
 
 
@@ -334,14 +294,11 @@ void UMafiaBaseRoleComponent::ServerReqVote_Implementation(AMafiaBasePlayerState
 {
 	/** ktw : 서버에서 실행됩니다. */
 		/** ktw : 서버에서 실행됩니다. */
-	if (UMafiaBaseGameInstance* GI = GetServerInstance())
+	if (UMafiaChairManManager* ChairManManager = GetChairMan())
 	{
 		if (OwningPlayerState.IsValid())
 		{
-			if (UMafiaChairManManager* ChairManManager = GI->GetChairMan())
-			{
-				ChairManManager->AddVoteEvent(OwningPlayerState.Get(), InOther);
-			}
+			ChairManManager->AddVoteEvent(OwningPlayerState.Get(), InOther);
 		}
 	}
 }
@@ -499,30 +456,6 @@ void UMafiaBaseRoleComponent::OnChangedMafiaFlowState(const EMafiaFlowState& InM
 
 
 
-
-UMafiaBaseGameInstance* UMafiaBaseRoleComponent::GetServerInstance()
-{
-	if (UWorld* World = GetWorld())
-	{
-		if (IsValid(World))
-		{
-			if (UMafiaBaseGameInstance* GI = World->GetGameInstance<UMafiaBaseGameInstance>())
-			{
-				if (GI->IsDedicatedServerInstance())
-				{
-					return GI;
-				}
-				else
-				{
-					return nullptr;
-				}
-			}
-		}
-	}
-	return nullptr;
-}
-
-
 bool operator < (const FAffectedEvent& A, const FAffectedEvent& B)
 {
 	if (A.Other.IsValid() && B.Other.IsValid())
@@ -537,5 +470,22 @@ bool operator < (const FAffectedEvent& A, const FAffectedEvent& B)
 	return false;
 }
 
+UMafiaChairManManager* UMafiaBaseRoleComponent::GetChairMan()
+{
+	if (UWorld* World = GetWorld())
+	{
+		if (IsValid(World))
+		{
+			if (UMafiaBaseGameInstance* GI = World->GetGameInstance<UMafiaBaseGameInstance>())
+			{
+				if (GI->IsDedicatedServerInstance())
+				{
+					return GI->GetChairMan();
+				}
+			}
+		}
+	}
+	return nullptr;
+}
 
 

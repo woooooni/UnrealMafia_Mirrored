@@ -26,6 +26,7 @@ protected:
 protected:
 	virtual void ClientNotifyResultAbility_Implementation(UMafiaBaseRoleComponent* InOther) override;
 	virtual void ClientAffectedEventsFlush_Implementation() override;
+	virtual void ClientRecieveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther) override;
 	
 	
 };

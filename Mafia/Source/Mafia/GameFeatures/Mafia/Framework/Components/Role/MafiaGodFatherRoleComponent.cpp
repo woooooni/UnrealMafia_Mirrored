@@ -28,3 +28,7 @@ void UMafiaGodFatherRoleComponent::ClientNotifyResultAbility_Implementation(UMaf
 void UMafiaGodFatherRoleComponent::ClientAffectedEventsFlush_Implementation()
 {
 }
+
+void UMafiaGodFatherRoleComponent::ClientRecieveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther)
+{
+}
