@@ -28,7 +28,6 @@ void UMafiaBaseRoleComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	DOREPLIFETIME(UMafiaBaseRoleComponent, TeamType);
 	DOREPLIFETIME(UMafiaBaseRoleComponent, RoleType);
 	DOREPLIFETIME(UMafiaBaseRoleComponent, OwningPlayerState);
-	DOREPLIFETIME(UMafiaBaseRoleComponent, CachedAffectedEventsHeap);
 }
 
 void UMafiaBaseRoleComponent::OnUnregister()
@@ -98,6 +97,11 @@ void UMafiaBaseRoleComponent::UnBindDelegates()
 	UnbindGameEvent(OnChangedMafiaFlowState, OnChangedMafiaFlowStateHandle);
 }
 
+void UMafiaBaseRoleComponent::ResetForNextRound()
+{
+	CachedAffectedEventsHeap.Empty();
+}
+
 void UMafiaBaseRoleComponent::UseAbility(AMafiaBasePlayerState* InOther)
 {
 	ServerReqUseAbility(InOther, EMafiaAbilityEventType::DeferredEvent);
@@ -105,7 +109,7 @@ void UMafiaBaseRoleComponent::UseAbility(AMafiaBasePlayerState* InOther)
 
 void UMafiaBaseRoleComponent::SendOfferMafiaTeam(AMafiaBasePlayerState* InOther)
 {
-	if (RoleType == EMafiaRole::Mafia)
+	if (RoleType == EMafiaRole::GodFather)
 	{
 		ServerReqSendOfferMafiaTeam(InOther);
 	}
@@ -233,7 +237,7 @@ void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaBasePlaye
 
 void UMafiaBaseRoleComponent::ServerReqSendOfferMafiaTeam_Implementation(AMafiaBasePlayerState* InOther)
 {
-	if (RoleType == EMafiaRole::Mafia)
+	if (RoleType == EMafiaRole::GodFather)
 	{
 		if (UMafiaChairManManager* ChairManManager = GetChairMan())
 		{
@@ -371,11 +375,11 @@ void UMafiaBaseRoleComponent::OnChangedMafiaFlowState(const EMafiaFlowState& InM
 	/** #Todo - ktw : Flow에 따른 연출 및 UI 출력. */
 	if (InMafiaFlowState == EMafiaFlowState::None)
 	{
-		
+		ResetForNextRound();
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::BeforeDay)
 	{
-
+		ResetForNextRound();
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::Day)
 	{
@@ -387,7 +391,7 @@ void UMafiaBaseRoleComponent::OnChangedMafiaFlowState(const EMafiaFlowState& InM
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::EndDay)
 	{
-
+		
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::BeforeVote)
 	{
@@ -407,7 +411,7 @@ void UMafiaBaseRoleComponent::OnChangedMafiaFlowState(const EMafiaFlowState& InM
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::BeforeNight)
 	{
-
+		
 	}
 	else if(InMafiaFlowState == EMafiaFlowState::Night)
 	{

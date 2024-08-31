@@ -74,10 +74,30 @@ EMafiaUseAbilityFlag UMafiaBaseAbilityPipeline::AddDeferredAbilityEvent(UMafiaBa
 
 	FAbilityEvent Event;
 	Event.AbilityUser = InOther;
-	Event.bIgnoreChange |= (OtherRole == EMafiaRole::Madam);
+	Event.bIgnoreChange = (OtherRole == EMafiaRole::Madam);
 
 	DeferredEventArray.Add(Event);
 	return EMafiaUseAbilityFlag::Succeed;
+}
+
+bool UMafiaBaseAbilityPipeline::RemoveDeferredAbilityEvent(const EMafiaRole& InRole, FAbilityEvent& OutRemovedEvent)
+{
+	FAbilityEvent* FindEvent = DeferredEventArray.FindByPredicate([&](const FAbilityEvent& Event)
+		{
+			return ((Event.AbilityUser.Get()->GetRoleType()) == InRole);
+		});
+
+	if (FindEvent)
+	{
+		OutRemovedEvent = *FindEvent;
+		DeferredEventArray.RemoveAll([&](const FAbilityEvent& Event)
+			{
+				return ((Event.AbilityUser.Get()->GetRoleType()) == InRole);
+			});
+		return true;
+	}
+
+	return false;
 }
 
 void UMafiaBaseAbilityPipeline::StartAbilityEvent()

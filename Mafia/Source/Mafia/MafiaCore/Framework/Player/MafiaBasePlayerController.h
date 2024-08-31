@@ -59,13 +59,16 @@ private:
 	void ServerReqStartGame();
 
 	UFUNCTION(Exec)
-	void CheatUseAbility(int32 InPlayerNum);
+	void CheatUseAbility(const FString& InColorStr);
 
 	UFUNCTION(Exec)
 	void CheatVote(int32 InPlayerNum);
 
 	UFUNCTION(Exec)
 	void CheatChangeRole(const FString& InStrRole);
+
+private:
+	 bool FindPlayerColor(const FString& InColorStr, OUT EMafiaColor& OutMafiaColor);
 #pragma endregion
 
 #pragma region MaterialCheat
@@ -77,6 +80,10 @@ private:
 	UFUNCTION(Exec)
 	void CheatChangePlayerNickname(FName InNickname);
 #pragma endregion
+
+
+
+
 
 
 

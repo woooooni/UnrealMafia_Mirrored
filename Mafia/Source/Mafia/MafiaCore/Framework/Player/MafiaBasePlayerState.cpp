@@ -105,21 +105,7 @@ void AMafiaBasePlayerState::NotifyGameResult(EMafiaGameResult InGameResult)
 
 void AMafiaBasePlayerState::ClientNotifyGameResult_Implementation(EMafiaGameResult InGameResult)
 {
-	/** ktw : 클라이언트에서 실행됩니다. */
-	/** #Todo - ktw : 게임 결과에 따른 UI 출력 등. */
-	switch (InGameResult)
-	{
-	case EMafiaGameResult::None:
-		break;
-	case EMafiaGameResult::CitizenWin:
-		break;
-	case EMafiaGameResult::MafiaWin:
-		break;
-	case EMafiaGameResult::NeutralWin:
-		break;
-	case EMafiaGameResult::Invalid:
-		break;
-	}
+	HandleNotyfiyGameResult(InGameResult);
 }
 
 
@@ -188,7 +174,7 @@ void AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole InRole)
 		break;
 	case EMafiaRole::Killer:
 		break;
-	case EMafiaRole::Mafia:
+	case EMafiaRole::GodFather:
 		RoleComponent = NewObject<UMafiaGodFatherRoleComponent>(this);
 		break;
 	case EMafiaRole::Vigilante:
@@ -223,6 +209,24 @@ void AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole InRole)
 void AMafiaBasePlayerState::OnRep_ChangePlayerNickname()
 {
 	SendGameEvent_TwoParams(OnChangedPlayerName, GetPlayerController()->GetPawn<AMafiaSampleCharacter>(), PlayerNickname);
+}
+
+void AMafiaBasePlayerState::HandleNotyfiyGameResult(EMafiaGameResult InGameResult)
+{
+	/** ktw : 클라이언트에서 실행됩니다. */
+	switch (InGameResult)
+	{
+	case EMafiaGameResult::None:
+		break;
+	case EMafiaGameResult::CitizenWin:
+		break;
+	case EMafiaGameResult::MafiaWin:
+		break;
+	case EMafiaGameResult::NeutralWin:
+		break;
+	case EMafiaGameResult::Invalid:
+		break;
+	}
 }
 
 

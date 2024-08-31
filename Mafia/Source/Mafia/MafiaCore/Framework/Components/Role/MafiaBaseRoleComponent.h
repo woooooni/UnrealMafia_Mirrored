@@ -68,6 +68,9 @@ protected:
 	UFUNCTION()
 	virtual void UnBindDelegates();
 
+	UFUNCTION()
+	virtual void ResetForNextRound();
+
 public:
 	UFUNCTION()
 	virtual void UseAbility(class AMafiaBasePlayerState* InOther);
@@ -226,7 +229,7 @@ protected:
 	TSet<uint32> VisiblePlayerSet;
 
 	/** ktw : 이번 턴에 내가 처리할 이벤트 목록. */
-	UPROPERTY(Replicated)
+	UPROPERTY()
 	TArray<FAffectedEvent> CachedAffectedEventsHeap;
 
 private:

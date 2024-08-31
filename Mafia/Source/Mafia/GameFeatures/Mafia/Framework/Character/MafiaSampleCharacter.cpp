@@ -136,7 +136,7 @@ void AMafiaSampleCharacter::Tick(float DeltaTime)
 
 void AMafiaSampleCharacter::ChangeColor(FLinearColor InColor)
 {
-	if (GetPlayerState()->GetNetMode() == NM_DedicatedServer)
+	if (GetNetMode() == NM_DedicatedServer)
 	{
 		CharacterColor = InColor;
 	}
@@ -144,7 +144,7 @@ void AMafiaSampleCharacter::ChangeColor(FLinearColor InColor)
 
 void AMafiaSampleCharacter::ChangePlayerName(const FName& InNewPlayerName)
 {
-	if (GetPlayerState()->GetNetMode() == NM_DedicatedServer)
+	if (GetNetMode() == NM_DedicatedServer)
 	{
 		PlayerName = InNewPlayerName;
 	}

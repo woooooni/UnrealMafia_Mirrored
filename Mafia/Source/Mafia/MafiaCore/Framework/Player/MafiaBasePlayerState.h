@@ -82,6 +82,10 @@ private:
 private:
 	UFUNCTION()
 	void OnRep_ChangePlayerNickname();
+
+private:
+	void HandleNotyfiyGameResult(EMafiaGameResult InGameResult);
+
 	
 protected:
 	/** 유저가 Ready버튼을 눌렀을때 */

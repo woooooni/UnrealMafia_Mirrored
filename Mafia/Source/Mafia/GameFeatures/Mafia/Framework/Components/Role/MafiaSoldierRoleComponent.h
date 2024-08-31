@@ -4,23 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
-#include "MafiaBusDriverRoleComponent.generated.h"
+#include "MafiaSoldierRoleComponent.generated.h"
 
 /**
- * 
+ *
  */
-
 UCLASS()
-class MAFIA_API UMafiaBusDriverRoleComponent : public UMafiaBaseRoleComponent
+class MAFIA_API UMafiaSoldierRoleComponent : public UMafiaBaseRoleComponent
 {
 	GENERATED_BODY()
 
 public:
-	UMafiaBusDriverRoleComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UMafiaSoldierRoleComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual	void HandleAffectedAbilities() override;
@@ -32,10 +30,10 @@ protected:
 	virtual void HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag) override;
 	virtual void HandleReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag) override;
 	virtual void HandleFinishVoteEvent() override;
-	
-
 
 protected:
 	virtual void OnRep_Dead() override;
 
+private:
+	uint8 BulletproofCount;
 };

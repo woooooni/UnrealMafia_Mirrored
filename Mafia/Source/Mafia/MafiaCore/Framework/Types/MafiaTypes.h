@@ -61,6 +61,47 @@ const static TArray<FLinearColor> GPlayerColors = {
 	FLinearColor(0.9f, 0.9f, 0.98f)   // Lavender
 };
 
+const static TArray<FName> GPlayerColorEnglishNames =
+{
+	TEXT("Red"),
+	TEXT("Blue"),
+	TEXT("Green"),
+	TEXT("Yello"),
+	TEXT("Orange"),
+	TEXT("Purple"),
+	TEXT("Brown"),
+	TEXT("Gray"),
+	TEXT("Black"),
+	TEXT("SkyBlue"),
+	TEXT("LimeGreen"),
+	TEXT("Teal"),
+	TEXT("Beige"),
+	TEXT("Navy"),
+	TEXT("Mint"),
+	TEXT("Lavender"),
+};
+
+
+const static TArray<FName> GPlayerColorKoreanNames =
+{
+	TEXT("빨강"),
+	TEXT("파랑"),
+	TEXT("초록"),
+	TEXT("노랑"),
+	TEXT("주황"),
+	TEXT("보라"),
+	TEXT("갈색"),
+	TEXT("회색"),
+	TEXT("검정"),
+	TEXT("연파"),
+	TEXT("연초"),
+	TEXT("청록"),
+	TEXT("베이지"),
+	TEXT("남색"),
+	TEXT("민트"),
+	TEXT("연보"),
+};
+
 
 
 UENUM()
@@ -120,7 +161,7 @@ enum class EMafiaRole : uint8
 
 	Police,			/* 경찰 */
 	Killer,			/* 연쇄살인마 */
-	Mafia,			/* 마피아 */
+	GodFather,			/* 마피아 */
 	Vigilante,		/* 자경단원 */
 
 	Detective,		/* 탐정 */
@@ -203,7 +244,7 @@ enum class EMafiaVoteResultFlag : uint8
 /** ktw - 인원수에 따른 마피아 팀 직업 부여 */
 const static TArray<EMafiaRole> GMafiaAssignRoleArray =
 {
-	EMafiaRole::Mafia,
+	EMafiaRole::GodFather,
 	EMafiaRole::Madam,
 	EMafiaRole::Thief
 };
@@ -214,12 +255,12 @@ const static TArray<EMafiaRole> GCitizenAssignRoleArray =
 	EMafiaRole::Police,
 	EMafiaRole::Citizen,
 	EMafiaRole::Doctor,
+	EMafiaRole::Soldier,
+	EMafiaRole::BusDriver,
 	EMafiaRole::Vigilante,
 	EMafiaRole::Killer,
-	EMafiaRole::BusDriver,
 	EMafiaRole::Detective,
 	EMafiaRole::Spirit,
-	EMafiaRole::Soldier
 };
 
 const static TArray<EMafiaTeam> GTeamDistributionArray =

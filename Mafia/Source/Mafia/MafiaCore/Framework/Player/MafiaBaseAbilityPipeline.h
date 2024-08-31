@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "MafiaCore/Framework/Types/MafiaTypes.h"
+#include "Framework/Components/Role/MafiaBaseRoleComponent.h"
 #include "MafiaBaseAbilityPipeline.generated.h"
 
 
@@ -58,22 +59,8 @@ public:
 public:
 	EMafiaUseAbilityFlag DispatchInstantEvent(class UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType);
 	EMafiaUseAbilityFlag AddDeferredAbilityEvent(class UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType);
-	FORCEINLINE bool RemoveDeferredAbilityEvent(const EMafiaRole& InRole, FAbilityEvent& OutRemovedEvent)
-	{
-		FAbilityEvent* FindEvent = DeferredEventArray.FindByPredicate([&](const FAbilityEvent& Event)
-			{
-				return Event.AbilityUser.Get()->GetRoleType() == InRole;
-			});
-
-		if (FindEvent)
-		{
-			OutRemovedEvent = *FindEvent;
-			DeferredEventArray.Remove(*FindEvent);
-			return true;
-		}
-
-		return false;
-	}
+	bool RemoveDeferredAbilityEvent(const EMafiaRole& InRole, FAbilityEvent& OutRemovedEvent);
+	
 
 public:
 	void StartAbilityEvent();

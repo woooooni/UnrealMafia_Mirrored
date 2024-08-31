@@ -651,18 +651,23 @@ void UMafiaChairManManager::NotifyGameResult(EMafiaGameResult InGameResult) cons
 	}
 }
 
+void UMafiaChairManManager::ResetForNextRound()
+{
+	CachedAlreadyVoterSet.Empty();
+	CachedAlreadyAbillityPlayerSet.Empty();
+	CachedVoteEventsMap.Empty();
+}
+
 void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 {
 	/** ktw : AMafiaBaseGameState::SetMafiaFlowState에서 호출됩니다. */
 	if (InFlowState == EMafiaFlowState::None)
 	{
-		CachedAlreadyVoterSet.Empty();
-		CachedAlreadyAbillityPlayerSet.Empty();
-		CachedVoteEventsMap.Empty();
+		ResetForNextRound();
 	}
 	else if (InFlowState == EMafiaFlowState::BeforeDay) 
 	{
-		
+		ResetForNextRound();
 	}
 	else if(InFlowState == EMafiaFlowState::Day)
 	{
@@ -670,13 +675,11 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	}
 	else if(InFlowState == EMafiaFlowState::AfterDay)
 	{
-		CachedAlreadyVoterSet.Empty();
-		CachedAlreadyAbillityPlayerSet.Empty();
-		CachedVoteEventsMap.Empty();
+
 	}
 	else if(InFlowState == EMafiaFlowState::EndDay)
 	{
-
+		
 	}
 	else if(InFlowState == EMafiaFlowState::BeforeVote)
 	{
@@ -689,16 +692,6 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	else if(InFlowState == EMafiaFlowState::AfterVote)
 	{
 		EndVote();
-		EMafiaVoteResultFlag VoteFlag = NotifyDeadMan();
-		if (VoteFlag == EMafiaVoteResultFlag::SomeoneDying)
-		{
-
-		}
-
-		else
-		{
-
-		}
 	}
 	else if(InFlowState == EMafiaFlowState::EndVote)
 	{

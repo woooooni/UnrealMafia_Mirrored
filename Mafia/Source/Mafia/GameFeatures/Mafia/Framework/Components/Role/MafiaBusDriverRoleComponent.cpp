@@ -20,14 +20,11 @@ void UMafiaBusDriverRoleComponent::GetLifetimeReplicatedProps(TArray<FLifetimePr
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
-void UMafiaBusDriverRoleComponent::UseAbility(AMafiaBasePlayerState* InOther)
-{
-	// Super 호출 금지.
-	
-}
+
 
 void UMafiaBusDriverRoleComponent::HandleAffectedAbilities()
 {
+	Super::HandleAffectedAbilities();
 }
 
 void UMafiaBusDriverRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther)
@@ -55,6 +52,10 @@ void UMafiaBusDriverRoleComponent::HandleReceiveVoteResult(UMafiaBaseRoleCompone
 }
 
 void UMafiaBusDriverRoleComponent::HandleFinishVoteEvent()
+{
+}
+
+void UMafiaBusDriverRoleComponent::OnRep_Dead()
 {
 }
 

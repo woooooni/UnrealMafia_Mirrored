@@ -206,9 +206,25 @@ void AMafiaBasePlayerController::CheatStartGame()
 #endif
 }
 
-void AMafiaBasePlayerController::CheatUseAbility(int32 InPlayerNum)
+void AMafiaBasePlayerController::CheatUseAbility(const FString& InColorStr)
 {
 #if ENABLE_CHEAT
+	if (InColorStr.IsEmpty())
+	{
+		MAFIA_ULOG(LogPlayerController, Warning, TEXT("Str is Empty"));
+		return;
+	}
+
+	
+	EMafiaColor OutPlayerColor;
+	if (FindPlayerColor(InColorStr, OutPlayerColor) == false)
+	{
+		MAFIA_ULOG(LogPlayerController, Warning, TEXT("Invalid Str."));
+		return;
+	}
+
+
+
 	if (AMafiaBasePlayerState* MyPlayerState = GetPlayerState<AMafiaBasePlayerState>())
 	{
 		UWorld* World = GetWorld();
@@ -216,30 +232,38 @@ void AMafiaBasePlayerController::CheatUseAbility(int32 InPlayerNum)
 		if (AMafiaBaseGameState* GS = World->GetGameState<AMafiaBaseGameState>())
 		{
 			/** ktw : 본인 제외. */
-			if (1 >= InPlayerNum || GS->PlayerArray.IsValidIndex(InPlayerNum - 1) == false)
+			if (MyPlayerState->GetPlayerColor() == OutPlayerColor)
 			{
-				MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Invalid Player Number"));
+				MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Invalid Player."));
 				return;
 			}
 
-			if (AMafiaBasePlayerState* OtherPlayerState = Cast<AMafiaBasePlayerState>(GS->PlayerArray[InPlayerNum - 1]))
+			for (auto& Pair : GS->GetJoinedUserPlayerStateMap())
 			{
-				if (MyPlayerState->GetUniqueId() != OtherPlayerState->GetUniqueId())
+				if (AMafiaBasePlayerState* OtherPlayerState = Pair.Value.Get())
 				{
-					if (UMafiaBaseRoleComponent* RoleComponent = MyPlayerState->GetRoleComponent())
+					if (OutPlayerColor == OtherPlayerState->GetPlayerColor())
 					{
-						RoleComponent->UseAbility(OtherPlayerState);
+						if (MyPlayerState->GetUniqueId() != OtherPlayerState->GetUniqueId())
+						{
+							if (UMafiaBaseRoleComponent* RoleComponent = MyPlayerState->GetRoleComponent())
+							{
+								RoleComponent->UseAbility(OtherPlayerState);
+								return;
+							}
+							else
+							{
+								MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Find Role Component Failed."));
+							}
+						}
+						else
+						{
+							MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("That Player is My Player"));
+						}
 					}
-					else
-					{
-						MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("Find Role Component Failed."));
-					}
-				}
-				else
-				{
-					MAFIA_ALOG(LogMafiaPlayerController, Warning, TEXT("That Player is My Player"));
 				}
 			}
+
 		}
 	}
 
@@ -311,7 +335,7 @@ void AMafiaBasePlayerController::CheatChangeRole(const FString& InStrRole)
 			}
 			else if(InStrRole == TEXT("마피아"))
 			{
-				RoleType = EMafiaRole::Mafia;
+				RoleType = EMafiaRole::GodFather;
 			}
 			else if(InStrRole == TEXT("자경단원"))
 			{
@@ -350,6 +374,27 @@ void AMafiaBasePlayerController::CheatChangeRole(const FString& InStrRole)
 	}
 #endif
 }
+
+bool AMafiaBasePlayerController::FindPlayerColor(const FString& InColorStr, OUT EMafiaColor& OutMafiaColor)
+{
+
+#if ENABLE_CHEAT
+	FName ColorName = FName(*InColorStr);
+	int32 FindIndex = GPlayerColorKoreanNames.Find(ColorName);
+	FindIndex = FindIndex == INDEX_NONE ? GPlayerColorEnglishNames.Find(ColorName) : FindIndex;
+	
+	if (FindIndex == INDEX_NONE)
+	{
+		return false;
+	}
+		
+
+	OutMafiaColor = static_cast<EMafiaColor>(FindIndex);
+	return true;
+#endif
+}
+
+
 
 
 void AMafiaBasePlayerController::CheatChangePlayerColor(const EMafiaColor& InColor)

@@ -121,6 +121,9 @@ private:
 	void NotifyGameResult(EMafiaGameResult InGameResult) const;
 
 private:
+	void ResetForNextRound();
+
+private:
 
 	/** ktw : 능력사용 플레이어를 저장합니다. */
 	UPROPERTY()

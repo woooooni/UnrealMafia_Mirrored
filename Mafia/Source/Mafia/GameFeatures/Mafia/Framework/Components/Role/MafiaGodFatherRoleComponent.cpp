@@ -13,7 +13,7 @@ void UMafiaGodFatherRoleComponent::BeginPlay()
 	Super::BeginPlay();
 
 	TeamType = EMafiaTeam::Mafia;
-	RoleType = EMafiaRole::Mafia;
+	RoleType = EMafiaRole::GodFather;
 	RoleName = TEXT("마피아(대부)");
 }
 
@@ -50,17 +50,5 @@ void UMafiaGodFatherRoleComponent::HandleFinishVoteEvent()
 }
 
 void UMafiaGodFatherRoleComponent::OnRep_Dead()
-{
-}
-
-void UMafiaGodFatherRoleComponent::ClientNotifyResultAbility_Implementation(UMafiaBaseRoleComponent* InOther)
-{
-}
-
-void UMafiaGodFatherRoleComponent::ClientAbilityEventsFlush_Implementation()
-{
-}
-
-void UMafiaGodFatherRoleComponent::ClientRecieveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther)
 {
 }
