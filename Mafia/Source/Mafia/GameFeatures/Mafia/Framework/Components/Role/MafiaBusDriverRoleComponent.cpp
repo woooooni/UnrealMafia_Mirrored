@@ -26,24 +26,36 @@ void UMafiaBusDriverRoleComponent::UseAbility(AMafiaBasePlayerState* InOther)
 	
 }
 
-void UMafiaBusDriverRoleComponent::ClientNotifyResultAbility_Implementation(UMafiaBaseRoleComponent* InOther)
+void UMafiaBusDriverRoleComponent::HandleAffectedAbilities()
 {
-
 }
 
-void UMafiaBusDriverRoleComponent::ClientAffectedEventsFlush_Implementation()
+void UMafiaBusDriverRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther)
 {
-
 }
 
-void UMafiaBusDriverRoleComponent::ClientRecieveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther)
+void UMafiaBusDriverRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther)
 {
-
 }
 
-void UMafiaBusDriverRoleComponent::OnRep_Dead()
+void UMafiaBusDriverRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
 {
+}
 
+void UMafiaBusDriverRoleComponent::HandleStartVoteEvent()
+{
+}
+
+void UMafiaBusDriverRoleComponent::HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag)
+{
+}
+
+void UMafiaBusDriverRoleComponent::HandleReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag)
+{
+}
+
+void UMafiaBusDriverRoleComponent::HandleFinishVoteEvent()
+{
 }
 
 

@@ -17,6 +17,38 @@ void UMafiaGodFatherRoleComponent::BeginPlay()
 	RoleName = TEXT("마피아(대부)");
 }
 
+void UMafiaGodFatherRoleComponent::HandleAffectedAbilities()
+{
+}
+
+void UMafiaGodFatherRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther)
+{
+}
+
+void UMafiaGodFatherRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther)
+{
+}
+
+void UMafiaGodFatherRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
+{
+}
+
+void UMafiaGodFatherRoleComponent::HandleStartVoteEvent()
+{
+}
+
+void UMafiaGodFatherRoleComponent::HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag)
+{
+}
+
+void UMafiaGodFatherRoleComponent::HandleReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag)
+{
+}
+
+void UMafiaGodFatherRoleComponent::HandleFinishVoteEvent()
+{
+}
+
 void UMafiaGodFatherRoleComponent::OnRep_Dead()
 {
 }
@@ -25,7 +57,7 @@ void UMafiaGodFatherRoleComponent::ClientNotifyResultAbility_Implementation(UMaf
 {
 }
 
-void UMafiaGodFatherRoleComponent::ClientAffectedEventsFlush_Implementation()
+void UMafiaGodFatherRoleComponent::ClientAbilityEventsFlush_Implementation()
 {
 }
 

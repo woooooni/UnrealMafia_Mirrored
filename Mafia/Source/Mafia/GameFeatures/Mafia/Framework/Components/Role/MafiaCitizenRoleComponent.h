@@ -21,12 +21,17 @@ protected:
 	virtual void BeginPlay() override;
 
 protected:
-	virtual void OnRep_Dead() override;
+	virtual	void HandleAffectedAbilities() override;
+	virtual void HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther);
+	virtual void HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther);
+	virtual void HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType);
+
+	virtual void HandleStartVoteEvent() override;
+	virtual void HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag) override;
+	virtual void HandleReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag) override;
+	virtual void HandleFinishVoteEvent() override;
 
 protected:
-	virtual void ClientNotifyResultAbility_Implementation(UMafiaBaseRoleComponent* InOther) override;
-	virtual void ClientAffectedEventsFlush_Implementation() override;
-	virtual void ClientRecieveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther) override;
-	
+	virtual void OnRep_Dead() override;
 	
 };

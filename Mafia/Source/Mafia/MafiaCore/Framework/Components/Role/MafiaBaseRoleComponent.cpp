@@ -100,7 +100,7 @@ void UMafiaBaseRoleComponent::UnBindDelegates()
 
 void UMafiaBaseRoleComponent::UseAbility(AMafiaBasePlayerState* InOther)
 {
-	ServerReqUseAbility(InOther, EMafiaAbilityEventType::DefferedEvent);
+	ServerReqUseAbility(InOther, EMafiaAbilityEventType::DeferredEvent);
 }
 
 void UMafiaBaseRoleComponent::SendOfferMafiaTeam(AMafiaBasePlayerState* InOther)
@@ -265,23 +265,22 @@ void UMafiaBaseRoleComponent::ClientAffectedAbilityByOther_Implementation(EMafia
 
 void UMafiaBaseRoleComponent::ClientResponseUseAbility_Implementation(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
 {
-	/** #Todo - ktw : 파생 클래스에서 override. Flag에 따른 동작 처리. */
-
+	HandleResponseUseAbility(InOther, InFlag, InEventType);
 }
 
 void UMafiaBaseRoleComponent::ClientNotifyResultAbility_Implementation(UMafiaBaseRoleComponent* InOther)
 {
-	/** #Todo - ktw : 파생 클래스에서 override. 자신의 능력 사용에 관한 결과를 계산합니다. (경찰, 마피아, 대부, .. 등등) */
+	HandleNotifyResultAbility(InOther);
 }
 
-void UMafiaBaseRoleComponent::ClientAffectedEventsFlush_Implementation()
+void UMafiaBaseRoleComponent::ClientAbilityEventsFlush_Implementation()
 {
-	/** ktw : 파생 클래스에서 override. */
+	HandleAffectedAbilities();
 }
 
 void UMafiaBaseRoleComponent::ClientRecieveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther)
 {
-	/** ktw : 파생 클래스에서 override. */
+	HandleRecieveInstantEvent(InOther);
 }
 
 
@@ -306,7 +305,7 @@ void UMafiaBaseRoleComponent::ServerReqVote_Implementation(AMafiaBasePlayerState
 void UMafiaBaseRoleComponent::ClientStartVoteEvent_Implementation()
 {
 	/** ktw : 클라이언트에서 실행됩니다. */
-
+	HandleStartVoteEvent();
 }
 
 void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag)
@@ -315,47 +314,17 @@ void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(AMafiaBaseP
 		ktw : 클라이언트에서 실행됩니다. 
 				InCandidate는 nullptr일 수 있습니다.
 	*/
-	
-	// 투표 결과 응답.
-	if (OwningPlayerState.IsValid())
-	{
-		/** Todo - ktw : 투표 Flag당 실행할 기능 추가. */
-		if (EMafiaVoteFlag::ImpossibleVote == InFlag)
-		{
-			// EMafiaGameFlow가 Vote가 아니거나 투표를 할 수 없는 상태.
-		}
-		else if (EMafiaVoteFlag::AlreadyVoted == InFlag)
-		{
-			// 중복 투표
-		}
-		else if (EMafiaVoteFlag::Succeed == InFlag)
-		{
-			// 투표 완료.
-		}
-		else
-		{
-
-		}
-	}
+	HandleResponseVoteEvent(InCandidate, InFlag);
 }
 
 void UMafiaBaseRoleComponent::ClientReceiveVoteResult_Implementation(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag)
 {
-	/** #Todo - ktw : 통지된 사형수가 있는지 체크해서 별도의 동작을 수행. */
-	if (InFlag == EMafiaVoteResultFlag::NoDeathPlayer)
-	{
-
-	}
-	else if (InFlag == EMafiaVoteResultFlag::SomeoneDying)
-	{
-
-	}
-	
+	HandleReceiveVoteResult(InDeathRow, InFlag);
 }
 
 void UMafiaBaseRoleComponent::ClientFinishVoteEvent_Implementation()
 {
-	/** ktw : 클라이언트에서 실행됩니다. */
+	HandleFinishVoteEvent();
 }
 
 #pragma endregion RPC Vote
@@ -451,6 +420,18 @@ void UMafiaBaseRoleComponent::OnChangedMafiaFlowState(const EMafiaFlowState& InM
 	else if(InMafiaFlowState == EMafiaFlowState::EndNight)
 	{
 
+	}
+}
+
+void UMafiaBaseRoleComponent::HandleAffectedAbilities()
+{
+	if (CachedAffectedEventsHeap.Num() > 0)
+	{
+		UWorld* World = GetWorld();
+		if (IsValid(World))
+		{
+			World->GetTimerManager().SetTimer(AffectedAbilityTimerHandle, this, &UMafiaBaseRoleComponent::HandleAffectedAbilities, AffectedAbilityTime);
+		}
 	}
 }
 

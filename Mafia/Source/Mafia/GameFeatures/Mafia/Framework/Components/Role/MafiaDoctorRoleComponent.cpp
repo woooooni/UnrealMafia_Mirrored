@@ -17,18 +17,38 @@ void UMafiaDoctorRoleComponent::BeginPlay()
 	RoleName = TEXT("의사");
 }
 
+void UMafiaDoctorRoleComponent::HandleAffectedAbilities()
+{
+}
+
+void UMafiaDoctorRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther)
+{
+}
+
+void UMafiaDoctorRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther)
+{
+}
+
+void UMafiaDoctorRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
+{
+}
+
+void UMafiaDoctorRoleComponent::HandleStartVoteEvent()
+{
+}
+
+void UMafiaDoctorRoleComponent::HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag)
+{
+}
+
+void UMafiaDoctorRoleComponent::HandleReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag)
+{
+}
+
+void UMafiaDoctorRoleComponent::HandleFinishVoteEvent()
+{
+}
+
 void UMafiaDoctorRoleComponent::OnRep_Dead()
-{
-}
-
-void UMafiaDoctorRoleComponent::ClientNotifyResultAbility_Implementation(UMafiaBaseRoleComponent* InOther)
-{
-}
-
-void UMafiaDoctorRoleComponent::ClientAffectedEventsFlush_Implementation()
-{
-}
-
-void UMafiaDoctorRoleComponent::ClientRecieveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther)
 {
 }

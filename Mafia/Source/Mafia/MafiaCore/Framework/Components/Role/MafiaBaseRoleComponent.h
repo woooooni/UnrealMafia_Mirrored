@@ -149,7 +149,7 @@ protected:
 	virtual void ClientResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType);
 
 	UFUNCTION(Client, Reliable)
-	virtual void ClientAffectedEventsFlush();
+	virtual void ClientAbilityEventsFlush();
 
 	UFUNCTION(Client, Reliable)
 	virtual void ClientRecieveInstantEvent(UMafiaBaseRoleComponent* InOther);
@@ -198,6 +198,19 @@ protected:
 	virtual void OnChangedMafiaFlowState(const EMafiaFlowState& InMafiaFlowState);
 
 protected:
+	virtual	void HandleAffectedAbilities();
+	virtual void HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther) { /**/ };
+	virtual void HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther) { /**/ };
+	virtual void HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType) { /**/ };
+	
+	virtual void HandleStartVoteEvent() { /**/ };
+	virtual void HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag) { /**/ };
+	virtual void HandleReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag) { /**/ };
+	virtual void HandleFinishVoteEvent() { /**/ };
+
+
+
+protected:
 	UPROPERTY(Replicated)
 	EMafiaTeam TeamType;
 
@@ -216,15 +229,17 @@ protected:
 	UPROPERTY(Replicated)
 	TArray<FAffectedEvent> CachedAffectedEventsHeap;
 
-
-
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_Dead)
 	uint8 bDead : 1;
+
+	UPROPERTY()
+	float AffectedAbilityTime = 3.f;
 
 	UPROPERTY(Replicated)
 	TWeakObjectPtr<class AMafiaBasePlayerState> OwningPlayerState;
 
 private:
 	FDelegateHandle OnChangedMafiaFlowStateHandle;
+	FTimerHandle AffectedAbilityTimerHandle;
 };

@@ -69,7 +69,14 @@ bool UMafiaChairManManager::AssignAllPlayersAbility()
 							else
 							{
 								UMafiaBaseRoleComponent* NewRoleComponent = Pair.Value.Get()->AssignAbility(ShuffledRoleArray[Num++]);
-								JoinedPlayerRoleComponents.Emplace(AccountId, NewRoleComponent);
+								if (IsValid(NewRoleComponent))
+								{
+									JoinedPlayerRoleComponents.Emplace(AccountId, NewRoleComponent);
+									if (NewRoleComponent->GetRoleType() == EMafiaRole::BusDriver)
+									{
+										BusData.BusDriver = NewRoleComponent;
+									}
+								}
 							}
 						}
 						else
@@ -170,7 +177,10 @@ EMafiaUseAbilityFlag UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerStat
 				return EMafiaUseAbilityFlag::AlreadyUseAbility;
 			}
 			
-			if (UMafiaBaseAbilityPipeline* DestPipeline = JoinedPlayerAbilityPipelines.Find(DestinationAccountId)->Get())
+			UMafiaBaseAbilityPipeline* OriginPipeline = JoinedPlayerAbilityPipelines.Find(OriginAccountId)->Get();
+			UMafiaBaseAbilityPipeline* DestPipeline = JoinedPlayerAbilityPipelines.Find(DestinationAccountId)->Get();
+			
+			if (IsValid(OriginPipeline) && IsValid(DestPipeline))
 			{
 				if (InEventType == EMafiaAbilityEventType::InstantEvent)
 				{
@@ -210,6 +220,11 @@ void UMafiaChairManManager::CheatChangeRole(AMafiaBasePlayerState* InPlayerState
 		{
 			JoinedPlayerRoleComponents.Emplace(AccountId, InNewRoleComponent);
 		}
+
+		if (InNewRoleComponent->GetRoleType() == EMafiaRole::BusDriver)
+		{
+			BusData.BusDriver = InNewRoleComponent;
+		}
 	}
 #endif
 }
@@ -222,7 +237,7 @@ void UMafiaChairManManager::StartAbilityEvent()
 	{
 		if (UMafiaBaseAbilityPipeline* Pipeline = Pair.Value.Get())
 		{
-			Pipeline->ResetForNextRound();
+			Pipeline->StartAbilityEvent();
 		}
 	}
 }
@@ -236,9 +251,13 @@ void UMafiaChairManManager::BusDrive()
 {
 	UMafiaBaseAbilityPipeline* FirstPassenger = BusData.FirstPassenger.Get();
 	UMafiaBaseAbilityPipeline* SecondPassenger = BusData.SecondPassenger.Get();
-	if (IsValid(FirstPassenger) && IsValid(SecondPassenger))
+	if (IsValid(FirstPassenger) && IsValid(SecondPassenger) && BusData.BusDriver.IsValid())
 	{
-		// FirstPassenger->ChangeAbility
+		FirstPassenger->SetChangedPlayer(SecondPassenger->GetOriginPlayerState());
+		SecondPassenger->SetChangedPlayer(FirstPassenger->GetOriginPlayerState());
+
+		FirstPassenger->AddDeferredAbilityEvent(BusData.BusDriver.Get(), EMafiaAbilityEventType::DeferredEvent);
+		SecondPassenger->AddDeferredAbilityEvent(BusData.BusDriver.Get(), EMafiaAbilityEventType::DeferredEvent);
 	}
 }
 
@@ -249,7 +268,7 @@ void UMafiaChairManManager::BroadcastAbilityEvents()
 	{
 		if (UMafiaBaseAbilityPipeline* Pipeline = Pair.Value.Get())
 		{
-			
+			Pipeline->BroadcastDeferredAbilityEvent();
 		}
 	}
 }
@@ -260,7 +279,7 @@ void UMafiaChairManManager::PostBroadcastAbilityEvents()
 	{
 		if (UMafiaBaseAbilityPipeline* Pipeline = Pair.Value.Get())
 		{
-			
+			Pipeline->PostBroadcastAbilityEvents();
 		}
 	}
 }
@@ -271,7 +290,7 @@ void UMafiaChairManManager::EndAbilityEvents()
 	{
 		if (UMafiaBaseAbilityPipeline* Pipeline = Pair.Value.Get())
 		{
-			Pipeline->ResetForNextRound();
+			Pipeline->EndAbilityEvents();
 		}
 	}
 }

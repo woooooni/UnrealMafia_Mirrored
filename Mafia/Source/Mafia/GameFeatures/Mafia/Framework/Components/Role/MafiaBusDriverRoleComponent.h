@@ -22,13 +22,21 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-public:
-	virtual void UseAbility(class AMafiaBasePlayerState* InOther) override;	
-
 protected:
-	virtual void ClientNotifyResultAbility_Implementation(UMafiaBaseRoleComponent* InOther) override;
-	virtual void ClientAffectedEventsFlush_Implementation() override;
-	virtual void ClientRecieveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther) override;
+	virtual	void HandleAffectedAbilities() override;
+	virtual void HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther) override;
+	virtual void HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther) override;
+	virtual void HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType) override;
+
+	virtual void HandleStartVoteEvent() override;
+	virtual void HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag) override;
+	virtual void HandleReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag) override;
+	virtual void HandleFinishVoteEvent() override;
+
+public:
+	virtual void UseAbility(class AMafiaBasePlayerState* InOther) override;
+	
+
 
 protected:
 	virtual void OnRep_Dead() override;

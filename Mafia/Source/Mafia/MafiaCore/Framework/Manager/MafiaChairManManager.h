@@ -47,6 +47,9 @@ public:
 
 	UPROPERTY()
 	TWeakObjectPtr<class UMafiaBaseAbilityPipeline> SecondPassenger;
+
+	UPROPERTY()
+	TWeakObjectPtr<class UMafiaBaseRoleComponent> BusDriver;
 };
 
 

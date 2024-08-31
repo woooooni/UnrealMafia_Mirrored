@@ -23,7 +23,7 @@ bool UMafiaBaseAbilityPipeline::Initialize(const EMafiaColor& InColorEnum, AMafi
 			PipelineColor = InColorEnum;
 
 			OriginPlayer = InPlayerState;
-			AffectedPlayer = InPlayerState;
+			ChangedPlayer = InPlayerState;
 
 			bInitialized = true;
 
@@ -36,7 +36,7 @@ bool UMafiaBaseAbilityPipeline::Initialize(const EMafiaColor& InColorEnum, AMafi
 
 EMafiaUseAbilityFlag UMafiaBaseAbilityPipeline::DispatchInstantEvent(UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType)
 {
-	if (InEventType == EMafiaAbilityEventType::DefferedEvent)
+	if (InEventType == EMafiaAbilityEventType::DeferredEvent)
 	{
 		return EMafiaUseAbilityFlag::ImpossibleUseAbility;
 	}
@@ -76,8 +76,18 @@ EMafiaUseAbilityFlag UMafiaBaseAbilityPipeline::AddDeferredAbilityEvent(UMafiaBa
 	Event.AbilityUser = InOther;
 	Event.bIgnoreChange |= (OtherRole == EMafiaRole::Madam);
 
-	DeferredEventsArray.Add(Event);
+	DeferredEventArray.Add(Event);
 	return EMafiaUseAbilityFlag::Succeed;
+}
+
+void UMafiaBaseAbilityPipeline::StartAbilityEvent()
+{
+	ResetForNextRound();
+}
+
+void UMafiaBaseAbilityPipeline::PreBroadcastAbilityEvents()
+{
+
 }
 
 void UMafiaBaseAbilityPipeline::BroadcastDeferredAbilityEvent()
@@ -87,23 +97,41 @@ void UMafiaBaseAbilityPipeline::BroadcastDeferredAbilityEvent()
 			1. 이번 턴에 영향받을 플레이어에게 이벤트를 BroadCast.
 			2. 나에게 능력을 사용한 Player에게 결과 통지.
 	*/ 
-	if (AffectedPlayer.IsValid())
+	if (OriginPlayer.IsValid() && ChangedPlayer.IsValid())
 	{
-		if (UMafiaBaseRoleComponent* AffectedComponent = AffectedPlayer.Get()->GetRoleComponent())
+		UMafiaBaseRoleComponent* OriginComponent = OriginPlayer.Get()->GetRoleComponent();
+		UMafiaBaseRoleComponent* ChangedComponent = ChangedPlayer.Get()->GetRoleComponent();
+
+		if (IsValid(OriginComponent) && IsValid(ChangedComponent))
 		{
-			for (auto& Other : DeferredEventsArray)
+			for (auto& Event : DeferredEventArray)
 			{
-				if (UMafiaBaseRoleComponent* OtherComponent = Other.AbilityUser.Get())
+				if (UMafiaBaseRoleComponent* AbilityUserComponent = Event.AbilityUser.Get())
 				{
-					AffectedComponent->AffectedAbilityByOther(OtherComponent->GetRoleType(), OtherComponent);
+					if (Event.bIgnoreChange)
+					{
+						OriginComponent->AffectedAbilityByOther(AbilityUserComponent->GetRoleType(), AbilityUserComponent);
+					}
+					else
+					{
+						ChangedComponent->AffectedAbilityByOther(AbilityUserComponent->GetRoleType(), AbilityUserComponent);
+					}
 				}
 			}
 
-			for (auto& Other : DeferredEventsArray)
+
+			for (auto& Event : DeferredEventArray)
 			{
-				if (UMafiaBaseRoleComponent* OtherComponent = Other.AbilityUser.Get())
+				if (UMafiaBaseRoleComponent* AbilityUserComponent = Event.AbilityUser.Get())
 				{
-					AffectedComponent->AffectedAbilityByOther(OtherComponent->GetRoleType(), OtherComponent);
+					if (Event.bIgnoreChange)
+					{
+						AbilityUserComponent->NotifyResultAbility(OriginComponent);
+					}
+					else
+					{
+						AbilityUserComponent->NotifyResultAbility(ChangedComponent);
+					}
 				}
 			}
 		}
@@ -112,20 +140,30 @@ void UMafiaBaseAbilityPipeline::BroadcastDeferredAbilityEvent()
 	
 }
 
-
-
-bool UMafiaBaseAbilityPipeline::SetAffectedPlayer(AMafiaBasePlayerState* InAffectedPlayerState)
+void UMafiaBaseAbilityPipeline::PostBroadcastAbilityEvents()
 {
-	AffectedPlayer = InAffectedPlayerState;
+	
+}
+
+void UMafiaBaseAbilityPipeline::EndAbilityEvents()
+{
+	ResetForNextRound();
+}
+
+
+
+bool UMafiaBaseAbilityPipeline::SetChangedPlayer(AMafiaBasePlayerState* InAffectedPlayerState)
+{
+	ChangedPlayer = InAffectedPlayerState;
 	InAffectedPlayerState->GetRoleComponent();
 
-	return AffectedPlayer.IsValid();
+	return ChangedPlayer.IsValid();
 }
 
 void UMafiaBaseAbilityPipeline::ResetForNextRound()
 {
-	DeferredEventsArray.Empty();
-	AffectedPlayer = OriginPlayer;
+	DeferredEventArray.Empty();
+	ChangedPlayer = OriginPlayer;
 }
 
 
@@ -133,7 +171,9 @@ void UMafiaBaseAbilityPipeline::ResetAll()
 {
 	bInitialized = false;
 
+	DeferredEventArray.Empty();
+
 	OriginPlayer = nullptr;
-	AffectedPlayer = nullptr;
+	ChangedPlayer = nullptr;
 	
 }
