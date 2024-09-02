@@ -5,7 +5,10 @@
 
 UMafiaSoldierRoleComponent::UMafiaSoldierRoleComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-{
+{	
+	TeamType = EMafiaTeam::Citizen;
+	RoleType = EMafiaRole::Soldier;
+	RoleName = TEXT("군인");
 	BulletproofCount = 1;
 }
 

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GameFeatures/Mafia/Framework/UI/InGame/MafiaPlayerNameActionGroupWidget.h"
+#include "GameFeatures/Mafia/Framework/UI/InWorld/MafiaPlayerNameActionGroupWidget.h"
 #include "Framework/System/MafiaGameEvents.h"
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
 

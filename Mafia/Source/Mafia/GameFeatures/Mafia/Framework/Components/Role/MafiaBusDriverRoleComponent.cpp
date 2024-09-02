@@ -8,6 +8,9 @@
 UMafiaBusDriverRoleComponent::UMafiaBusDriverRoleComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	TeamType = EMafiaTeam::Citizen;
+	RoleType = EMafiaRole::BusDriver;
+	RoleName = TEXT("버스기사");
 }
 
 void UMafiaBusDriverRoleComponent::BeginPlay()

@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GameFeatures/Mafia/Framework/Character/MafiaSampleCharacter.h"
-#include "Mafia/Framework/UI/InGame/MafiaPlayerNameActionGroupWidget.h"
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
 #include "Engine/LocalPlayer.h"
 
@@ -15,7 +14,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
 
-#include "GameFeatures/Mafia/Framework/UI/InGame/MafiaPlayerNameActionGroupWidget.h"
+#include "GameFeatures/Mafia/Framework/UI/InWorld/MafiaPlayerNameActionGroupWidget.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"

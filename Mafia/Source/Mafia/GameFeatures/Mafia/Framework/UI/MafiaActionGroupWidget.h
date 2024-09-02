@@ -37,6 +37,7 @@ private:
 private:
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<UTextBlock> TB_MatchState;
+
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<UTextBlock> TB_MafiaFlowState;
 

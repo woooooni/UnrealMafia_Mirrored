@@ -12,6 +12,7 @@
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaDoctorRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaBusDriverRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaGodFatherRoleComponent.h"
+#include "GameFeatures/Mafia/Framework/Components/Role/MafiaSoldierRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Character/MafiaSampleCharacter.h"
 
 #include "Net/UnrealNetwork.h"
@@ -188,6 +189,7 @@ void AMafiaBasePlayerState::CreateRoleComponent(EMafiaRole InRole)
 	case EMafiaRole::Thief:
 		break;
 	case EMafiaRole::Soldier:
+		RoleComponent = NewObject<UMafiaSoldierRoleComponent>(this);
 		break;
 	case EMafiaRole::Doctor:
 		RoleComponent = NewObject<UMafiaDoctorRoleComponent>(this);
