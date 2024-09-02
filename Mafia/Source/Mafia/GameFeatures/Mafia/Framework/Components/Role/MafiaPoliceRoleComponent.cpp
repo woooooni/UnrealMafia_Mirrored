@@ -24,6 +24,10 @@ void UMafiaPoliceRoleComponent::HandleAffectedAbilities()
 
 void UMafiaPoliceRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther)
 {
+	if (IsValid(InOther))
+	{
+		EMafiaRole OtherRole = InOther->GetRoleType();
+	}
 }
 
 void UMafiaPoliceRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther)

@@ -20,6 +20,9 @@ UMafiaChairManManager::UMafiaChairManManager(const FObjectInitializer& ObjectIni
 bool UMafiaChairManManager::StartGame()
 {
 	BusData.Reset();
+	JoinedPlayerAbilityPipelines.Empty();
+	JoinedPlayerAbilityPipelines.Empty();
+
 	return AssignAllPlayersAbility() && MakePlayersAbilityPipeline();
 }
 

@@ -39,7 +39,11 @@ struct FBusData
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE void Reset() { FirstPassenger = nullptr; SecondPassenger = nullptr; }
+	FORCEINLINE void Reset() {
+		FirstPassenger = nullptr; 
+		SecondPassenger = nullptr; 
+		BusDriver = nullptr;
+	}
 
 public:
 	UPROPERTY()
@@ -67,7 +71,6 @@ public:
 
 public:
 	bool StartGame();
-
 	void EndGame();
 
 public:

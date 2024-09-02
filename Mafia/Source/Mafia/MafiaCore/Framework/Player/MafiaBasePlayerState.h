@@ -76,9 +76,6 @@ private:
 	UFUNCTION(Client, Reliable)
 	void ClientNotifyGameResult(EMafiaGameResult InGameResult);
 
-	UFUNCTION(Client, Reliable)
-	void PostInitializeRoleComponent();
-
 private:
 	UFUNCTION()
 	void OnRep_ChangePlayerNickname();

@@ -58,7 +58,8 @@ EMafiaUseAbilityFlag UMafiaBaseAbilityPipeline::DispatchInstantEvent(UMafiaBaseR
 	return EMafiaUseAbilityFlag::ImpossibleUseAbility;
 }
 
-EMafiaUseAbilityFlag UMafiaBaseAbilityPipeline::AddDeferredAbilityEvent(UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType)
+EMafiaUseAbilityFlag UMafiaBaseAbilityPipeline::AddDeferredAbilityEvent(UMafiaBaseRoleComponent* InOther, 
+	EMafiaAbilityEventType InEventType)
 {
 	if (InEventType == EMafiaAbilityEventType::InstantEvent)
 	{
