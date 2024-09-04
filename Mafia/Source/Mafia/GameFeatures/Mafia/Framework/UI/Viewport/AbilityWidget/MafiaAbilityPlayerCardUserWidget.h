@@ -16,7 +16,12 @@ class MAFIA_API UMafiaAbilityPlayerCardUserWidget : public UMafiaBaseUserWidget
 
 private:
 	UMafiaAbilityPlayerCardUserWidget(const FObjectInitializer& ObjectInitializer);
+	
+public:
+	bool InitializePlayer(class AMafiaBasePlayerState* InPlayerState);
 
+public:
+	FORCEINLINE class AMafiaBasePlayerState* GetOwnerPlayer() { return OwnerPlayer.Get(); }
 
 protected:
 	virtual void NativeConstruct() override;
@@ -28,6 +33,10 @@ protected:
 private:
 	UFUNCTION()
 	void OnClickedPlayerAbilityCard();
+
+
+private:
+	TWeakObjectPtr<class AMafiaBasePlayerState> OwnerPlayer;
 
 private:
 	UPROPERTY(meta = (BindWidgetOptional))

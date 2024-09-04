@@ -1,14 +1,23 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GameFeatures/Mafia/Framework/UI/InViewport/MafiaAbilityPlayerCardUserWidget.h"
+#include "GameFeatures/Mafia/Framework/UI/Viewport/AbilityWidget/MafiaAbilityPlayerCardUserWidget.h"
 
 #include "Components/Button.h"
+#include "Mafia/Framework/Player/MafiaPlayerState.h"
+#include "Mafia/MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
 
 UMafiaAbilityPlayerCardUserWidget::UMafiaAbilityPlayerCardUserWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 
+}
+
+bool UMafiaAbilityPlayerCardUserWidget::InitializePlayer(AMafiaBasePlayerState* InPlayerState)
+{
+	OwnerPlayer = InPlayerState;
+
+	return OwnerPlayer.IsValid();
 }
 
 
@@ -32,7 +41,6 @@ void UMafiaAbilityPlayerCardUserWidget::BindDelegates()
 
 	// OnChangedMatchStateHandle = BindGameEvent(OnChangedMatchState, &UMafiaActionGroupWidget::OnChangedMatchState);
 	// OnChangedMafiaFlowStateHandle = BindGameEvent(OnChangedMafiaFlowState, &UMafiaActionGroupWidget::OnChangedMafiaFlowState);
-	
 }
 
 void UMafiaAbilityPlayerCardUserWidget::UnBindDelegates()
@@ -46,5 +54,15 @@ void UMafiaAbilityPlayerCardUserWidget::UnBindDelegates()
 
 void UMafiaAbilityPlayerCardUserWidget::OnClickedPlayerAbilityCard()
 {
-
+	if (AMafiaBasePlayerState* MyPlayerState = GetOwningPlayerState<AMafiaBasePlayerState>())
+	{
+		if (OwnerPlayer.IsValid())
+		{
+			UMafiaBaseRoleComponent* MyPlayerComponent = MyPlayerState->GetRoleComponent();
+			if (IsValid(MyPlayerComponent))
+			{
+				MyPlayerComponent->UseAbility(OwnerPlayer.Get());
+			}
+		}
+	}
 }

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GameFeatures/Mafia/Framework/UI/InViewport/MafiaAbilityActionGroupWidget.h"
+#include "GameFeatures/Mafia/Framework/UI/Viewport/AbilityWidget/MafiaAbilityActionGroupWidget.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameState.h"
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
 #include "MafiaCore/Framework/System/MafiaGameEvents.h"
@@ -17,6 +17,11 @@ UMafiaAbilityActionGroupWidget::UMafiaAbilityActionGroupWidget(const FObjectInit
 	: Super(ObjectInitializer)
 {
 
+}
+
+void UMafiaAbilityActionGroupWidget::NativePreConstruct()
+{
+	Super::NativePreConstruct();
 }
 
 void UMafiaAbilityActionGroupWidget::NativeConstruct()

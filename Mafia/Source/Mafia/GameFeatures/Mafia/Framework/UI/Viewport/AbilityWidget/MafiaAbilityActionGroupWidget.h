@@ -4,9 +4,34 @@
 
 #include "CoreMinimal.h"
 #include "MafiaCore/Framework/UI/Core/MafiaBaseActionGroupWidget.h"
-#include "GameFeatures/Mafia/Framework/UI/InViewport/MafiaAbilityPlayerCardUserWidget.h"
+#include "GameFeatures/Mafia/Framework/UI/Viewport/AbilityWidget/MafiaAbilityPlayerCardUserWidget.h"
 #include "MafiaCore/Framework/Types/MafiaTypes.h"
 #include "MafiaAbilityActionGroupWidget.generated.h"
+
+USTRUCT(BlueprintType)
+struct FCircleWidgetParam
+{
+	GENERATED_BODY();
+
+public:
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	uint8 NumWidgets;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FVector InitialRotationAxis;
+
+	UPROPERTY(BlueprintReadWrite)
+	float Radius;
+
+	UPROPERTY(BlueprintReadWrite)
+	float AngleOfFirstWidget;
+
+	UPROPERTY(BlueprintReadWrite)
+	float BaseWidgetRotation;
+
+	UPROPERTY(BlueprintReadWrite)
+	uint8 bRotateWidgets : 1;
+};
 
 /**
  * 
@@ -19,6 +44,7 @@ class MAFIA_API UMafiaAbilityActionGroupWidget : public UMafiaBaseActionGroupWid
 private:
 	UMafiaAbilityActionGroupWidget(const FObjectInitializer& ObjectInitializer);
 
+	virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 	virtual void BindDelegates() override;
@@ -30,6 +56,10 @@ private:
 private:
 	void OnChangedMafiaFlowState(const EMafiaFlowState& InFlowState);
 	
+public:
+	UPROPERTY(BlueprintReadWrite)
+	FCircleWidgetParam CircleWidgetParam;
+
 private:
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<class UCanvasPanel> CP_RoundPlayerPanel;

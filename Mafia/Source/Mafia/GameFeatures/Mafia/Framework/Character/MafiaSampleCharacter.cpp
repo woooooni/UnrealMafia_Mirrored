@@ -14,7 +14,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
 
-#include "GameFeatures/Mafia/Framework/UI/InWorld/MafiaPlayerNameActionGroupWidget.h"
+#include "GameFeatures/Mafia/Framework/UI/World/MafiaPlayerNameActionGroupWidget.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
