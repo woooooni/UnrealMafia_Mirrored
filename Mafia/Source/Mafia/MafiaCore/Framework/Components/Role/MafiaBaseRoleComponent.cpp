@@ -104,7 +104,7 @@ void UMafiaBaseRoleComponent::ResetForNextRound()
 
 void UMafiaBaseRoleComponent::UseAbility(AMafiaBasePlayerState* InOther)
 {
-	ServerReqUseAbility(InOther, EMafiaAbilityEventType::DeferredEvent);
+	ServerReqUseAbility(InOther, AbilityEventType);
 }
 
 void UMafiaBaseRoleComponent::SendOfferMafiaTeam(AMafiaBasePlayerState* InOther)

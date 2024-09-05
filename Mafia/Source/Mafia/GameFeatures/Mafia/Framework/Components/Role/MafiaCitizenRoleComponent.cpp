@@ -15,6 +15,7 @@ void UMafiaCitizenRoleComponent::BeginPlay()
 
 	TeamType = EMafiaTeam::Citizen;
 	RoleType = EMafiaRole::Citizen;
+	AbilityEventType = EMafiaAbilityEventType::DeferredEvent;
 	RoleName = TEXT("시민");
 }
 

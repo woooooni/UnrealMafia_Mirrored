@@ -178,8 +178,10 @@ enum class EMafiaRole : uint8
 UENUM()
 enum class EMafiaAbilityEventType : uint8 
 {
+	None,
 	InstantEvent,
 	DeferredEvent,
+	BusDriveEvent,
 };
 
 UENUM()

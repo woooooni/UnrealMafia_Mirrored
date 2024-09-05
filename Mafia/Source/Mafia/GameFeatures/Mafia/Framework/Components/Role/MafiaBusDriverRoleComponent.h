@@ -34,8 +34,10 @@ protected:
 	virtual void HandleFinishVoteEvent() override;
 	
 
-
 protected:
 	virtual void OnRep_Dead() override;
+
+	
+
 
 };

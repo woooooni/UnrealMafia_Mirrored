@@ -8,6 +8,7 @@ UMafiaMadamRoleComponent::UMafiaMadamRoleComponent(const FObjectInitializer& Obj
 {
 	TeamType = EMafiaTeam::Citizen;
 	RoleType = EMafiaRole::Madam;
+	AbilityEventType = EMafiaAbilityEventType::DeferredEvent;
 	RoleName = TEXT("마담");
 }
 

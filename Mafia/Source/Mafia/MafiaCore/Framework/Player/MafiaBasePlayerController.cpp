@@ -116,17 +116,8 @@ void AMafiaBasePlayerController::TickDebug(float DeltaSeconds)
 			{
 				if (UMafiaBaseRoleComponent* RoleComponent = Val->GetRoleComponent())
 				{
-					if (PS->GetUniqueId() == Val->GetUniqueId())
-					{
-						const FString DebugString = FString::Printf(TEXT("My Role : %s"), *RoleComponent->GetRoleName().ToString());
-						GEngine->AddOnScreenDebugMessage(PopupKey--, SMALL_NUMBER, FColor::Blue, DebugString);
-					}
-					else
-					{
-						const FString DebugString = FString::Printf(TEXT("Player %d Role : %s"), PlayerNum++, *RoleComponent->GetRoleName().ToString());
-						GEngine->AddOnScreenDebugMessage(PopupKey--, SMALL_NUMBER, FColor::Yellow, DebugString);
-					}
-					
+					const FString DebugString = FString::Printf(TEXT("Player %d Role : %s"), PlayerNum++, *RoleComponent->GetRoleName().ToString());
+					GEngine->AddOnScreenDebugMessage(PopupKey--, SMALL_NUMBER, FColor::Yellow, DebugString);
 				}
 				else
 				{

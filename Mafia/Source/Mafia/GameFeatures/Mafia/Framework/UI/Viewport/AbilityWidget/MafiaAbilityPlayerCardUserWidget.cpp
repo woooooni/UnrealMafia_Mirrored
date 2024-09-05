@@ -3,21 +3,56 @@
 
 #include "GameFeatures/Mafia/Framework/UI/Viewport/AbilityWidget/MafiaAbilityPlayerCardUserWidget.h"
 
-#include "Components/Button.h"
+
 #include "Mafia/Framework/Player/MafiaPlayerState.h"
 #include "Mafia/MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
+
+#include "Runtime/UMG/Public/UMG.h"
+#include "Runtime/UMG/Public/UMGStyle.h"
+#include "Runtime/UMG/Public/Slate/SObjectWidget.h"
+#include "Runtime/UMG/Public/IUMGModule.h"
+#include "Runtime/UMG/Public/Blueprint/UserWidget.h"
+
+#include "Components/TextBlock.h"
+#include "Components/Button.h"
+#include "Components/Image.h"
 
 UMafiaAbilityPlayerCardUserWidget::UMafiaAbilityPlayerCardUserWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-
+	
 }
 
 bool UMafiaAbilityPlayerCardUserWidget::InitializePlayer(AMafiaBasePlayerState* InPlayerState)
 {
-	OwnerPlayer = InPlayerState;
+	if (IsValid(InPlayerState))
+	{
+		OwnerPlayer = InPlayerState;
+		UpdateCard();
+	}
+	
 
 	return OwnerPlayer.IsValid();
+}
+
+void UMafiaAbilityPlayerCardUserWidget::UpdateCard()
+{
+	if (OwnerPlayer.IsValid())
+	{
+		if (UMafiaBaseRoleComponent* RoleComponent = OwnerPlayer.Get()->GetRoleComponent())
+		{
+			EMafiaColor PlayerColor = OwnerPlayer.Get()->GetPlayerColor();
+			int32 Index = int32(PlayerColor);
+
+			if (GPlayerColorKoreanNames.IsValidIndex(Index))
+			{
+				IMG_PlayerColor->SetBrushTintColor(FSlateColor(GPlayerColors[Index]));
+				IMG_AbilityIcon->SetBrushTintColor(FSlateColor(GPlayerColors[Index]));
+				TB_PlayerColor->SetText(FText::FromName(GPlayerColorKoreanNames[Index]));
+			}
+		}
+	}
+	
 }
 
 

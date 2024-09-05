@@ -14,6 +14,7 @@ void UMafiaDoctorRoleComponent::BeginPlay()
 
 	TeamType = EMafiaTeam::Citizen;
 	RoleType = EMafiaRole::Doctor;
+	AbilityEventType = EMafiaAbilityEventType::DeferredEvent;
 	RoleName = TEXT("의사");
 }
 

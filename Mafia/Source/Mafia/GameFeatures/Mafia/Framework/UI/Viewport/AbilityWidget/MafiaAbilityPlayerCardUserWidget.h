@@ -19,7 +19,7 @@ private:
 	
 public:
 	bool InitializePlayer(class AMafiaBasePlayerState* InPlayerState);
-
+	void UpdateCard();
 public:
 	FORCEINLINE class AMafiaBasePlayerState* GetOwnerPlayer() { return OwnerPlayer.Get(); }
 

@@ -14,6 +14,7 @@ void UMafiaGodFatherRoleComponent::BeginPlay()
 
 	TeamType = EMafiaTeam::Mafia;
 	RoleType = EMafiaRole::GodFather;
+	AbilityEventType = EMafiaAbilityEventType::DeferredEvent;
 	RoleName = TEXT("마피아(대부)");
 }
 

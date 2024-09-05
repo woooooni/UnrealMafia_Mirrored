@@ -73,7 +73,7 @@ AMafiaSampleCharacter::AMafiaSampleCharacter(const FObjectInitializer& ObjectIni
 	PlayerNameComponent->SetupAttachment(RootComponent);
 	PlayerNameComponent->SetRelativeLocation(FVector(0.f, 0.f, 125.f));
 
-	static ConstructorHelpers::FClassFinder<UUserWidget> PlayerNameWidgetRef = TEXT("/Game/UI/ActionGruopWidget/InGame/WBP_MafiaPlayerNameActionGroupWidget.WBP_MafiaPlayerNameActionGroupWidget_C");
+	static ConstructorHelpers::FClassFinder<UUserWidget> PlayerNameWidgetRef = TEXT("/Game/UI/ActionGruopWidget/World/WBP_MafiaPlayerNameActionGroupWidget.WBP_MafiaPlayerNameActionGroupWidget_C");
 	if (PlayerNameWidgetRef.Succeeded())
 	{
 		PlayerNameComponent->SetWidgetClass(PlayerNameWidgetRef.Class);

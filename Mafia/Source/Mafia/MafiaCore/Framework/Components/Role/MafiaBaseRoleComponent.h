@@ -220,6 +220,9 @@ protected:
 	UPROPERTY(Replicated)
 	EMafiaRole RoleType;
 
+	UPROPERTY()
+	EMafiaAbilityEventType AbilityEventType;
+
 	UPROPERTY(Replicated)
 	FName RoleName;
 

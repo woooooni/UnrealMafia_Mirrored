@@ -11,6 +11,7 @@ UMafiaBusDriverRoleComponent::UMafiaBusDriverRoleComponent(const FObjectInitiali
 	TeamType = EMafiaTeam::Citizen;
 	RoleType = EMafiaRole::BusDriver;
 	RoleName = TEXT("버스기사");
+	AbilityEventType = EMafiaAbilityEventType::BusDriveEvent;
 }
 
 void UMafiaBusDriverRoleComponent::BeginPlay()
@@ -22,6 +23,8 @@ void UMafiaBusDriverRoleComponent::GetLifetimeReplicatedProps(TArray<FLifetimePr
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
+
+
 
 
 

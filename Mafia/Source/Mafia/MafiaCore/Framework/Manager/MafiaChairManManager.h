@@ -47,10 +47,10 @@ public:
 
 public:
 	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseAbilityPipeline> FirstPassenger;
+	TWeakObjectPtr<class UMafiaBaseAbilityDwelling> FirstPassenger;
 
 	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseAbilityPipeline> SecondPassenger;
+	TWeakObjectPtr<class UMafiaBaseAbilityDwelling> SecondPassenger;
 
 	UPROPERTY()
 	TWeakObjectPtr<class UMafiaBaseRoleComponent> BusDriver;
@@ -79,6 +79,8 @@ public:
 		InOrigin : 능력 사용 Player, InDestination : 능력에 영향을 받은 Player.
 	*/
 	EMafiaUseAbilityFlag AddAbilityEvent(class AMafiaBasePlayerState* InOrigin, class AMafiaBasePlayerState* InDestination, EMafiaAbilityEventType InEventType);
+	EMafiaUseAbilityFlag PickupPassenger(class UMafiaBaseAbilityDwelling* InPassengerDwelling);
+
 
 	/** ktw : InVotor - 투표자, InCandidate - 피투표자 */
 	void AddVoteEvent(class AMafiaBasePlayerState* InVotor, class AMafiaBasePlayerState* InCandidate);
@@ -87,6 +89,7 @@ public:
 
 public:
 	FORCEINLINE const TMap<FName, FPlayerVoteData>& GetPlayerVoteMap() { return CachedVoteEventsMap; }
+	FORCEINLINE const FBusData& GetBusData() { return BusData; }
 
 #pragma region Cheat
 public:
@@ -99,7 +102,7 @@ public:
 
 private:
 	bool AssignAllPlayersAbility();
-	bool MakePlayersAbilityPipeline();
+	bool MakePlayersAbilityDwelling();
 
 private:
 	void StartAbilityEvent();
@@ -127,7 +130,6 @@ private:
 	void ResetForNextRound();
 
 private:
-
 	/** ktw : 능력사용 플레이어를 저장합니다. */
 	UPROPERTY()
 	TSet<FName> CachedAlreadyAbillityPlayerSet;
@@ -143,9 +145,10 @@ private:
 	TMap<FName, FPlayerVoteData> CachedVoteEventsMap;
 
 
+
 private:
 	UPROPERTY()
-	TMap<FName, TObjectPtr<class UMafiaBaseAbilityPipeline>> JoinedPlayerAbilityPipelines;
+	TMap<FName, TObjectPtr<class UMafiaBaseAbilityDwelling>> JoinedPlayerAbilityDwellings;
 
 	UPROPERTY()
 	TMap<FName, TObjectPtr<class UMafiaBaseRoleComponent>> JoinedPlayerRoleComponents;

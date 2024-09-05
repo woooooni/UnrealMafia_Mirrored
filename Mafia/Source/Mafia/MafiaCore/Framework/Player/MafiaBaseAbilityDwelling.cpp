@@ -1,17 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MafiaCore/Framework/Player/MafiaBaseAbilityPipeline.h"
+#include "MafiaCore/Framework/Player/MafiaBaseAbilityDwelling.h"
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
 #include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
 
-UMafiaBaseAbilityPipeline::UMafiaBaseAbilityPipeline(const FObjectInitializer& ObjectInitializer)
+UMafiaBaseAbilityDwelling::UMafiaBaseAbilityDwelling(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }
 
 
-bool UMafiaBaseAbilityPipeline::Initialize(const EMafiaColor& InColorEnum, AMafiaBasePlayerState* InPlayerState)
+bool UMafiaBaseAbilityDwelling::Initialize(const EMafiaColor& InColorEnum, AMafiaBasePlayerState* InPlayerState)
 {
 	ResetAll();
 	if (IsValid(InPlayerState))
@@ -20,7 +20,7 @@ bool UMafiaBaseAbilityPipeline::Initialize(const EMafiaColor& InColorEnum, AMafi
 		{
 			InPlayerState->ChangePlayerColor(InColorEnum);
 
-			PipelineColor = InColorEnum;
+			DwellingColor = InColorEnum;
 
 			OriginPlayer = InPlayerState;
 			ChangedPlayer = InPlayerState;
@@ -34,7 +34,7 @@ bool UMafiaBaseAbilityPipeline::Initialize(const EMafiaColor& InColorEnum, AMafi
 	return false;
 }
 
-EMafiaUseAbilityFlag UMafiaBaseAbilityPipeline::DispatchInstantEvent(UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType)
+EMafiaUseAbilityFlag UMafiaBaseAbilityDwelling::DispatchInstantEvent(UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType)
 {
 	if (InEventType == EMafiaAbilityEventType::DeferredEvent)
 	{
@@ -58,8 +58,7 @@ EMafiaUseAbilityFlag UMafiaBaseAbilityPipeline::DispatchInstantEvent(UMafiaBaseR
 	return EMafiaUseAbilityFlag::ImpossibleUseAbility;
 }
 
-EMafiaUseAbilityFlag UMafiaBaseAbilityPipeline::AddDeferredAbilityEvent(UMafiaBaseRoleComponent* InOther, 
-	EMafiaAbilityEventType InEventType)
+EMafiaUseAbilityFlag UMafiaBaseAbilityDwelling::AddDeferredAbilityEvent(UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType)
 {
 	if (InEventType == EMafiaAbilityEventType::InstantEvent)
 	{
@@ -81,7 +80,7 @@ EMafiaUseAbilityFlag UMafiaBaseAbilityPipeline::AddDeferredAbilityEvent(UMafiaBa
 	return EMafiaUseAbilityFlag::Succeed;
 }
 
-bool UMafiaBaseAbilityPipeline::RemoveDeferredAbilityEvent(const EMafiaRole& InRole, FAbilityEvent& OutRemovedEvent)
+bool UMafiaBaseAbilityDwelling::RemoveDeferredAbilityEvent(const EMafiaRole& InRole, FAbilityEvent& OutRemovedEvent)
 {
 	FAbilityEvent* FindEvent = DeferredEventArray.FindByPredicate([&](const FAbilityEvent& Event)
 		{
@@ -101,17 +100,17 @@ bool UMafiaBaseAbilityPipeline::RemoveDeferredAbilityEvent(const EMafiaRole& InR
 	return false;
 }
 
-void UMafiaBaseAbilityPipeline::StartAbilityEvent()
+void UMafiaBaseAbilityDwelling::StartAbilityEvent()
 {
 	ResetForNextRound();
 }
 
-void UMafiaBaseAbilityPipeline::PreBroadcastAbilityEvents()
+void UMafiaBaseAbilityDwelling::PreBroadcastAbilityEvents()
 {
 
 }
 
-void UMafiaBaseAbilityPipeline::BroadcastDeferredAbilityEvent()
+void UMafiaBaseAbilityDwelling::BroadcastDeferredAbilityEvent()
 {
 	/** 
 		#Todo - ktw
@@ -161,19 +160,19 @@ void UMafiaBaseAbilityPipeline::BroadcastDeferredAbilityEvent()
 	
 }
 
-void UMafiaBaseAbilityPipeline::PostBroadcastAbilityEvents()
+void UMafiaBaseAbilityDwelling::PostBroadcastAbilityEvents()
 {
 	
 }
 
-void UMafiaBaseAbilityPipeline::EndAbilityEvents()
+void UMafiaBaseAbilityDwelling::EndAbilityEvents()
 {
 	ResetForNextRound();
 }
 
 
 
-bool UMafiaBaseAbilityPipeline::SetChangedPlayer(AMafiaBasePlayerState* InAffectedPlayerState)
+bool UMafiaBaseAbilityDwelling::SetChangedPlayer(AMafiaBasePlayerState* InAffectedPlayerState)
 {
 	ChangedPlayer = InAffectedPlayerState;
 	InAffectedPlayerState->GetRoleComponent();
@@ -181,14 +180,14 @@ bool UMafiaBaseAbilityPipeline::SetChangedPlayer(AMafiaBasePlayerState* InAffect
 	return ChangedPlayer.IsValid();
 }
 
-void UMafiaBaseAbilityPipeline::ResetForNextRound()
+void UMafiaBaseAbilityDwelling::ResetForNextRound()
 {
 	DeferredEventArray.Empty();
 	ChangedPlayer = OriginPlayer;
 }
 
 
-void UMafiaBaseAbilityPipeline::ResetAll()
+void UMafiaBaseAbilityDwelling::ResetAll()
 {
 	bInitialized = false;
 

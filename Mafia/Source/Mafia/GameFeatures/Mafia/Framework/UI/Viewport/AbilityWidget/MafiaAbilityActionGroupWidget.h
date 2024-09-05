@@ -14,22 +14,22 @@ struct FCircleWidgetParam
 	GENERATED_BODY();
 
 public:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Circle Param")
 	uint8 NumWidgets;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Circle Param")
 	FVector InitialRotationAxis;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Param")
 	float Radius;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Param")
 	float AngleOfFirstWidget;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Param")
 	float BaseWidgetRotation;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Param")
 	uint8 bRotateWidgets : 1;
 };
 
@@ -52,24 +52,42 @@ private:
 
 private:
 	void CreatePlayerCards();
+	void ArrangeCircleCards();
+	void UpdatePlayerCards();
+	void ResetCards();
 
 private:
 	void OnChangedMafiaFlowState(const EMafiaFlowState& InFlowState);
+	void OnChangedMatchState(const FName& InMatchState);
+
+private:
+	bool IsAbilityRole();
 	
 public:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Param")
 	FCircleWidgetParam CircleWidgetParam;
 
 private:
 	UPROPERTY(meta = (BindWidgetOptional))
-	TObjectPtr<class UCanvasPanel> CP_RoundPlayerPanel;
+	TObjectPtr<class UCanvasPanel> CP_PlayerCardCirclePanel;
 
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<class UImage> IMG_AbilityIcon;
 
 	UPROPERTY(meta = (BindWidgetOptional))
+	TObjectPtr<class UTextBlock> TB_RoleName;
+
+	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<class UTextBlock> TB_AbilityToolTip;
 
 private:
+	TArray<TWeakObjectPtr<class UMafiaAbilityPlayerCardUserWidget>> PlayerCards;
+
+private:
+	TSubclassOf<class UMafiaAbilityPlayerCardUserWidget> CardWidgetClass;
+
+private:
+	FDelegateHandle OnChangedMatchStateHandle;
 	FDelegateHandle OnChangedMafiaFlowStateHandle;
+	
 };

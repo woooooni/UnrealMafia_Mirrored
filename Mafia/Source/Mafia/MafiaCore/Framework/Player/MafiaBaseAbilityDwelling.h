@@ -6,7 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "MafiaCore/Framework/Types/MafiaTypes.h"
 #include "Framework/Components/Role/MafiaBaseRoleComponent.h"
-#include "MafiaBaseAbilityPipeline.generated.h"
+#include "MafiaBaseAbilityDwelling.generated.h"
 
 
 enum class EDeferredEventKey
@@ -44,12 +44,12 @@ public:
  * 
  */
 UCLASS()
-class MAFIA_API UMafiaBaseAbilityPipeline : public UObject
+class MAFIA_API UMafiaBaseAbilityDwelling : public UObject
 {	
 	GENERATED_BODY()
 
 protected:
-	UMafiaBaseAbilityPipeline(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UMafiaBaseAbilityDwelling(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 public:
@@ -98,7 +98,7 @@ private:
 	TWeakObjectPtr<class AMafiaBasePlayerState> ChangedPlayer;
 
 	UPROPERTY()
-	EMafiaColor PipelineColor;
+	EMafiaColor DwellingColor;
 
 	UPROPERTY()
 	uint8 bInitialized : 1 = false;
