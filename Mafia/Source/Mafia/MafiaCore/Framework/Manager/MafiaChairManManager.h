@@ -85,6 +85,7 @@ public:
 	/** ktw : InVotor - 투표자, InCandidate - 피투표자 */
 	void AddVoteEvent(class AMafiaBasePlayerState* InVotor, class AMafiaBasePlayerState* InCandidate);
 
+	EMafiaVoteResultFlag NotifyDeadMan();
 	EMafiaGameResult CheckGameResult() const;
 
 public:
@@ -116,7 +117,6 @@ private:
 private:
 	void StartVote();
 	class UMafiaBaseRoleComponent* FindDeadMan();
-	EMafiaVoteResultFlag NotifyDeadMan();
 	void EndVote();
 
 private:

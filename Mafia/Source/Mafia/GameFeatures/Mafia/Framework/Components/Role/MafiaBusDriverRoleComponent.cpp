@@ -24,8 +24,9 @@ void UMafiaBusDriverRoleComponent::GetLifetimeReplicatedProps(TArray<FLifetimePr
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
-
-
+void UMafiaBusDriverRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
+{
+}
 
 
 void UMafiaBusDriverRoleComponent::HandleAffectedAbilities()
@@ -41,9 +42,6 @@ void UMafiaBusDriverRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleCompo
 {
 }
 
-void UMafiaBusDriverRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
-{
-}
 
 void UMafiaBusDriverRoleComponent::HandleStartVoteEvent()
 {
@@ -63,6 +61,7 @@ void UMafiaBusDriverRoleComponent::HandleFinishVoteEvent()
 
 void UMafiaBusDriverRoleComponent::OnRep_Dead()
 {
+	
 }
 
 

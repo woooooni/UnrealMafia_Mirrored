@@ -16,4 +16,6 @@ DECLARE_LOG_CATEGORY_EXTERN(LogMafiaGameInstance, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogMafiaWidget, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogMafiaCheat, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogMafiaChairMan, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogMafiaAssetManager, Log, All);
+
 // LOG_CATEGORY End

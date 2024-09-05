@@ -290,8 +290,33 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 	}		 
 	else if (CurrentFlowState == EMafiaFlowState::EndVote)
 	{
-		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::BeforeNight, 1.f);
-		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
+		EMafiaVoteResultFlag VoteResultFlag = ChairMan->NotifyDeadMan();
+		if (VoteResultFlag == EMafiaVoteResultFlag::SomeoneDying)
+		{
+			MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::BeginPunishment, 10.f);
+			MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 10.f);
+		}
+		else
+		{
+			MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::BeforeNight, 1.f);
+			MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
+		}
+	}
+	else if (CurrentFlowState == EMafiaFlowState::BeginPunishment)
+	{
+
+	}
+	else if (CurrentFlowState == EMafiaFlowState::Punishment)
+	{
+
+	}
+	else if (CurrentFlowState == EMafiaFlowState::AfterPunishment)
+	{
+
+	}
+	else if (CurrentFlowState == EMafiaFlowState::EndPunishment)
+	{
+
 	}
 	else if (CurrentFlowState == EMafiaFlowState::BeforeNight)
 	{		 

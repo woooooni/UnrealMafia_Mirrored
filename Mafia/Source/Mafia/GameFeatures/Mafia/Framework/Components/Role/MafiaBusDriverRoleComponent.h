@@ -23,10 +23,11 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
+	virtual void HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType) override;
 	virtual	void HandleAffectedAbilities() override;
 	virtual void HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther) override;
 	virtual void HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther) override;
-	virtual void HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType) override;
+	
 
 	virtual void HandleStartVoteEvent() override;
 	virtual void HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag) override;

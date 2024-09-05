@@ -118,7 +118,12 @@ enum class EMafiaFlowState : uint8
 	BeforeVote,		// 투표 이전
 	Vote,			// 투표.
 	AfterVote,		// 투표 이후
-	EndVote,		// 투표 -> 저녁 이전.
+	EndVote,		// 투표 -> 처형 이전 or 저녁 이전.
+
+	BeginPunishment,	// 처형 이전.
+	Punishment,			// 처형 중
+	AfterPunishment,	// 처형 이후
+	EndPunishment,			// 처형 -> 저녁 이전
 
 	BeforeNight,	// 저녁 시작 전
 	Night,			// 저녁
