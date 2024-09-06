@@ -77,11 +77,10 @@ bool UMafiaChairManManager::AssignAllPlayersAbility()
 									if (NewRoleComponent->GetRoleType() == EMafiaRole::BusDriver)
 									{
 										BusDriver = Cast<UMafiaBusDriverRoleComponent>(NewRoleComponent);
-										return BusDriver.IsValid();
-									}
-									else
-									{
-										return true;
+										if (BusDriver.IsValid() == false)
+										{
+											return false;
+										}
 									}
 								}
 							}
@@ -201,7 +200,7 @@ EMafiaUseAbilityFlag UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerStat
 					}
 					else
 					{
-						return DestDwelling->DispatchInstantEvent(InOrigin->GetRoleComponent(), InEventType);
+						return DestDwelling->DispatchInstantEvent(InOrigin, InEventType);
 					}
 				}
 				else if(InEventType == EMafiaAbilityEventType::DeferredEvent)
@@ -213,7 +212,7 @@ EMafiaUseAbilityFlag UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerStat
 							FAbilityEvent OutEvent;
 							if (true == Dwelling.Value->RemoveDeferredAbilityEvent(InOrigin, OutEvent))
 							{
-								return DestDwelling->AddDeferredAbilityEvent(InOrigin->GetRoleComponent(), InEventType);
+								return DestDwelling->AddDeferredAbilityEvent(InOrigin, InEventType);
 							}
 						}
 						return EMafiaUseAbilityFlag::Failed;
@@ -221,7 +220,7 @@ EMafiaUseAbilityFlag UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerStat
 					else
 					{
 						CachedAlreadyDeferredAbillityPlayerSet.Emplace(OriginAccountId);
-						return DestDwelling->AddDeferredAbilityEvent(InOrigin->GetRoleComponent(), InEventType);
+						return DestDwelling->AddDeferredAbilityEvent(InOrigin, InEventType);
 					}
 				}
 				else if (InEventType == EMafiaAbilityEventType::BusDriveEvent)
@@ -338,7 +337,7 @@ void UMafiaChairManManager::BroadcastAbilityEvents()
 	{
 		if (UMafiaBaseAbilityDwelling* Dwelling = Pair.Value.Get())
 		{
-			Dwelling->BroadcastDeferredAbilityEvent();
+			Dwelling->BroadcastDeferredAbilityEvents();
 		}
 	}
 }
@@ -380,36 +379,25 @@ void UMafiaChairManManager::StartVote()
 
 
 
-void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaBasePlayerState* InCandidate)
+EMafiaVoteFlag UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaBasePlayerState* InCandidate)
 {
+	
 	if (IsValid(InVotor))
 	{
-		/** ktw : 1. AccountId & RoleComponent 유효성 체크. */
-		UMafiaBaseRoleComponent* VotorRoleComponent = InVotor->GetRoleComponent();
-		if (IsValid(VotorRoleComponent) == false)
-		{
-			MAFIA_ULOG(LogMafiaChairMan, Warning, TEXT("RoleComponent is Invalid."));
-			return;
-		}
-
+		/** ktw : 1. AccountId 유효성 체크. */
 		const FString& VotorAccountIdStr = InVotor->GetUniqueId().ToString();
-
 		if (VotorAccountIdStr.IsEmpty())
 		{
 			MAFIA_ULOG(LogMafiaChairMan, Warning, TEXT("AccountIdStr is empty"));
-			return;
+			return EMafiaVoteFlag::Failed;
 		}
-
-		
 
 		/** ktw : 2. 중복 투표 체크. */
 		const FName VotorAccountId = FName(*VotorAccountIdStr);
 		if (CachedAlreadyVoterSet.Find(VotorAccountId))
 		{
-			VotorRoleComponent->ResponseVoteEvent(InCandidate, EMafiaVoteFlag::AlreadyVoted);
-			return;
+			return EMafiaVoteFlag::AlreadyVoted;
 		}
-
 
 		/** ktw : 3. 투표가 가능한 상태인지 체크. */
 		if (IsPossibleVote())
@@ -421,35 +409,27 @@ void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaB
 				if (CandidateAccountIdStr.IsEmpty())
 				{
 					MAFIA_ULOG(LogMafiaChairMan, Warning, TEXT("AccountIdStr is empty"));
-					return;
+					return EMafiaVoteFlag::AlreadyVoted;
 				}
 				const FName CandidateAccountId = FName(*CandidateAccountIdStr);
 
-				
-				UMafiaBaseRoleComponent* CandidateRoleComponent = InCandidate->GetRoleComponent();
-				if (IsValid(CandidateRoleComponent))
+				FPlayerVoteData* Pair = CachedVoteEventsMap.Find(CandidateAccountId);
+				if (Pair)
 				{
-					FPlayerVoteData* Pair = CachedVoteEventsMap.Find(CandidateAccountId);
-					if (Pair)
-					{
-						Pair->VotedCount++;
-						CachedAlreadyVoterSet.Emplace(VotorAccountId);
-					}
-					else
-					{
-						FPlayerVoteData VoteData;
-						VoteData.Candidate = CandidateRoleComponent;
-						VoteData.VotedCount = 1;
-
-						CachedAlreadyVoterSet.Emplace(VotorAccountId);
-						CachedVoteEventsMap.Emplace(CandidateAccountId, VoteData);
-					}
+					Pair->VotedCount++;
+					CachedAlreadyVoterSet.Emplace(VotorAccountId);
 				}
 				else
 				{
-					VotorRoleComponent->ResponseVoteEvent(InCandidate, EMafiaVoteFlag::ImpossibleVote);
-					return;
+					FPlayerVoteData VoteData;
+					VoteData.Candidate = InCandidate;
+					VoteData.VotedCount = 1;
+
+					CachedAlreadyVoterSet.Emplace(VotorAccountId);
+					CachedVoteEventsMap.Emplace(CandidateAccountId, VoteData);
 				}
+
+				return EMafiaVoteFlag::Succeed;
 			}
 			else
 			{
@@ -469,19 +449,20 @@ void UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaB
 					CachedAlreadyVoterSet.Emplace(VotorAccountId);
 					CachedVoteEventsMap.Emplace(TEXT("NullVote"), VoteData);
 				}
-			}
 
-			VotorRoleComponent->ResponseVoteEvent(InCandidate, EMafiaVoteFlag::Succeed);
+				return EMafiaVoteFlag::Succeed;
+			}
 		}
 		else
 		{
-			VotorRoleComponent->ResponseVoteEvent(InCandidate, EMafiaVoteFlag::ImpossibleVote);
-			return;
+			return EMafiaVoteFlag::ImpossibleVote;
 		}
 	}
+
+	return EMafiaVoteFlag::Failed;
 }
 
-UMafiaBaseRoleComponent* UMafiaChairManManager::FindDeadMan()
+AMafiaBasePlayerState* UMafiaChairManManager::FindDeadMan()
 {
 	/** ktw : 투표로 처형할 사람을 찾습니다. */
 	TArray<FPlayerVoteData> VoteArray;
@@ -550,12 +531,16 @@ UMafiaBaseRoleComponent* UMafiaChairManManager::FindDeadMan()
 	return nullptr;
 }
 
-EMafiaVoteResultFlag UMafiaChairManManager::NotifyDeadMan()
+void UMafiaChairManManager::NotifyDeadMan(AMafiaBasePlayerState* DeadMan)
 {
-	UMafiaBaseRoleComponent* DeathRow = FindDeadMan();
-	EMafiaVoteResultFlag Flag = IsValid(DeathRow) ? EMafiaVoteResultFlag::SomeoneDying : EMafiaVoteResultFlag::NoDeathPlayer;
-
-	return Flag;
+	EMafiaVoteResultFlag Flag = IsValid(DeadMan) ? EMafiaVoteResultFlag::SomeoneDying : EMafiaVoteResultFlag::NoDeathPlayer;
+	for (auto& Pair : JoinedPlayerRoleComponents)
+	{
+		if (IsValid(Pair.Value))
+		{
+			Pair.Value.Get()->ReceiveVoteResult(DeadMan, Flag);
+		}
+	}
 }
 
 void UMafiaChairManManager::EndVote()

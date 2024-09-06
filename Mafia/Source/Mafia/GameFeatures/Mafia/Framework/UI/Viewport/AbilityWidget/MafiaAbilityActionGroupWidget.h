@@ -62,7 +62,7 @@ private:
 private:
 	void OnChangedMafiaFlowState(const EMafiaFlowState& InFlowState);
 	void OnChangedMatchState(const FName& InMatchState);
-	void OnResponseUseAbility(const class UMafiaBaseRoleComponent* InOther, const EMafiaUseAbilityFlag InFlag, const EMafiaAbilityEventType InEventType);
+	void OnResponseUseAbility(const class AMafiaBasePlayerState* InOther, const EMafiaUseAbilityFlag InFlag, const EMafiaAbilityEventType InEventType);
 	void OnClickedCard();
 
 private:

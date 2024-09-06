@@ -20,42 +20,6 @@ void UMafiaPoliceRoleComponent::BeginPlay()
 }
 
 
-void UMafiaPoliceRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
-{
-	Super::HandleResponseUseAbility(InOther, InFlag, InEventType);
-}
-
-void UMafiaPoliceRoleComponent::HandleAffectedAbilities()
-{
-}
-
-void UMafiaPoliceRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther)
-{
-	if (IsValid(InOther))
-	{
-		EMafiaRole OtherRole = InOther->GetRoleType();
-	}
-}
-
-void UMafiaPoliceRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther)
-{
-}
-
-void UMafiaPoliceRoleComponent::HandleStartVoteEvent()
-{
-}
-
-void UMafiaPoliceRoleComponent::HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag)
-{
-}
-
-void UMafiaPoliceRoleComponent::HandleReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag)
-{
-}
-
-void UMafiaPoliceRoleComponent::HandleFinishVoteEvent()
-{
-}
 
 void UMafiaPoliceRoleComponent::OnRep_Dead()
 {

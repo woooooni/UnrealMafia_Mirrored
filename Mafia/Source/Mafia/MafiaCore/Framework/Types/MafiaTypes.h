@@ -223,6 +223,7 @@ enum class EMafiaVoteFlag : uint8
 	ImpossibleVote,
 	AlreadyVoted,
 	Succeed,
+	Failed,
 };
 
 UENUM()

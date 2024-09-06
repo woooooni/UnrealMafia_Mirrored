@@ -17,38 +17,7 @@ void UMafiaMadamRoleComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UMafiaMadamRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
-{
-	Super::HandleResponseUseAbility(InOther, InFlag, InEventType);
-}
 
-void UMafiaMadamRoleComponent::HandleAffectedAbilities()
-{
-}
-
-void UMafiaMadamRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther)
-{
-}
-
-void UMafiaMadamRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther)
-{
-}
-
-void UMafiaMadamRoleComponent::HandleStartVoteEvent()
-{
-}
-
-void UMafiaMadamRoleComponent::HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag)
-{
-}
-
-void UMafiaMadamRoleComponent::HandleReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag)
-{
-}
-
-void UMafiaMadamRoleComponent::HandleFinishVoteEvent()
-{
-}
 
 void UMafiaMadamRoleComponent::OnRep_Dead()
 {

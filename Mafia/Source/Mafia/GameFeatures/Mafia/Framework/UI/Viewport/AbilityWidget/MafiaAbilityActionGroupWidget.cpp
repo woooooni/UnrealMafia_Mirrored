@@ -211,7 +211,7 @@ void UMafiaAbilityActionGroupWidget::OnChangedMatchState(const FName& InMatchSta
 	}
 }
 
-void UMafiaAbilityActionGroupWidget::OnResponseUseAbility(const UMafiaBaseRoleComponent* InOther, const EMafiaUseAbilityFlag InFlag, const EMafiaAbilityEventType InEventType)
+void UMafiaAbilityActionGroupWidget::OnResponseUseAbility(const AMafiaBasePlayerState* InOther, const EMafiaUseAbilityFlag InFlag, const EMafiaAbilityEventType InEventType)
 {
 	if (InFlag == EMafiaUseAbilityFlag::ImpossibleUseAbility)
 	{

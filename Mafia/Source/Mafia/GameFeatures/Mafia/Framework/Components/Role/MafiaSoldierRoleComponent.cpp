@@ -17,38 +17,6 @@ void UMafiaSoldierRoleComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UMafiaSoldierRoleComponent::HandleAffectedAbilities()
-{
-}
-
-void UMafiaSoldierRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
-{
-	Super::HandleResponseUseAbility(InOther, InFlag, InEventType);
-}
-
-void UMafiaSoldierRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther)
-{
-}
-
-void UMafiaSoldierRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther)
-{
-}
-
-void UMafiaSoldierRoleComponent::HandleStartVoteEvent()
-{
-}
-
-void UMafiaSoldierRoleComponent::HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag)
-{
-}
-
-void UMafiaSoldierRoleComponent::HandleReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag)
-{
-}
-
-void UMafiaSoldierRoleComponent::HandleFinishVoteEvent()
-{
-}
 
 void UMafiaSoldierRoleComponent::OnRep_Dead()
 {

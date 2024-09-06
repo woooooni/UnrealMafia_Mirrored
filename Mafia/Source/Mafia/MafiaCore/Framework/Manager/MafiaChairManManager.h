@@ -17,10 +17,10 @@ struct FPlayerVoteData
 
 public:
 	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseRoleComponent> Votor;
+	TWeakObjectPtr<class AMafiaBasePlayerState> Votor;
 
 	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseRoleComponent> Candidate;
+	TWeakObjectPtr<class AMafiaBasePlayerState> Candidate;
 
 	UPROPERTY()
 	uint8 VotedCount = 0;
@@ -61,8 +61,10 @@ public:
 
 
 	/** ktw : InVotor - 투표자, InCandidate - 피투표자 */
-	void AddVoteEvent(class AMafiaBasePlayerState* InVotor, class AMafiaBasePlayerState* InCandidate);
-	EMafiaVoteResultFlag NotifyDeadMan();
+	EMafiaVoteFlag AddVoteEvent(class AMafiaBasePlayerState* InVotor, class AMafiaBasePlayerState* InCandidate);
+
+	class AMafiaBasePlayerState* FindDeadMan();
+	void NotifyDeadMan(class AMafiaBasePlayerState* InDeadMan);
 
 	EMafiaGameResult CheckGameResult() const;
 
@@ -93,7 +95,6 @@ private:
 
 private:
 	void StartVote();
-	class UMafiaBaseRoleComponent* FindDeadMan();
 	void EndVote();
 
 private:
@@ -130,8 +131,8 @@ private:
 
 	UPROPERTY()
 	TMap<FName, TObjectPtr<class UMafiaBaseRoleComponent>> JoinedPlayerRoleComponents;
-	
 
+	
 private:
 	TWeakObjectPtr<class UMafiaBusDriverRoleComponent> BusDriver;
 };

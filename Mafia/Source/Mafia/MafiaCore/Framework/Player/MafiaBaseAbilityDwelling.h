@@ -23,7 +23,7 @@ struct FAbilityEvent
 
 public:
 	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseRoleComponent> AbilityUser;
+	TWeakObjectPtr<class AMafiaBasePlayerState> AbilityUser;
 
 	UPROPERTY()
 	uint8 bIgnoreChange : 1 = false;
@@ -57,18 +57,19 @@ public:
 	bool Initialize(const EMafiaColor& InColorEnum, class AMafiaBasePlayerState* InPlayerState);
 
 public:
-	EMafiaUseAbilityFlag DispatchInstantEvent(class UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType);
-	EMafiaUseAbilityFlag AddDeferredAbilityEvent(class UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType);
+	EMafiaUseAbilityFlag DispatchInstantEvent(class AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType);
+	EMafiaUseAbilityFlag AddDeferredAbilityEvent(class AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType);
 	bool RemoveDeferredAbilityEvent(class AMafiaBasePlayerState* InPlayerState, FAbilityEvent& OutRemovedEvent);
 	
 
 public:
 	void StartAbilityEvent();
 	void PreBroadcastAbilityEvents();
-	void BroadcastDeferredAbilityEvent();
-	bool SendBroadCastEvent(class AMafiaBasePlayerState* InSender, const EMafiaBroadCastEvent& InEvent);
+	void BroadcastDeferredAbilityEvents();
 	void PostBroadcastAbilityEvents();
 	void EndAbilityEvents();
+
+	bool SendBroadCastEvent(class AMafiaBasePlayerState* InSender, const EMafiaBroadCastEvent& InEvent);
 
 public:
 	bool SetChangedPlayer(class AMafiaBasePlayerState* InChangePlayerState);

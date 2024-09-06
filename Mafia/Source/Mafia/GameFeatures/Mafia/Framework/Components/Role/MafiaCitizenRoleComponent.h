@@ -20,16 +20,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-protected:
-	virtual	void HandleAffectedAbilities() override;
-	virtual void HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther);
-	virtual void HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther);
-	virtual void HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType);
 
-	virtual void HandleStartVoteEvent() override;
-	virtual void HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag) override;
-	virtual void HandleReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag) override;
-	virtual void HandleFinishVoteEvent() override;
+protected:
+
 
 protected:
 	virtual void OnRep_Dead() override;

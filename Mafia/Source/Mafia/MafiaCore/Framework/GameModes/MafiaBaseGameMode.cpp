@@ -290,33 +290,38 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 	}		 
 	else if (CurrentFlowState == EMafiaFlowState::EndVote)
 	{
-		EMafiaVoteResultFlag VoteResultFlag = ChairMan->NotifyDeadMan();
-		if (VoteResultFlag == EMafiaVoteResultFlag::SomeoneDying)
+		AMafiaBasePlayerState* DeadMan = ChairMan->FindDeadMan();
+		if (IsValid(DeadMan))
 		{
 			MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::BeginPunishment, 10.f);
 			MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 10.f);
 		}
 		else
 		{
-			MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::BeforeNight, 1.f);
-			MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
+			MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::BeforeNight, 10.f);
+			MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 10.f);
 		}
+		ChairMan->NotifyDeadMan(DeadMan);
 	}
 	else if (CurrentFlowState == EMafiaFlowState::BeginPunishment)
 	{
-
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::Punishment, 10.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 10.f);
 	}
 	else if (CurrentFlowState == EMafiaFlowState::Punishment)
 	{
-
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::AfterPunishment, 1.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
 	}
 	else if (CurrentFlowState == EMafiaFlowState::AfterPunishment)
 	{
-
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::EndPunishment, 1.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
 	}
 	else if (CurrentFlowState == EMafiaFlowState::EndPunishment)
 	{
-
+		MafiaBaseGameState->SetMafiaFlowState(EMafiaFlowState::BeforeNight, 1.f);
+		MyWorld->GetTimerManager().SetTimer(MainGameFlowTimerHandle, this, &AMafiaBaseGameMode::HandleInProgressMafia, 1.f);
 	}
 	else if (CurrentFlowState == EMafiaFlowState::BeforeNight)
 	{		 

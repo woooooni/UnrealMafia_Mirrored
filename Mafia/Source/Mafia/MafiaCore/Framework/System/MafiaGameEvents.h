@@ -34,7 +34,7 @@ public:
 	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnChangedPlayerName, const AMafiaBaseCharacter* InCharacter, const FName& InPlayerNewName);
 	FOnChangedPlayerName OnChangedPlayerName;
 
-	DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnResponseUseAbility, const UMafiaBaseRoleComponent* InOther, const EMafiaUseAbilityFlag InFlag, const EMafiaAbilityEventType InEventType);
+	DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnResponseUseAbility, const AMafiaBasePlayerState* InOther, const EMafiaUseAbilityFlag InFlag, const EMafiaAbilityEventType InEventType);
 	FOnResponseUseAbility OnResponseUseAbility;
 
 	DECLARE_MULTICAST_DELEGATE(FOnClickedPlayerCard)

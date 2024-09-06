@@ -26,7 +26,7 @@ void UMafiaBusDriverRoleComponent::BeginPlay()
 void UMafiaBusDriverRoleComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	// DOREPLIFETIME(UMafiaBusDriverRoleComponent, BusData);
+	DOREPLIFETIME(UMafiaBusDriverRoleComponent, BusData);
 	
 }
 
@@ -41,83 +41,50 @@ void UMafiaBusDriverRoleComponent::BusDrive(UMafiaChairManManager* InContext)
 			FirstPassenger->SetChangedPlayer(SecondPassenger->GetOriginPlayerState());
 			SecondPassenger->SetChangedPlayer(FirstPassenger->GetOriginPlayerState());
 
-			FirstPassenger->AddDeferredAbilityEvent(BusData.BusDriver.Get(), EMafiaAbilityEventType::DeferredEvent);
-			SecondPassenger->AddDeferredAbilityEvent(BusData.BusDriver.Get(), EMafiaAbilityEventType::DeferredEvent);
+			FirstPassenger->AddDeferredAbilityEvent(BusData.BusDriver.Get()->GetOwningPlayerState(), EMafiaAbilityEventType::DeferredEvent);
+			SecondPassenger->AddDeferredAbilityEvent(BusData.BusDriver.Get()->GetOwningPlayerState(), EMafiaAbilityEventType::DeferredEvent);
 		}
 	}
 }
 
 EMafiaUseAbilityFlag UMafiaBusDriverRoleComponent::PickupPassenger(UMafiaBaseAbilityDwelling* InPassengerDwelling)
 {
-
-	if (BusData.FirstPassenger.IsValid() && BusData.SecondPassenger.IsValid())
+	if (GetOwnerRole() == ROLE_Authority)
 	{
-		/** ktw : 이미 탔던 승객. */
-		if (BusData.FirstPassenger == InPassengerDwelling)
+		if (BusData.FirstPassenger.IsValid() && BusData.SecondPassenger.IsValid())
 		{
-			BusData.SecondPassenger = InPassengerDwelling;
-			return EMafiaUseAbilityFlag::Succeed;
+			/** ktw : 이미 탔던 승객. */
+			if (BusData.FirstPassenger == InPassengerDwelling)
+			{
+				BusData.SecondPassenger = InPassengerDwelling;
+				return EMafiaUseAbilityFlag::Succeed;
+			}
+			else
+			{
+				BusData.FirstPassenger = InPassengerDwelling;
+				return EMafiaUseAbilityFlag::Succeed;
+			}
 		}
 		else
 		{
-			BusData.FirstPassenger = InPassengerDwelling;
-			return EMafiaUseAbilityFlag::Succeed;
+			/** ktw : 승객이 한 명만 있을 경우나, 아예 없을 경우. */
+			if (BusData.FirstPassenger.IsValid())
+			{
+				BusData.SecondPassenger = InPassengerDwelling;
+				return EMafiaUseAbilityFlag::Succeed;
+			}
+			else
+			{
+				BusData.FirstPassenger = InPassengerDwelling;
+				return EMafiaUseAbilityFlag::Succeed;
+			}
 		}
 	}
-	else
-	{
-		/** ktw : 승객이 한 명만 있을 경우나, 아예 없을 경우. */
-		if (BusData.FirstPassenger.IsValid())
-		{
-			BusData.SecondPassenger = InPassengerDwelling;
-			return EMafiaUseAbilityFlag::Succeed;
-		}
-		else
-		{
-			BusData.FirstPassenger = InPassengerDwelling;
-			return EMafiaUseAbilityFlag::Succeed;
-		}
-	}
+	
 
 	return EMafiaUseAbilityFlag::Failed;
 }
 
-void UMafiaBusDriverRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
-{
-	Super::HandleResponseUseAbility(InOther, InFlag, InEventType);
-}
-
-
-void UMafiaBusDriverRoleComponent::HandleAffectedAbilities()
-{
-	Super::HandleAffectedAbilities();
-}
-
-void UMafiaBusDriverRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther)
-{
-
-}
-
-void UMafiaBusDriverRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther)
-{
-}
-
-
-void UMafiaBusDriverRoleComponent::HandleStartVoteEvent()
-{
-}
-
-void UMafiaBusDriverRoleComponent::HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag)
-{
-}
-
-void UMafiaBusDriverRoleComponent::HandleReceiveVoteResult(UMafiaBaseRoleComponent* InDeathRow, EMafiaVoteResultFlag InFlag)
-{
-}
-
-void UMafiaBusDriverRoleComponent::HandleFinishVoteEvent()
-{
-}
 
 void UMafiaBusDriverRoleComponent::OnRep_Dead()
 {
@@ -126,6 +93,7 @@ void UMafiaBusDriverRoleComponent::OnRep_Dead()
 
 void UMafiaBusDriverRoleComponent::OnRep_BusData()
 {
+
 }
 
 

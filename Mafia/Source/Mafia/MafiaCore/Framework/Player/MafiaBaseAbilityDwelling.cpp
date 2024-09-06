@@ -32,7 +32,7 @@ bool UMafiaBaseAbilityDwelling::Initialize(const EMafiaColor& InColorEnum, AMafi
 	return false;
 }
 
-EMafiaUseAbilityFlag UMafiaBaseAbilityDwelling::DispatchInstantEvent(UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType)
+EMafiaUseAbilityFlag UMafiaBaseAbilityDwelling::DispatchInstantEvent(AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType)
 {
 	if (InEventType == EMafiaAbilityEventType::DeferredEvent)
 	{
@@ -49,14 +49,14 @@ EMafiaUseAbilityFlag UMafiaBaseAbilityDwelling::DispatchInstantEvent(UMafiaBaseR
 	{
 		if (UMafiaBaseRoleComponent* OriginPlayerRoleComponent = OriginPlayer.Get()->GetRoleComponent())
 		{
-			OriginPlayerRoleComponent->RecieveInstantEvent(InOther);
+			OriginPlayerRoleComponent->ReceiveInstantEvent(InOther);
 			return EMafiaUseAbilityFlag::Succeed;
 		}
 	}
 	return EMafiaUseAbilityFlag::Failed;
 }
 
-EMafiaUseAbilityFlag UMafiaBaseAbilityDwelling::AddDeferredAbilityEvent(UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType)
+EMafiaUseAbilityFlag UMafiaBaseAbilityDwelling::AddDeferredAbilityEvent(AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType)
 {
 	if (InEventType == EMafiaAbilityEventType::InstantEvent)
 	{
@@ -68,14 +68,21 @@ EMafiaUseAbilityFlag UMafiaBaseAbilityDwelling::AddDeferredAbilityEvent(UMafiaBa
 		return EMafiaUseAbilityFlag::Failed;
 	}
 
-	EMafiaRole OtherRole = InOther->GetRoleType();
+	if (UMafiaBaseRoleComponent* OtherRoleComponent = InOther->GetRoleComponent())
+	{
+		EMafiaRole OtherRole = OtherRoleComponent->GetRoleType();
 
-	FAbilityEvent Event;
-	Event.AbilityUser = InOther;
-	Event.bIgnoreChange = (OtherRole == EMafiaRole::Madam);
+		FAbilityEvent Event;
+		Event.AbilityUser = InOther;
+		Event.bIgnoreChange = (OtherRole == EMafiaRole::Madam);
 
-	DeferredEventArray.Add(Event);
-	return EMafiaUseAbilityFlag::Succeed;
+		DeferredEventArray.Add(Event);
+		return EMafiaUseAbilityFlag::Succeed;
+	}
+
+	return EMafiaUseAbilityFlag::Failed;
+
+	
 }
 
 bool UMafiaBaseAbilityDwelling::RemoveDeferredAbilityEvent(AMafiaBasePlayerState* InPlayerState, FAbilityEvent& OutRemovedEvent)
@@ -86,17 +93,34 @@ bool UMafiaBaseAbilityDwelling::RemoveDeferredAbilityEvent(AMafiaBasePlayerState
 		{
 			EMafiaRole PlayerRole = RoleComponent->GetRoleType();
 			FAbilityEvent* FindEvent = DeferredEventArray.FindByPredicate([&](const FAbilityEvent& Event)
+			{
+				if (Event.AbilityUser.IsValid())
 				{
-					return ((Event.AbilityUser.Get()->GetRoleType()) == PlayerRole);
-				});
+					if (UMafiaBaseRoleComponent* RoleComponent = Event.AbilityUser.Get()->GetRoleComponent())
+					{
+						return ((RoleComponent->GetRoleType()) == PlayerRole);
+					}
+				}
+				return false;
+					
+			});
 
 			if (FindEvent)
 			{
 				OutRemovedEvent = *FindEvent;
+
 				DeferredEventArray.RemoveAll([&](const FAbilityEvent& Event)
+				{
+					if (Event.AbilityUser.IsValid())
 					{
-						return ((Event.AbilityUser.Get()->GetRoleType()) == PlayerRole);
-					});
+						if (UMafiaBaseRoleComponent* RoleComponent = Event.AbilityUser.Get()->GetRoleComponent())
+						{
+							return ((RoleComponent->GetRoleType()) == PlayerRole);
+						}
+					}
+					return false;
+				});
+
 				return true;
 			}
 		}
@@ -116,7 +140,7 @@ void UMafiaBaseAbilityDwelling::PreBroadcastAbilityEvents()
 	
 }
 
-void UMafiaBaseAbilityDwelling::BroadcastDeferredAbilityEvent()
+void UMafiaBaseAbilityDwelling::BroadcastDeferredAbilityEvents()
 {
 	/** 
 		#Todo - ktw
@@ -132,15 +156,18 @@ void UMafiaBaseAbilityDwelling::BroadcastDeferredAbilityEvent()
 		{
 			for (auto& Event : DeferredEventArray)
 			{
-				if (UMafiaBaseRoleComponent* AbilityUserComponent = Event.AbilityUser.Get())
+				if (AMafiaBasePlayerState* AbilityUser = Event.AbilityUser.Get())
 				{
-					if (Event.bIgnoreChange)
+					if (UMafiaBaseRoleComponent* AbilityUserComponent = AbilityUser->GetRoleComponent())
 					{
-						OriginComponent->AffectedAbilityByOther(AbilityUserComponent->GetRoleType(), AbilityUserComponent);
-					}
-					else
-					{
-						ChangedComponent->AffectedAbilityByOther(AbilityUserComponent->GetRoleType(), AbilityUserComponent);
+						if (Event.bIgnoreChange)
+						{
+							OriginComponent->AffectedAbilityByOther(AbilityUserComponent->GetRoleType(), AbilityUser);
+						}
+						else
+						{
+							ChangedComponent->AffectedAbilityByOther(AbilityUserComponent->GetRoleType(), AbilityUser);
+						}
 					}
 				}
 			}
@@ -148,15 +175,18 @@ void UMafiaBaseAbilityDwelling::BroadcastDeferredAbilityEvent()
 
 			for (auto& Event : DeferredEventArray)
 			{
-				if (UMafiaBaseRoleComponent* AbilityUserComponent = Event.AbilityUser.Get())
+				if (AMafiaBasePlayerState* AbilityUser = Event.AbilityUser.Get())
 				{
-					if (Event.bIgnoreChange)
+					if (UMafiaBaseRoleComponent* AbilityUserComponent = AbilityUser->GetRoleComponent())
 					{
-						AbilityUserComponent->NotifyResultAbility(OriginComponent);
-					}
-					else
-					{
-						AbilityUserComponent->NotifyResultAbility(ChangedComponent);
+						if (Event.bIgnoreChange)
+						{
+							AbilityUserComponent->NotifyResultAbility(OriginPlayer.Get());
+						}
+						else
+						{
+							AbilityUserComponent->NotifyResultAbility(ChangedPlayer.Get());
+						}
 					}
 				}
 			}
