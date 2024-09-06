@@ -8,6 +8,20 @@
 #include "MafiaBaseRoleComponent.generated.h"
 
 USTRUCT()
+struct FBroadCastEvent
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	TWeakObjectPtr<class UMafiaBaseRoleComponent> EventSender;
+
+	UPROPERTY()
+	EMafiaBroadCastEvent EventType;
+};
+
+
+USTRUCT()
 struct FAffectedEvent
 {
 	GENERATED_BODY()
@@ -76,6 +90,12 @@ public:
 	virtual void UseAbility(class AMafiaBasePlayerState* InOther);
 
 	UFUNCTION()
+	void SendBroadCastEvent(const EMafiaBroadCastEvent& InEvent);
+
+	UFUNCTION()
+	void ReceiveBroadCastEvent(AMafiaBasePlayerState* InSender, const EMafiaBroadCastEvent& InEvent);
+
+	UFUNCTION()
 	virtual void SendOfferMafiaTeam(class AMafiaBasePlayerState* InOther);
 
 	UFUNCTION()
@@ -96,7 +116,7 @@ public:
 		ktw : 서버에서 호출해야 합니다.
 	*/
 	UFUNCTION()
-	void RecieveInstantEvent(UMafiaBaseRoleComponent* InOther);
+	void ReceiveInstantEvent(UMafiaBaseRoleComponent* InOther);
 
 
 	/**
@@ -141,21 +161,27 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerReqSetAffectedEvents(const TArray<FAffectedEvent>& InEvents);
 
+	UFUNCTION(Server, Reliable)
+	void ServerReqSendBroadCastEvent(const EMafiaBroadCastEvent InEvent);
+
 protected:
 	UFUNCTION(Client, Reliable)
 	void ClientAffectedAbilityByOther(EMafiaRole InRole, UMafiaBaseRoleComponent* InOther);
 
 	UFUNCTION(Client, Reliable)
-	virtual void ClientNotifyResultAbility(UMafiaBaseRoleComponent* InOther);
+	void ClientNotifyResultAbility(UMafiaBaseRoleComponent* InOther);
 
 	UFUNCTION(Client, Reliable)
-	virtual void ClientResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType);
+	void ClientResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType);
 
 	UFUNCTION(Client, Reliable)
-	virtual void ClientAbilityEventsFlush();
+	void ClientAbilityEventsFlush();
 
 	UFUNCTION(Client, Reliable)
-	virtual void ClientRecieveInstantEvent(UMafiaBaseRoleComponent* InOther);
+	void ClientReceiveInstantEvent(UMafiaBaseRoleComponent* InOther);
+
+	UFUNCTION(Client, Reliable)
+	void ClientReceiveBroadCastEvent(AMafiaBasePlayerState* InSender, const EMafiaBroadCastEvent InEvent);
 #pragma endregion Role Ability RPC
 
 #pragma region Vote(투표) RPC
@@ -195,16 +221,17 @@ private:
 
 protected:
 	UFUNCTION()
-	virtual void OnRep_Dead() PURE_VIRTUAL(UMafiaBaseGameInstance::OnRep_Dead, );
-
-	UFUNCTION()
 	virtual void OnChangedMafiaFlowState(const EMafiaFlowState& InMafiaFlowState);
 
+	UFUNCTION()
+	virtual void OnRep_Dead() PURE_VIRTUAL(UMafiaBaseGameInstance::OnRep_Dead, );
+
 protected:
+	virtual void HandleReciveReciveBroadCastEvent(AMafiaBasePlayerState* InSender, const EMafiaBroadCastEvent& InEvent);
 	virtual	void HandleAffectedAbilities();
 	virtual void HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther) { /**/ };
-	virtual void HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther) { /**/ };
-	virtual void HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType) { /**/ };
+	virtual void HandleReceiveInstantEvent(UMafiaBaseRoleComponent* InOther) { /**/ };
+	virtual void HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType);
 	
 	virtual void HandleStartVoteEvent() { /**/ };
 	virtual void HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag) { /**/ };
@@ -231,19 +258,21 @@ protected:
 	UPROPERTY()
 	TSet<uint32> VisiblePlayerSet;
 
-	/** ktw : 이번 턴에 내가 처리할 이벤트 목록. */
+	/** ktw : 이번 턴에 내가 처리할 능력 이벤트 목록. */
 	UPROPERTY()
 	TArray<FAffectedEvent> CachedAffectedEventsHeap;
+
+	/** ktw : 이번 턴에 내가 처리할 전체 이벤트 목록. */
+	UPROPERTY()
+	TArray<FBroadCastEvent> CachedBroadCastEventArray;
 
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_Dead)
 	uint8 bDead : 1;
 
-	UPROPERTY()
-	float AffectedAbilityTime = 3.f;
-
 	UPROPERTY(Replicated)
 	TWeakObjectPtr<class AMafiaBasePlayerState> OwningPlayerState;
+
 
 private:
 	FDelegateHandle OnChangedMafiaFlowStateHandle;

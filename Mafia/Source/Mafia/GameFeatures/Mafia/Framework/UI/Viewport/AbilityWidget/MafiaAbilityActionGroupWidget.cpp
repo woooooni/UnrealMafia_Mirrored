@@ -47,7 +47,8 @@ void UMafiaAbilityActionGroupWidget::BindDelegates()
 	Super::BindDelegates();
 	OnChangedMafiaFlowStateHandle = BindGameEvent(OnChangedMafiaFlowState, &UMafiaAbilityActionGroupWidget::OnChangedMafiaFlowState);
 	OnChangedMatchStateHandle = BindGameEvent(OnChangedMatchState, &UMafiaAbilityActionGroupWidget::OnChangedMatchState);
-	
+	OnResponseAbilityHandle = BindGameEvent(OnResponseUseAbility, &UMafiaAbilityActionGroupWidget::OnResponseUseAbility);
+	OnClickedPlayerCard = BindGameEvent(OnClickedPlayerCard, &UMafiaAbilityActionGroupWidget::OnClickedCard);
 }
 
 void UMafiaAbilityActionGroupWidget::UnBindDelegates()
@@ -179,9 +180,26 @@ void UMafiaAbilityActionGroupWidget::ResetCards()
 	PlayerCards.Empty();
 }
 
+void UMafiaAbilityActionGroupWidget::ResetForNextRound()
+{
+	for (auto Weak : PlayerCards)
+	{
+		if (Weak.IsValid())
+		{
+			if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Weak.Get())
+			{
+				CardWidget->ResetForNextRound();
+			}
+		}
+	}
+}
+
 void UMafiaAbilityActionGroupWidget::OnChangedMafiaFlowState(const EMafiaFlowState& InFlowState)
 {
-	
+	if (InFlowState != EMafiaFlowState::Night)
+	{
+		ResetForNextRound();
+	}
 }
 
 void UMafiaAbilityActionGroupWidget::OnChangedMatchState(const FName& InMatchState)
@@ -190,6 +208,28 @@ void UMafiaAbilityActionGroupWidget::OnChangedMatchState(const FName& InMatchSta
 	{
 		ResetCards();
 		CreatePlayerCards();
+	}
+}
+
+void UMafiaAbilityActionGroupWidget::OnResponseUseAbility(const UMafiaBaseRoleComponent* InOther, const EMafiaUseAbilityFlag InFlag, const EMafiaAbilityEventType InEventType)
+{
+	if (InFlag == EMafiaUseAbilityFlag::ImpossibleUseAbility)
+	{
+		ResetForNextRound();
+	}
+}
+
+void UMafiaAbilityActionGroupWidget::OnClickedCard()
+{
+	for (auto Weak : PlayerCards)
+	{
+		if (Weak.IsValid())
+		{
+			if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Weak.Get())
+			{
+				CardWidget->ResetForNextRound();
+			}
+		}
 	}
 }
 

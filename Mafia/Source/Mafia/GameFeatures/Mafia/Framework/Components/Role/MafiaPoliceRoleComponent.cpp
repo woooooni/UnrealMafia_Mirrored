@@ -19,6 +19,12 @@ void UMafiaPoliceRoleComponent::BeginPlay()
 	RoleName = TEXT("경찰");
 }
 
+
+void UMafiaPoliceRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
+{
+	Super::HandleResponseUseAbility(InOther, InFlag, InEventType);
+}
+
 void UMafiaPoliceRoleComponent::HandleAffectedAbilities()
 {
 }
@@ -32,10 +38,6 @@ void UMafiaPoliceRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponen
 }
 
 void UMafiaPoliceRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther)
-{
-}
-
-void UMafiaPoliceRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
 {
 }
 

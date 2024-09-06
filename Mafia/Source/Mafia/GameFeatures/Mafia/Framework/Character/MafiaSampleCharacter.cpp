@@ -104,11 +104,11 @@ void AMafiaSampleCharacter::BeginPlay()
 		}
 	}
 
-	// SetPlayerColor
-	if (AMafiaBasePlayerState* PS = GetPlayerState<AMafiaBasePlayerState>())
-	{
-		PS->ChangePlayerColor(PS->GetPlayerColor());
-	}
+	//// SetPlayerColor
+	//if (AMafiaBasePlayerState* PS = GetPlayerState<AMafiaBasePlayerState>())
+	//{
+	//	PS->ChangePlayerColor(PS->GetPlayerColor());
+	//}
 }
 
 void AMafiaSampleCharacter::Tick(float DeltaTime)

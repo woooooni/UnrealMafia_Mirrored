@@ -17,6 +17,11 @@ void UMafiaMadamRoleComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
+void UMafiaMadamRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
+{
+	Super::HandleResponseUseAbility(InOther, InFlag, InEventType);
+}
+
 void UMafiaMadamRoleComponent::HandleAffectedAbilities()
 {
 }
@@ -26,10 +31,6 @@ void UMafiaMadamRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent
 }
 
 void UMafiaMadamRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther)
-{
-}
-
-void UMafiaMadamRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
 {
 }
 

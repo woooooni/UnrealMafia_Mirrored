@@ -5,6 +5,7 @@
 #include "MafiaCore/Framework/System/MafiaLogChannels.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameMode.h"
 #include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
+#include "GameFeatures/Mafia/Framework/Components/Role/MafiaBusDriverRoleComponent.h"
 #include "MafiaCore/Framework/Player/MafiaBaseAbilityDwelling.h"
 #include "Framework/GameModes/MafiaBaseGameState.h"
 #include "GameFeatures/Mafia/Framework/Player/MafiaPlayerState.h"
@@ -19,16 +20,14 @@ UMafiaChairManManager::UMafiaChairManManager(const FObjectInitializer& ObjectIni
 
 bool UMafiaChairManManager::StartGame()
 {
-	BusData.Reset();
 	JoinedPlayerAbilityDwellings.Empty();
 	JoinedPlayerAbilityDwellings.Empty();
 
-	return AssignAllPlayersAbility() && MakePlayersAbilityDwelling();
+	return AssignAllPlayersAbility() && InitializePlayersAbilityDwelling();
 }
 
 void UMafiaChairManManager::EndGame()
 {
-	BusData.Reset();
 	JoinedPlayerRoleComponents.Empty();
 	JoinedPlayerAbilityDwellings.Empty();
 }
@@ -77,7 +76,12 @@ bool UMafiaChairManManager::AssignAllPlayersAbility()
 									JoinedPlayerRoleComponents.Emplace(AccountId, NewRoleComponent);
 									if (NewRoleComponent->GetRoleType() == EMafiaRole::BusDriver)
 									{
-										BusData.BusDriver = NewRoleComponent;
+										BusDriver = Cast<UMafiaBusDriverRoleComponent>(NewRoleComponent);
+										return BusDriver.IsValid();
+									}
+									else
+									{
+										return true;
 									}
 								}
 							}
@@ -101,7 +105,7 @@ bool UMafiaChairManManager::AssignAllPlayersAbility()
 	return false;
 }
 
-bool UMafiaChairManManager::MakePlayersAbilityDwelling()
+bool UMafiaChairManManager::InitializePlayersAbilityDwelling()
 {
 	UWorld* World = GetWorld();
 	JoinedPlayerAbilityDwellings.Empty();
@@ -180,24 +184,45 @@ EMafiaUseAbilityFlag UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerStat
 			const FName OriginAccountId = FName(*OriginAccountIdStr);
 			const FName DestinationAccountId = FName(*DestinationAccountIdStr);
 
-			if (CachedAlreadyAbillityPlayerSet.Find(OriginAccountId))
-			{
-				return EMafiaUseAbilityFlag::AlreadyUseAbility;
-			}
+			
 			
 			UMafiaBaseAbilityDwelling* OriginDwelling = JoinedPlayerAbilityDwellings.Find(OriginAccountId)->Get();
 			UMafiaBaseAbilityDwelling* DestDwelling = JoinedPlayerAbilityDwellings.Find(DestinationAccountId)->Get();
 			
 			if (IsValid(OriginDwelling) && IsValid(DestDwelling))
 			{
+
+
 				if (InEventType == EMafiaAbilityEventType::InstantEvent)
 				{
-					return DestDwelling->DispatchInstantEvent(InOrigin->GetRoleComponent(), InEventType);
+					if (CachedAlreadyInstantAbillityPlayerSet.Find(OriginAccountId))
+					{
+						return EMafiaUseAbilityFlag::AlreadyUseAbility;
+					}
+					else
+					{
+						return DestDwelling->DispatchInstantEvent(InOrigin->GetRoleComponent(), InEventType);
+					}
 				}
 				else if(InEventType == EMafiaAbilityEventType::DeferredEvent)
 				{
-					CachedAlreadyAbillityPlayerSet.Emplace(OriginAccountId);
-					return DestDwelling->AddDeferredAbilityEvent(InOrigin->GetRoleComponent(), InEventType);
+					if (CachedAlreadyDeferredAbillityPlayerSet.Find(OriginAccountId))
+					{
+						for (auto& Dwelling : JoinedPlayerAbilityDwellings)
+						{
+							FAbilityEvent OutEvent;
+							if (true == Dwelling.Value->RemoveDeferredAbilityEvent(InOrigin, OutEvent))
+							{
+								return DestDwelling->AddDeferredAbilityEvent(InOrigin->GetRoleComponent(), InEventType);
+							}
+						}
+						return EMafiaUseAbilityFlag::Failed;
+					}
+					else
+					{
+						CachedAlreadyDeferredAbillityPlayerSet.Emplace(OriginAccountId);
+						return DestDwelling->AddDeferredAbilityEvent(InOrigin->GetRoleComponent(), InEventType);
+					}
 				}
 				else if (InEventType == EMafiaAbilityEventType::BusDriveEvent)
 				{
@@ -210,35 +235,35 @@ EMafiaUseAbilityFlag UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerStat
 	return EMafiaUseAbilityFlag::ImpossibleUseAbility;
 }
 
+
+EMafiaBroadCastEventFlag UMafiaChairManManager::BroadCastEvent(AMafiaBasePlayerState* InSender, EMafiaBroadCastEvent InEvent)
+{
+	for (auto& Pair : JoinedPlayerAbilityDwellings)
+	{
+		if (UMafiaBaseAbilityDwelling* Dwelling = Pair.Value.Get())
+		{
+			if (Dwelling->SendBroadCastEvent(InSender, InEvent) == false)
+			{
+				return EMafiaBroadCastEventFlag::Failed;
+			}
+		}
+		else
+		{
+			return EMafiaBroadCastEventFlag::Failed;
+		}
+	}
+	return EMafiaBroadCastEventFlag::Succeed;
+}
+
 EMafiaUseAbilityFlag UMafiaChairManManager::PickupPassenger(UMafiaBaseAbilityDwelling* InPassengerDwelling)
 {
-	if (BusData.FirstPassenger.IsValid() && BusData.SecondPassenger.IsValid())
+	if (BusDriver.IsValid())
 	{
-		/** ktw : 승객이 다 있을 경우. */
-		if (BusData.FirstPassenger == InPassengerDwelling)
-		{
-			BusData.SecondPassenger = InPassengerDwelling;
-		}
-		else
-		{
-			BusData.FirstPassenger = InPassengerDwelling;
-		}
+		UMafiaBusDriverRoleComponent* BusDriverComponent = BusDriver.Get();
+		return BusDriverComponent->PickupPassenger(InPassengerDwelling);
 	}
-	else
-	{
-		/** ktw : 승객이 한 명만 있을 경우나, 아예 없을 경우. */
-		if (BusData.FirstPassenger.IsValid())
-		{
-			BusData.SecondPassenger = InPassengerDwelling;
-			return EMafiaUseAbilityFlag::Succeed;
-		}
-		else
-		{
-			BusData.FirstPassenger = InPassengerDwelling;
-			return EMafiaUseAbilityFlag::Succeed;
-		}
-	}
-	return EMafiaUseAbilityFlag::ImpossibleUseAbility;
+	
+	return EMafiaUseAbilityFlag::Failed;
 }
 
 #pragma region Cheat
@@ -266,7 +291,7 @@ void UMafiaChairManManager::CheatChangeRole(AMafiaBasePlayerState* InPlayerState
 
 		if (InNewRoleComponent->GetRoleType() == EMafiaRole::BusDriver)
 		{
-			BusData.BusDriver = InNewRoleComponent;
+			BusDriver = Cast<UMafiaBusDriverRoleComponent>(InNewRoleComponent);
 		}
 	}
 #endif
@@ -288,20 +313,22 @@ void UMafiaChairManManager::StartAbilityEvent()
 void UMafiaChairManManager::PreBroadcastAbilityEvents()
 {
 	BusDrive();
+	for (auto& Pair : JoinedPlayerAbilityDwellings)
+	{
+		if (UMafiaBaseAbilityDwelling* Dwelling = Pair.Value.Get())
+		{
+			Dwelling->PreBroadcastAbilityEvents();
+		}
+	}
 }
 
 void UMafiaChairManManager::BusDrive()
 {
-	UMafiaBaseAbilityDwelling* FirstPassenger = BusData.FirstPassenger.Get();
-	UMafiaBaseAbilityDwelling* SecondPassenger = BusData.SecondPassenger.Get();
-	if (IsValid(FirstPassenger) && IsValid(SecondPassenger) && BusData.BusDriver.IsValid())
+	if(BusDriver.IsValid())
 	{
-		FirstPassenger->SetChangedPlayer(SecondPassenger->GetOriginPlayerState());
-		SecondPassenger->SetChangedPlayer(FirstPassenger->GetOriginPlayerState());
-
-		FirstPassenger->AddDeferredAbilityEvent(BusData.BusDriver.Get(), EMafiaAbilityEventType::DeferredEvent);
-		SecondPassenger->AddDeferredAbilityEvent(BusData.BusDriver.Get(), EMafiaAbilityEventType::DeferredEvent);
+		BusDriver.Get()->BusDrive(this);
 	}
+
 }
 
 void UMafiaChairManManager::BroadcastAbilityEvents()
@@ -340,7 +367,8 @@ void UMafiaChairManManager::EndAbilityEvents()
 
 void UMafiaChairManManager::StartVote()
 {
-	CachedAlreadyAbillityPlayerSet.Empty();
+	CachedAlreadyInstantAbillityPlayerSet.Empty();
+	CachedAlreadyDeferredAbillityPlayerSet.Empty();
 	CachedVoteEventsMap.Empty();
 	CachedAlreadyVoterSet.Empty();
 
@@ -537,7 +565,8 @@ void UMafiaChairManManager::EndVote()
 		Pair.Value->FinishVoteEvent();
 	}	
 
-	CachedAlreadyAbillityPlayerSet.Empty();
+	CachedAlreadyInstantAbillityPlayerSet.Empty();
+	CachedAlreadyDeferredAbillityPlayerSet.Empty();
 	CachedVoteEventsMap.Empty();
 	CachedAlreadyVoterSet.Empty();
 }
@@ -696,9 +725,9 @@ void UMafiaChairManManager::NotifyGameResult(EMafiaGameResult InGameResult) cons
 
 void UMafiaChairManManager::ResetForNextRound()
 {
-	BusData.Reset();
 	CachedAlreadyVoterSet.Empty();
-	CachedAlreadyAbillityPlayerSet.Empty();
+	CachedAlreadyInstantAbillityPlayerSet.Empty();
+	CachedAlreadyDeferredAbillityPlayerSet.Empty();
 	CachedVoteEventsMap.Empty();
 }
 

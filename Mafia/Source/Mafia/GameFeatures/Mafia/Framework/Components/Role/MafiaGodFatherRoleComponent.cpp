@@ -22,15 +22,16 @@ void UMafiaGodFatherRoleComponent::HandleAffectedAbilities()
 {
 }
 
+void UMafiaGodFatherRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
+{
+	Super::HandleResponseUseAbility(InOther, InFlag, InEventType);
+}
+
 void UMafiaGodFatherRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther)
 {
 }
 
 void UMafiaGodFatherRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther)
-{
-}
-
-void UMafiaGodFatherRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
 {
 }
 

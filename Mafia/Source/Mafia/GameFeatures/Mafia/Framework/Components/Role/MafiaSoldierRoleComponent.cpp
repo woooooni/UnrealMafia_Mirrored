@@ -21,15 +21,16 @@ void UMafiaSoldierRoleComponent::HandleAffectedAbilities()
 {
 }
 
+void UMafiaSoldierRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
+{
+	Super::HandleResponseUseAbility(InOther, InFlag, InEventType);
+}
+
 void UMafiaSoldierRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther)
 {
 }
 
 void UMafiaSoldierRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleComponent* InOther)
-{
-}
-
-void UMafiaSoldierRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
 {
 }
 

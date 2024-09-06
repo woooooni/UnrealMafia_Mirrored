@@ -59,13 +59,14 @@ public:
 public:
 	EMafiaUseAbilityFlag DispatchInstantEvent(class UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType);
 	EMafiaUseAbilityFlag AddDeferredAbilityEvent(class UMafiaBaseRoleComponent* InOther, EMafiaAbilityEventType InEventType);
-	bool RemoveDeferredAbilityEvent(const EMafiaRole& InRole, FAbilityEvent& OutRemovedEvent);
+	bool RemoveDeferredAbilityEvent(class AMafiaBasePlayerState* InPlayerState, FAbilityEvent& OutRemovedEvent);
 	
 
 public:
 	void StartAbilityEvent();
 	void PreBroadcastAbilityEvents();
 	void BroadcastDeferredAbilityEvent();
+	bool SendBroadCastEvent(class AMafiaBasePlayerState* InSender, const EMafiaBroadCastEvent& InEvent);
 	void PostBroadcastAbilityEvents();
 	void EndAbilityEvents();
 
@@ -96,9 +97,6 @@ private:
 	/** ktw : 이번 턴에 영향 받는 플레이어 */
 	UPROPERTY()
 	TWeakObjectPtr<class AMafiaBasePlayerState> ChangedPlayer;
-
-	UPROPERTY()
-	EMafiaColor DwellingColor;
 
 	UPROPERTY()
 	uint8 bInitialized : 1 = false;

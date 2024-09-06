@@ -20,15 +20,18 @@ private:
 public:
 	bool InitializePlayer(class AMafiaBasePlayerState* InPlayerState);
 	void UpdateCard();
+	void ResetForNextRound();
+
 public:
 	FORCEINLINE class AMafiaBasePlayerState* GetOwnerPlayer() { return OwnerPlayer.Get(); }
+	bool IsOwnerPlayer(class AMafiaBasePlayerState* InPlayerState);
+
 
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 	virtual void BindDelegates() override;
 	virtual void UnBindDelegates() override;
-
 
 private:
 	UFUNCTION()
@@ -50,6 +53,4 @@ private:
 
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<class UTextBlock> TB_PlayerColor;
-
-	
 };

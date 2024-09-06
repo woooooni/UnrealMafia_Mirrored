@@ -100,11 +100,22 @@ void UMafiaBaseRoleComponent::UnBindDelegates()
 void UMafiaBaseRoleComponent::ResetForNextRound()
 {
 	CachedAffectedEventsHeap.Empty();
+	CachedBroadCastEventArray.Empty();
 }
 
 void UMafiaBaseRoleComponent::UseAbility(AMafiaBasePlayerState* InOther)
 {
 	ServerReqUseAbility(InOther, AbilityEventType);
+}
+
+void UMafiaBaseRoleComponent::SendBroadCastEvent(const EMafiaBroadCastEvent& InEvent)
+{
+	ServerReqSendBroadCastEvent(InEvent);
+}
+
+void UMafiaBaseRoleComponent::ReceiveBroadCastEvent(AMafiaBasePlayerState* InSender, const EMafiaBroadCastEvent& InEvent)
+{
+	ClientReceiveBroadCastEvent(InSender, InEvent);
 }
 
 void UMafiaBaseRoleComponent::SendOfferMafiaTeam(AMafiaBasePlayerState* InOther)
@@ -151,11 +162,11 @@ void UMafiaBaseRoleComponent::Vote(AMafiaBasePlayerState* InOther)
 
 
 
-void UMafiaBaseRoleComponent::RecieveInstantEvent(UMafiaBaseRoleComponent* InOther)
+void UMafiaBaseRoleComponent::ReceiveInstantEvent(UMafiaBaseRoleComponent* InOther)
 {
 	if (ENetRole::ROLE_Authority == GetOwnerRole())
 	{
-		ClientRecieveInstantEvent(InOther);
+		ClientReceiveInstantEvent(InOther);
 	}
 	else
 	{
@@ -221,6 +232,19 @@ void UMafiaBaseRoleComponent::FinishVoteEvent()
 
 
 #pragma region RPC Ability
+
+void UMafiaBaseRoleComponent::ServerReqSendBroadCastEvent_Implementation(const EMafiaBroadCastEvent InEvent)
+{
+	/** ktw : 서버에서 실행됩니다. */
+	if (UMafiaChairManManager* ChairManManager = GetChairMan())
+	{
+		if (OwningPlayerState.IsValid())
+		{
+			EMafiaBroadCastEventFlag Flag = ChairManManager->BroadCastEvent(OwningPlayerState.Get(), InEvent);
+		}
+	}
+}
+
 void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType)
 {
 	/** ktw : 서버에서 실행됩니다. */
@@ -237,6 +261,7 @@ void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaBasePlaye
 
 void UMafiaBaseRoleComponent::ServerReqSendOfferMafiaTeam_Implementation(AMafiaBasePlayerState* InOther)
 {
+	/** ktw : 서버에서 실행됩니다. */
 	if (RoleType == EMafiaRole::GodFather)
 	{
 		if (UMafiaChairManManager* ChairManManager = GetChairMan())
@@ -282,9 +307,14 @@ void UMafiaBaseRoleComponent::ClientAbilityEventsFlush_Implementation()
 	HandleAffectedAbilities();
 }
 
-void UMafiaBaseRoleComponent::ClientRecieveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther)
+void UMafiaBaseRoleComponent::ClientReceiveInstantEvent_Implementation(UMafiaBaseRoleComponent* InOther)
 {
-	HandleRecieveInstantEvent(InOther);
+	HandleReceiveInstantEvent(InOther);
+}
+
+void UMafiaBaseRoleComponent::ClientReceiveBroadCastEvent_Implementation(AMafiaBasePlayerState* InSender, const EMafiaBroadCastEvent InEvent)
+{
+	HandleReciveReciveBroadCastEvent(InSender, InEvent);
 }
 
 
@@ -377,53 +407,13 @@ void UMafiaBaseRoleComponent::OnChangedMafiaFlowState(const EMafiaFlowState& InM
 	{
 		ResetForNextRound();
 	}
-	else if(InMafiaFlowState == EMafiaFlowState::BeforeDay)
+	else if(InMafiaFlowState == EMafiaFlowState::EndVote)
 	{
 		ResetForNextRound();
 	}
-	else if(InMafiaFlowState == EMafiaFlowState::Day)
+	else if (InMafiaFlowState == EMafiaFlowState::EndPunishment)
 	{
-
-	}
-	else if(InMafiaFlowState == EMafiaFlowState::AfterDay)
-	{
-
-	}
-	else if(InMafiaFlowState == EMafiaFlowState::EndDay)
-	{
-		
-	}
-	else if(InMafiaFlowState == EMafiaFlowState::BeforeVote)
-	{
-
-	}
-	else if(InMafiaFlowState == EMafiaFlowState::Vote)
-	{
-
-	}
-	else if(InMafiaFlowState == EMafiaFlowState::AfterVote)
-	{
-
-	}
-	else if(InMafiaFlowState == EMafiaFlowState::EndVote)
-	{
-
-	}
-	else if(InMafiaFlowState == EMafiaFlowState::BeforeNight)
-	{
-		
-	}
-	else if(InMafiaFlowState == EMafiaFlowState::Night)
-	{
-
-	}
-	else if(InMafiaFlowState == EMafiaFlowState::AfterNight)
-	{
-
-	}
-	else if(InMafiaFlowState == EMafiaFlowState::EndNight)
-	{
-
+		ResetForNextRound();
 	}
 }
 
@@ -434,9 +424,26 @@ void UMafiaBaseRoleComponent::HandleAffectedAbilities()
 		UWorld* World = GetWorld();
 		if (IsValid(World))
 		{
-			World->GetTimerManager().SetTimer(AffectedAbilityTimerHandle, this, &UMafiaBaseRoleComponent::HandleAffectedAbilities, AffectedAbilityTime);
+			World->GetTimerManager().SetTimer(AffectedAbilityTimerHandle, this, &UMafiaBaseRoleComponent::HandleAffectedAbilities, 3.f);
 		}
 	}
+}
+
+void UMafiaBaseRoleComponent::HandleReciveReciveBroadCastEvent(AMafiaBasePlayerState* InSender, const EMafiaBroadCastEvent& InEvent)
+{
+	if (IsValid(InSender))
+	{
+		FBroadCastEvent Event;
+		Event.EventSender = InSender;
+		Event.EventType = InEvent;
+
+		CachedBroadCastEventArray.Add(Event);
+	}
+}
+
+void UMafiaBaseRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
+{
+	SendGameEvent_ThreeParams(OnResponseUseAbility, InOther, InFlag, InEventType);
 }
 
 

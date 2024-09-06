@@ -194,8 +194,28 @@ enum class EMafiaUseAbilityFlag : uint8
 {
 	ImpossibleUseAbility,
 	AlreadyUseAbility,
+	Failed,
 	Succeed,
 };
+
+UENUM()
+enum class EMafiaBroadCastEventFlag : uint8
+{
+	Failed,
+	Succeed,
+};
+
+UENUM()
+enum class EMafiaBroadCastEvent : uint8
+{
+	/** ktw : 모든 플레이어가 관람하는 전체 이벤트를 정의합니다. */
+
+	TrafficDead,	// 교통사고 - 버스기사의 승객이 다른 승객을 죽임.
+	Dead,			// 이번 턴에 죽음.
+	DoctorHeal,		// 의사가 살림.
+	DoctorHealDead,	// 의사가 살렸으나, 죽음.
+};
+
 
 UENUM()
 enum class EMafiaVoteFlag : uint8

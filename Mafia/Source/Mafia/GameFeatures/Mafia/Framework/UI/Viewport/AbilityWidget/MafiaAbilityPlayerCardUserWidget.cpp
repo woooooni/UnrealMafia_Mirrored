@@ -16,6 +16,7 @@
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
+#include "Framework/System/MafiaGameEvents.h"
 
 UMafiaAbilityPlayerCardUserWidget::UMafiaAbilityPlayerCardUserWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -55,6 +56,11 @@ void UMafiaAbilityPlayerCardUserWidget::UpdateCard()
 	
 }
 
+void UMafiaAbilityPlayerCardUserWidget::ResetForNextRound()
+{
+	BTN_AbilityPlayerCard->WidgetStyle.Normal.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 0.1f));	
+}
+
 
 void UMafiaAbilityPlayerCardUserWidget::NativeConstruct()
 {
@@ -87,8 +93,19 @@ void UMafiaAbilityPlayerCardUserWidget::UnBindDelegates()
 	}
 }
 
+bool UMafiaAbilityPlayerCardUserWidget::IsOwnerPlayer(AMafiaBasePlayerState* InPlayerState)
+{
+	if (IsValid(InPlayerState) && OwnerPlayer.IsValid())
+	{
+		return InPlayerState->GetUniqueId() == OwnerPlayer.Get()->GetUniqueId();
+	}
+	return false;
+}
+
 void UMafiaAbilityPlayerCardUserWidget::OnClickedPlayerAbilityCard()
 {
+	SendGameEvent(OnClickedPlayerCard);
+
 	if (AMafiaBasePlayerState* MyPlayerState = GetOwningPlayerState<AMafiaBasePlayerState>())
 	{
 		if (OwnerPlayer.IsValid())
@@ -97,6 +114,8 @@ void UMafiaAbilityPlayerCardUserWidget::OnClickedPlayerAbilityCard()
 			if (IsValid(MyPlayerComponent))
 			{
 				MyPlayerComponent->UseAbility(OwnerPlayer.Get());
+
+				BTN_AbilityPlayerCard->WidgetStyle.Normal.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 1.f ));
 			}
 		}
 	}

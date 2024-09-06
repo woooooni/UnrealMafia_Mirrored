@@ -22,6 +22,11 @@ void UMafiaDoctorRoleComponent::HandleAffectedAbilities()
 {
 }
 
+void UMafiaDoctorRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
+{
+	Super::HandleResponseUseAbility(InOther, InFlag, InEventType);
+}
+
 void UMafiaDoctorRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther)
 {
 }
@@ -30,9 +35,6 @@ void UMafiaDoctorRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleComponen
 {
 }
 
-void UMafiaDoctorRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
-{
-}
 
 void UMafiaDoctorRoleComponent::HandleStartVoteEvent()
 {

@@ -57,8 +57,13 @@ private:
 	void ResetCards();
 
 private:
+	void ResetForNextRound();
+
+private:
 	void OnChangedMafiaFlowState(const EMafiaFlowState& InFlowState);
 	void OnChangedMatchState(const FName& InMatchState);
+	void OnResponseUseAbility(const class UMafiaBaseRoleComponent* InOther, const EMafiaUseAbilityFlag InFlag, const EMafiaAbilityEventType InEventType);
+	void OnClickedCard();
 
 private:
 	bool IsAbilityRole();
@@ -89,5 +94,8 @@ private:
 private:
 	FDelegateHandle OnChangedMatchStateHandle;
 	FDelegateHandle OnChangedMafiaFlowStateHandle;
+	FDelegateHandle OnClickedPlayerCard;
+	FDelegateHandle OnResponseAbilityHandle;
+	
 	
 };

@@ -24,6 +24,11 @@ void UMafiaCitizenRoleComponent::HandleAffectedAbilities()
 	Super::HandleAffectedAbilities();
 }
 
+void UMafiaCitizenRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
+{
+	Super::HandleResponseUseAbility(InOther, InFlag, InEventType);
+}
+
 void UMafiaCitizenRoleComponent::HandleNotifyResultAbility(UMafiaBaseRoleComponent* InOther)
 {
 }
@@ -32,9 +37,7 @@ void UMafiaCitizenRoleComponent::HandleRecieveInstantEvent(UMafiaBaseRoleCompone
 {
 }
 
-void UMafiaCitizenRoleComponent::HandleResponseUseAbility(UMafiaBaseRoleComponent* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
-{
-}
+
 
 void UMafiaCitizenRoleComponent::HandleStartVoteEvent()
 {

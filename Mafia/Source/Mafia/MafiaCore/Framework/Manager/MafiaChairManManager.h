@@ -33,29 +33,6 @@ public:
 	}
 };
 
-USTRUCT()
-struct FBusData
-{
-	GENERATED_BODY()
-
-public:
-	FORCEINLINE void Reset() {
-		FirstPassenger = nullptr; 
-		SecondPassenger = nullptr; 
-		BusDriver = nullptr;
-	}
-
-public:
-	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseAbilityDwelling> FirstPassenger;
-
-	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseAbilityDwelling> SecondPassenger;
-
-	UPROPERTY()
-	TWeakObjectPtr<class UMafiaBaseRoleComponent> BusDriver;
-};
-
 
 
 /**
@@ -79,18 +56,18 @@ public:
 		InOrigin : 능력 사용 Player, InDestination : 능력에 영향을 받은 Player.
 	*/
 	EMafiaUseAbilityFlag AddAbilityEvent(class AMafiaBasePlayerState* InOrigin, class AMafiaBasePlayerState* InDestination, EMafiaAbilityEventType InEventType);
+	EMafiaBroadCastEventFlag BroadCastEvent(class AMafiaBasePlayerState* InSender, EMafiaBroadCastEvent InEvent);
 	EMafiaUseAbilityFlag PickupPassenger(class UMafiaBaseAbilityDwelling* InPassengerDwelling);
 
 
 	/** ktw : InVotor - 투표자, InCandidate - 피투표자 */
 	void AddVoteEvent(class AMafiaBasePlayerState* InVotor, class AMafiaBasePlayerState* InCandidate);
-
 	EMafiaVoteResultFlag NotifyDeadMan();
+
 	EMafiaGameResult CheckGameResult() const;
 
 public:
 	FORCEINLINE const TMap<FName, FPlayerVoteData>& GetPlayerVoteMap() { return CachedVoteEventsMap; }
-	FORCEINLINE const FBusData& GetBusData() { return BusData; }
 
 #pragma region Cheat
 public:
@@ -103,7 +80,7 @@ public:
 
 private:
 	bool AssignAllPlayersAbility();
-	bool MakePlayersAbilityDwelling();
+	bool InitializePlayersAbilityDwelling();
 
 private:
 	void StartAbilityEvent();
@@ -132,10 +109,11 @@ private:
 private:
 	/** ktw : 능력사용 플레이어를 저장합니다. */
 	UPROPERTY()
-	TSet<FName> CachedAlreadyAbillityPlayerSet;
+	TSet<FName> CachedAlreadyDeferredAbillityPlayerSet;
 
+	/** ktw : 인스턴스 능력사용 플레이어를 저장합니다.*/
 	UPROPERTY()
-	FBusData BusData;
+	TSet<FName> CachedAlreadyInstantAbillityPlayerSet;
 
 	/** ktw : 투표자를 저장합니다. */
 	UPROPERTY()
@@ -153,4 +131,7 @@ private:
 	UPROPERTY()
 	TMap<FName, TObjectPtr<class UMafiaBaseRoleComponent>> JoinedPlayerRoleComponents;
 	
+
+private:
+	TWeakObjectPtr<class UMafiaBusDriverRoleComponent> BusDriver;
 };
