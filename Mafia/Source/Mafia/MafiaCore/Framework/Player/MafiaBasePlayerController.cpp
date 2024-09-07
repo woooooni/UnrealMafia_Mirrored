@@ -9,7 +9,7 @@
 #include "MafiaCore/Framework/System/MafiaBaseGameInstance.h"
 #include "Framework/Components/Role/MafiaBaseRoleComponent.h"
 #include "Framework/UI/Core/MafiaBaseHUD.h"
-#include "Framework/Manager/MafiaChairManManager.h"
+#include "Framework/Manager/MafiaChairmanManager.h"
 #include "Mafia.h"
 
 AMafiaBasePlayerController::AMafiaBasePlayerController(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -91,6 +91,14 @@ void AMafiaBasePlayerController::TickDebug(float DeltaSeconds)
 	}
 
 	int32 PopupKey = 123456;
+
+	/** GameState : Round */
+	{
+		const int32 GameRound = GS->GetGameRound();
+		FString GameRoundString = TEXT("Game Round : ");
+		GameRoundString.Append(FString::FromInt(GameRound));
+		GEngine->AddOnScreenDebugMessage(PopupKey--, SMALL_NUMBER, FColor::Black, GameRoundString);
+	}
 
 	/** GameState:MatchState */
 	{
@@ -415,9 +423,9 @@ void AMafiaBasePlayerController::ServerReqStartGame_Implementation()
 	{
 		if (MafiaBaseGameInstance->IsDedicatedServerInstance())
 		{
-			if (UMafiaChairManManager* MafiaChairManManager = MafiaBaseGameInstance->GetChairMan())
+			if (UMafiaChairmanManager* MafiaChairmanManager = MafiaBaseGameInstance->GetChairMan())
 			{
-				MafiaChairManManager->StartGame();
+				MafiaChairmanManager->StartGame();
 			}
 		}
 	}

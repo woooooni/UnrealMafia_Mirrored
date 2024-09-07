@@ -1,5 +1,5 @@
 #include "Framework/Components/Role/MafiaBaseRoleComponent.h"
-#include "Framework/Manager/MafiaChairManManager.h"
+#include "Framework/Manager/MafiaChairmanManager.h"
 #include "Framework/System/MafiaLogChannels.h"
 #include "GameFeatures/Mafia/Framework/GameModes/MafiaGameMode.h"
 #include "GameFeatures/Mafia/Framework/Player/MafiaPlayerState.h"
@@ -86,6 +86,8 @@ void UMafiaBaseRoleComponent::UnBindDelegates()
 
 void UMafiaBaseRoleComponent::ResetForNextRound()
 {
+	CachedProcessedAbilityEvents.Empty();
+	CachedProcessedBroadCastEvents.Empty();
 	CachedAffectedEventsHeap.Empty();
 	CachedBroadCastEventsHeap.Empty();
 }
@@ -212,7 +214,7 @@ void UMafiaBaseRoleComponent::FinishVoteEvent()
 void UMafiaBaseRoleComponent::ServerReqSendBroadCastEvent_Implementation(const EMafiaBroadCastEvent InEvent)
 {
 	/** ktw : 서버에서 실행됩니다. */
-	if (UMafiaChairManManager* ChairManManager = GetChairMan())
+	if (UMafiaChairmanManager* ChairManManager = GetChairMan())
 	{
 		if (OwningPlayerState.IsValid())
 		{
@@ -224,7 +226,7 @@ void UMafiaBaseRoleComponent::ServerReqSendBroadCastEvent_Implementation(const E
 void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType)
 {
 	/** ktw : 서버에서 실행됩니다. */
-	if (UMafiaChairManManager* ChairManManager = GetChairMan())
+	if (UMafiaChairmanManager* ChairManManager = GetChairMan())
 	{
 		if (OwningPlayerState.IsValid())
 		{
@@ -252,20 +254,6 @@ void UMafiaBaseRoleComponent::ClientNotifyResultAbility_Implementation(AMafiaBas
 
 void UMafiaBaseRoleComponent::ClientAbilityEventsFlush_Implementation()
 {
-	/*CachedAffectedEventsHeap.Sort([](const FAffectedEvent& Left, const FAffectedEvent& Right) {
-		if (Left.Other.IsValid() && Right.Other.IsValid())
-		{
-			UMafiaBaseRoleComponent* LeftRoleComponent = Left.Other.Get()->GetRoleComponent();
-			UMafiaBaseRoleComponent* RightRoleComponent = Right.Other.Get()->GetRoleComponent();
-
-			if (IsValid(LeftRoleComponent) && IsValid(RightRoleComponent))
-			{
-				return LeftRoleComponent->GetRoleType() > RightRoleComponent->GetRoleType();
-			}
-		}
-		return false;
-	});*/
-
 	HandleAbilityEvents();
 }
 
@@ -289,7 +277,7 @@ void UMafiaBaseRoleComponent::ServerReqVote_Implementation(AMafiaBasePlayerState
 {
 	/** ktw : 서버에서 실행됩니다. */
 		/** ktw : 서버에서 실행됩니다. */
-	if (UMafiaChairManManager* ChairManManager = GetChairMan())
+	if (UMafiaChairmanManager* ChairManManager = GetChairMan())
 	{
 		if (OwningPlayerState.IsValid())
 		{
@@ -403,6 +391,7 @@ void UMafiaBaseRoleComponent::HandleReceiveAffectedAbility(EMafiaRole InRole, AM
 	{
 		FAffectedEvent Event;
 		Event.AbilityPlayer = InOther;
+		Event.AbilityPlayerRole = InRole;
 		CachedAffectedEventsHeap.HeapPush(Event);
 	}
 }
@@ -425,7 +414,7 @@ void UMafiaBaseRoleComponent::HandleResponseUseAbility(AMafiaBasePlayerState* In
 }
 
 
-UMafiaChairManManager* UMafiaBaseRoleComponent::GetChairMan()
+UMafiaChairmanManager* UMafiaBaseRoleComponent::GetChairMan()
 {
 	if (UWorld* World = GetWorld())
 	{
@@ -441,19 +430,4 @@ UMafiaChairManManager* UMafiaBaseRoleComponent::GetChairMan()
 		}
 	}
 	return nullptr;
-}
-
-bool operator < (const FAffectedEvent& Left, const FAffectedEvent& Right)
-{
-	if (Left.AbilityPlayer.IsValid() && Right.AbilityPlayer.IsValid())
-	{
-		UMafiaBaseRoleComponent* LeftRoleComponent = Left.AbilityPlayer.Get()->GetRoleComponent();
-		UMafiaBaseRoleComponent* RightRoleComponent = Right.AbilityPlayer.Get()->GetRoleComponent();
-
-		if (IsValid(LeftRoleComponent) && IsValid(RightRoleComponent))
-		{
-			return LeftRoleComponent->GetRoleType() > RightRoleComponent->GetRoleType();
-		}
-	}
-	return false;
 }

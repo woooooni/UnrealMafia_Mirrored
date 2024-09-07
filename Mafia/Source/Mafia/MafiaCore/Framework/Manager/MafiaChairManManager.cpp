@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Framework/Manager/MafiaChairManManager.h"
+#include "Framework/Manager/MafiaChairmanManager.h"
 #include "MafiaCore/Framework/System/MafiaLogChannels.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameMode.h"
 #include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
@@ -13,12 +13,12 @@
 #include "Mafia.h"
 
 
-UMafiaChairManManager::UMafiaChairManManager(const FObjectInitializer& ObjectInitializer)
+UMafiaChairmanManager::UMafiaChairmanManager(const FObjectInitializer& ObjectInitializer)
 {	
 
 }
 
-bool UMafiaChairManManager::StartGame()
+bool UMafiaChairmanManager::StartGame()
 {
 	JoinedPlayerAbilityDwellings.Empty();
 	JoinedPlayerAbilityDwellings.Empty();
@@ -26,7 +26,7 @@ bool UMafiaChairManManager::StartGame()
 	return AssignAllPlayersAbility() && InitializePlayersAbilityDwelling();
 }
 
-void UMafiaChairManManager::EndGame()
+void UMafiaChairmanManager::EndGame()
 {
 	JoinedPlayerRoleComponents.Empty();
 	JoinedPlayerAbilityDwellings.Empty();
@@ -34,7 +34,7 @@ void UMafiaChairManManager::EndGame()
 
 
 
-bool UMafiaChairManManager::AssignAllPlayersAbility()
+bool UMafiaChairmanManager::AssignAllPlayersAbility()
 {
 	UWorld* World = GetWorld();
 	JoinedPlayerRoleComponents.Empty();
@@ -104,7 +104,7 @@ bool UMafiaChairManManager::AssignAllPlayersAbility()
 	return false;
 }
 
-bool UMafiaChairManManager::InitializePlayersAbilityDwelling()
+bool UMafiaChairmanManager::InitializePlayersAbilityDwelling()
 {
 	UWorld* World = GetWorld();
 	JoinedPlayerAbilityDwellings.Empty();
@@ -159,7 +159,7 @@ bool UMafiaChairManManager::InitializePlayersAbilityDwelling()
 }
 
 
-EMafiaUseAbilityFlag UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMafiaBasePlayerState* InDestination, EMafiaAbilityEventType InEventType)
+EMafiaUseAbilityFlag UMafiaChairmanManager::AddAbilityEvent(AMafiaBasePlayerState* InOrigin, AMafiaBasePlayerState* InDestination, EMafiaAbilityEventType InEventType)
 {
 	if (InEventType == EMafiaAbilityEventType::None)
 	{
@@ -200,7 +200,7 @@ EMafiaUseAbilityFlag UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerStat
 					}
 					else
 					{
-						return DestDwelling->DispatchInstantEvent(InOrigin, InEventType);
+						return DestDwelling->SendInstantEvent(InOrigin, InEventType);
 					}
 				}
 				else if(InEventType == EMafiaAbilityEventType::DeferredEvent)
@@ -235,7 +235,7 @@ EMafiaUseAbilityFlag UMafiaChairManManager::AddAbilityEvent(AMafiaBasePlayerStat
 }
 
 
-EMafiaBroadCastEventFlag UMafiaChairManManager::BroadCastEvent(AMafiaBasePlayerState* InSender, EMafiaBroadCastEvent InEvent)
+EMafiaBroadCastEventFlag UMafiaChairmanManager::BroadCastEvent(AMafiaBasePlayerState* InSender, EMafiaBroadCastEvent InEvent)
 {
 	for (auto& Pair : JoinedPlayerAbilityDwellings)
 	{
@@ -254,7 +254,7 @@ EMafiaBroadCastEventFlag UMafiaChairManManager::BroadCastEvent(AMafiaBasePlayerS
 	return EMafiaBroadCastEventFlag::Succeed;
 }
 
-EMafiaUseAbilityFlag UMafiaChairManManager::PickupPassenger(UMafiaBaseAbilityDwelling* InPassengerDwelling)
+EMafiaUseAbilityFlag UMafiaChairmanManager::PickupPassenger(UMafiaBaseAbilityDwelling* InPassengerDwelling)
 {
 	if (BusDriver.IsValid())
 	{
@@ -266,7 +266,7 @@ EMafiaUseAbilityFlag UMafiaChairManManager::PickupPassenger(UMafiaBaseAbilityDwe
 }
 
 #pragma region Cheat
-void UMafiaChairManManager::CheatChangeRole(AMafiaBasePlayerState* InPlayerState, UMafiaBaseRoleComponent* InNewRoleComponent)
+void UMafiaChairmanManager::CheatChangeRole(AMafiaBasePlayerState* InPlayerState, UMafiaBaseRoleComponent* InNewRoleComponent)
 {
 #if ENABLE_CHEAT
 	const FString& AccountIdStr = InPlayerState->GetUniqueId().ToString();
@@ -298,7 +298,7 @@ void UMafiaChairManManager::CheatChangeRole(AMafiaBasePlayerState* InPlayerState
 
 #pragma endregion Cheat
 
-void UMafiaChairManManager::StartAbilityEvent()
+void UMafiaChairmanManager::StartAbilityEvent()
 {
 	for (auto& Pair : JoinedPlayerAbilityDwellings)
 	{
@@ -309,7 +309,7 @@ void UMafiaChairManManager::StartAbilityEvent()
 	}
 }
 
-void UMafiaChairManManager::PreBroadcastAbilityEvents()
+void UMafiaChairmanManager::PreBroadcastAbilityEvents()
 {
 	BusDrive();
 	for (auto& Pair : JoinedPlayerAbilityDwellings)
@@ -321,7 +321,7 @@ void UMafiaChairManManager::PreBroadcastAbilityEvents()
 	}
 }
 
-void UMafiaChairManManager::BusDrive()
+void UMafiaChairmanManager::BusDrive()
 {
 	if(BusDriver.IsValid())
 	{
@@ -330,7 +330,7 @@ void UMafiaChairManManager::BusDrive()
 
 }
 
-void UMafiaChairManManager::BroadcastAbilityEvents()
+void UMafiaChairmanManager::BroadcastAbilityEvents()
 {
 	/** #Todo - ktw : 능력사용 결과 뿌리기 */
 	for (auto& Pair : JoinedPlayerAbilityDwellings)
@@ -342,7 +342,7 @@ void UMafiaChairManManager::BroadcastAbilityEvents()
 	}
 }
 
-void UMafiaChairManManager::PostBroadcastAbilityEvents()
+void UMafiaChairmanManager::PostBroadcastAbilityEvents()
 {
 	for (auto& Pair : JoinedPlayerAbilityDwellings)
 	{
@@ -353,7 +353,7 @@ void UMafiaChairManManager::PostBroadcastAbilityEvents()
 	}
 }
 
-void UMafiaChairManManager::EndAbilityEvents()
+void UMafiaChairmanManager::EndAbilityEvents()
 {
 	for (auto& Pair : JoinedPlayerAbilityDwellings)
 	{
@@ -364,7 +364,7 @@ void UMafiaChairManManager::EndAbilityEvents()
 	}
 }
 
-void UMafiaChairManManager::StartVote()
+void UMafiaChairmanManager::StartVote()
 {
 	CachedAlreadyInstantAbillityPlayerSet.Empty();
 	CachedAlreadyDeferredAbillityPlayerSet.Empty();
@@ -379,7 +379,7 @@ void UMafiaChairManManager::StartVote()
 
 
 
-EMafiaVoteFlag UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaBasePlayerState* InCandidate)
+EMafiaVoteFlag UMafiaChairmanManager::AddVoteEvent(AMafiaBasePlayerState* InVotor, AMafiaBasePlayerState* InCandidate)
 {
 	
 	if (IsValid(InVotor))
@@ -462,7 +462,7 @@ EMafiaVoteFlag UMafiaChairManManager::AddVoteEvent(AMafiaBasePlayerState* InVoto
 	return EMafiaVoteFlag::Failed;
 }
 
-AMafiaBasePlayerState* UMafiaChairManManager::FindDeadMan()
+AMafiaBasePlayerState* UMafiaChairmanManager::FindDeadMan()
 {
 	/** ktw : 투표로 처형할 사람을 찾습니다. */
 	TArray<FPlayerVoteData> VoteArray;
@@ -531,7 +531,7 @@ AMafiaBasePlayerState* UMafiaChairManManager::FindDeadMan()
 	return nullptr;
 }
 
-void UMafiaChairManManager::NotifyDeadMan(AMafiaBasePlayerState* DeadMan)
+void UMafiaChairmanManager::NotifyDeadMan(AMafiaBasePlayerState* DeadMan)
 {
 	EMafiaVoteResultFlag Flag = IsValid(DeadMan) ? EMafiaVoteResultFlag::SomeoneDying : EMafiaVoteResultFlag::NoDeathPlayer;
 	for (auto& Pair : JoinedPlayerRoleComponents)
@@ -543,7 +543,7 @@ void UMafiaChairManManager::NotifyDeadMan(AMafiaBasePlayerState* DeadMan)
 	}
 }
 
-void UMafiaChairManManager::EndVote()
+void UMafiaChairmanManager::EndVote()
 {
 	for (auto& Pair : JoinedPlayerRoleComponents)
 	{
@@ -558,7 +558,7 @@ void UMafiaChairManManager::EndVote()
 
 
 
-bool UMafiaChairManManager::MakeShuffledRoleArray(int32 InUserCount, OUT TArray<EMafiaRole>& OutSuffledArray)
+bool UMafiaChairmanManager::MakeShuffledRoleArray(int32 InUserCount, OUT TArray<EMafiaRole>& OutSuffledArray)
 {
 	/** 
 	OutSuffledArray.Reserve(InUserCount);
@@ -603,7 +603,7 @@ bool UMafiaChairManManager::MakeShuffledRoleArray(int32 InUserCount, OUT TArray<
 	return true;
 }
 
-bool UMafiaChairManManager::IsPossibleVote()
+bool UMafiaChairmanManager::IsPossibleVote()
 {
 	if (UWorld* World = GetWorld())
 	{
@@ -615,7 +615,7 @@ bool UMafiaChairManManager::IsPossibleVote()
 	return false;
 }
 
-EMafiaGameResult UMafiaChairManManager::CheckGameResult() const
+EMafiaGameResult UMafiaChairmanManager::CheckGameResult() const
 {
 	UWorld* World = GetWorld();
 
@@ -686,7 +686,7 @@ EMafiaGameResult UMafiaChairManManager::CheckGameResult() const
 	return EMafiaGameResult::Invalid;
 }
 
-void UMafiaChairManManager::NotifyGameResult(EMafiaGameResult InGameResult) const
+void UMafiaChairmanManager::NotifyGameResult(EMafiaGameResult InGameResult) const
 {
 	if (InGameResult == EMafiaGameResult::None)
 	{
@@ -708,7 +708,7 @@ void UMafiaChairManManager::NotifyGameResult(EMafiaGameResult InGameResult) cons
 	}
 }
 
-void UMafiaChairManManager::ResetForNextRound()
+void UMafiaChairmanManager::ResetForNextRound()
 {
 	CachedAlreadyVoterSet.Empty();
 	CachedAlreadyInstantAbillityPlayerSet.Empty();
@@ -716,7 +716,7 @@ void UMafiaChairManManager::ResetForNextRound()
 	CachedVoteEventsMap.Empty();
 }
 
-void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
+void UMafiaChairmanManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 {
 	/** ktw : AMafiaBaseGameState::SetMafiaFlowState에서 호출됩니다. */
 	if (InFlowState == EMafiaFlowState::None)
@@ -757,6 +757,7 @@ void UMafiaChairManManager::OnSetMafiaFlowState(EMafiaFlowState InFlowState)
 	}
 	else if(InFlowState == EMafiaFlowState::BeforeNight)
 	{
+		ResetForNextRound();
 		StartAbilityEvent();
 	}
 	else if(InFlowState == EMafiaFlowState::Night)

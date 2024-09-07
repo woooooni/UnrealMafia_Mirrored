@@ -35,9 +35,13 @@ struct FAffectedEvent
 public:
 	UPROPERTY()
 	TWeakObjectPtr<class AMafiaBasePlayerState> AbilityPlayer;
+	EMafiaRole AbilityPlayerRole;
 
 public:
-	friend bool operator < (const FAffectedEvent& Left, const FAffectedEvent& Right);
+	friend bool operator < (const FAffectedEvent& Left, const FAffectedEvent& Right)
+	{
+		return Left.AbilityPlayerRole > Right.AbilityPlayerRole;
+	};
 };
 
 
@@ -211,11 +215,12 @@ protected:
 	virtual void HandleResponseUseAbility(AMafiaBasePlayerState* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType);
 	virtual void HandleReceiveAffectedAbility(EMafiaRole InRole, AMafiaBasePlayerState* InOther);
 	virtual void HandleReceiveInstantEvent(AMafiaBasePlayerState* InOther) { /**/ };
+	virtual void HandleNotifyResultAbility(AMafiaBasePlayerState* InOther) { /**/ };
 	virtual void HandleReceiveBroadCastEvent(AMafiaBasePlayerState* InSender, const EMafiaBroadCastEvent& InEvent);
 
 	virtual	void HandleAbilityEvents();
 	virtual void HandleBroadCastEvents();
-	virtual void HandleNotifyResultAbility(AMafiaBasePlayerState* InOther) { /**/ };
+	
 
 	virtual void HandleStartVoteEvent() { /**/ };
 	virtual void HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag) { /**/ };
@@ -223,7 +228,7 @@ protected:
 	virtual void HandleFinishVoteEvent() { /**/ };
 
 protected:
-	class UMafiaChairManManager* GetChairMan();
+	class UMafiaChairmanManager* GetChairMan();
 
 protected:
 	UFUNCTION()
@@ -259,6 +264,14 @@ protected:
 	/** ktw : 이번 턴에 내가 처리할 전체 이벤트 목록. */
 	UPROPERTY()
 	TArray<FBroadCastEvent> CachedBroadCastEventsHeap;
+
+	/** ktw : 처리된 능력 이벤트 목록 */
+	UPROPERTY()
+	TArray<FAffectedEvent> CachedProcessedAbilityEvents;
+
+	/** ktw : 처리된 전체 이벤트 목록 */
+	UPROPERTY()
+	TArray<FAffectedEvent> CachedProcessedBroadCastEvents;
 
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_Dead)

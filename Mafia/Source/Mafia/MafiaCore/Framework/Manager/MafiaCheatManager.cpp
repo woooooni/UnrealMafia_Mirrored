@@ -3,7 +3,7 @@
 
 #include "Framework/Manager/MafiaCheatManager.h"
 #include "Framework/System/MafiaBaseGameInstance.h"
-#include "Framework/Manager/MafiaChairManManager.h"
+#include "Framework/Manager/MafiaChairmanManager.h"
 #include "Framework/GameModes/MafiaBaseGameState.h"
 
 void UMafiaCheatManager::CheatTemplate()

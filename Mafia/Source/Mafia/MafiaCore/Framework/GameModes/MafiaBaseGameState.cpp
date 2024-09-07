@@ -6,7 +6,7 @@
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
 #include "MafiaCore/Framework/System/MafiaGameEvents.h"
 #include "MafiaCore/Framework/System/MafiaBaseGameInstance.h"
-#include "Framework/Manager/MafiaChairManManager.h"
+#include "Framework/Manager/MafiaChairmanManager.h"
 #include "MafiaCore/Framework/Types/MafiaTypes.h"
 #include "Mafia.h"
 
@@ -17,6 +17,7 @@ AMafiaBaseGameState::AMafiaBaseGameState()
 	GameStartSeconds = 0.f;
 	TimerStartSeconds = 0.f;
 	TotalTimerSeconds = 0.f;
+	GameRound = 0;
 	MafiaFlowState = EMafiaFlowState::None;
 	PrevFlowState = EMafiaFlowState::None;
 }
@@ -29,6 +30,8 @@ void AMafiaBaseGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(AMafiaBaseGameState, TimerStartSeconds);
 	DOREPLIFETIME(AMafiaBaseGameState, TotalTimerSeconds);
 	DOREPLIFETIME(AMafiaBaseGameState, MafiaFlowState);
+	DOREPLIFETIME(AMafiaBaseGameState, GameRound);
+	
 }
 
 void AMafiaBaseGameState::PostNetInit()
@@ -216,12 +219,18 @@ void AMafiaBaseGameState::SetMafiaFlowState(const EMafiaFlowState InState, const
 	{
 		if (GameInstance->IsDedicatedServerInstance())
 		{
-			if (UMafiaChairManManager* ChairMan = GameInstance->GetChairMan())
+			if (UMafiaChairmanManager* ChairMan = GameInstance->GetChairMan())
 			{
 				ChairMan->OnSetMafiaFlowState(MafiaFlowState);
 			}
 		}
 	}
+
+	if (MafiaFlowState == EMafiaFlowState::BeforeDay)
+	{
+		GameRound++;
+	}
+
 	OnRep_MafiaFlowState(); // server call
 }
 
@@ -299,4 +308,5 @@ void AMafiaBaseGameState::OnRep_MafiaFlowState()
 	
 	SendGameEvent_OneParam(OnChangedMafiaFlowState, MafiaFlowState);
 	PrevFlowState = MafiaFlowState;
+	
 }

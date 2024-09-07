@@ -54,6 +54,8 @@ public:
 	FORCEINLINE int32 GetJoinedUserCount() const { return JoinedUserPlayerStateMap.Num(); }
 	int32 GetReadyUserCount() const;
 
+	FORCEINLINE int32 GetGameRound() { return GameRound; }
+
 #pragma region Time
 public:
 	/** 서버기준의 실시간 월드 시간 */
@@ -91,6 +93,9 @@ private:
 	/** 현재 타이머 전체 진행 시간 */
 	UPROPERTY(Transient, Replicated)
 	float TotalTimerSeconds;
+	/** 현재 게임 라운드 */
+	UPROPERTY(Transient, Replicated)
+	int32 GameRound;
 
 protected:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_MafiaFlowState)

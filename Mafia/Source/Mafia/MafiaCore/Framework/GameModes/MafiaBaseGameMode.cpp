@@ -6,7 +6,7 @@
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameSession.h"
 #include "MafiaCore/Framework/Player/MafiaBasePlayerController.h"
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
-#include "Framework/Manager/MafiaChairManManager.h"
+#include "Framework/Manager/MafiaChairmanManager.h"
 #include "MafiaCore/Framework/UI/Core/MafiaBaseHUD.h"
 #include "MafiaCore/Framework/Types/MafiaTypes.h"
 #include "Mafia.h"
@@ -232,7 +232,7 @@ void AMafiaBaseGameMode::HandleInProgressMafia()
 		}
 	}
 
-	UMafiaChairManManager* ChairMan = GetChairMan();
+	UMafiaChairmanManager* ChairMan = GetChairMan();
 	if (IsValid(ChairMan) == false)
 	{
 		ensure(false);
@@ -603,7 +603,7 @@ bool AMafiaBaseGameMode::OnPendingMatchStateSetForInProgress(FName NewPendingSta
 			MafiaBaseGameState->UpdateTimerStartSeconds();
 			GetWorld()->GetTimerManager().SetTimer(AssignAbilityTimerHandle, this, &AMafiaBaseGameMode::OnEndAssigningAbilityState, AssigningAbilityTime);
 
-			if (UMafiaChairManManager* ChairMan = GetChairMan())
+			if (UMafiaChairmanManager* ChairMan = GetChairMan())
 			{
 				bool Succeed = ChairMan->StartGame();
 				if (Succeed == false)
@@ -708,7 +708,7 @@ void AMafiaBaseGameMode::AddGameDuration(const float InAddedSeconds)
 	}
 }
 
-UMafiaChairManManager* AMafiaBaseGameMode::GetChairMan()
+UMafiaChairmanManager* AMafiaBaseGameMode::GetChairMan()
 {
 	if (UMafiaBaseGameInstance* GI = GetGameInstance<UMafiaBaseGameInstance>())
 	{
@@ -720,7 +720,7 @@ UMafiaChairManManager* AMafiaBaseGameMode::GetChairMan()
 UE_NODISCARD
 bool AMafiaBaseGameMode::CheckGameOver()
 {
-	if (UMafiaChairManManager* ChairMan = GetChairMan())
+	if (UMafiaChairmanManager* ChairMan = GetChairMan())
 	{
 		return EMafiaGameResult::None != ChairMan->CheckGameResult();
 	}

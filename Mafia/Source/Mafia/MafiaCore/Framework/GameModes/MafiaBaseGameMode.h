@@ -89,7 +89,7 @@ public:
 #pragma endregion
 
 protected:
-	class UMafiaChairManManager* GetChairMan();
+	class UMafiaChairmanManager* GetChairMan();
 	bool CheckGameOver();
 
 protected:

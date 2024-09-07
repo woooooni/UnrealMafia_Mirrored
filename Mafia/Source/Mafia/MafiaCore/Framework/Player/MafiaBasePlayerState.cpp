@@ -5,7 +5,7 @@
 #include "MafiaCore/Framework/System/MafiaBaseGameInstance.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameMode.h"
 #include "MafiaCore/Framework/GameModes/MafiaBaseGameState.h"
-#include "Framework/Manager/MafiaChairManManager.h"
+#include "Framework/Manager/MafiaChairmanManager.h"
 #include "MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaCitizenRoleComponent.h"
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaPoliceRoleComponent.h"
@@ -71,7 +71,7 @@ void AMafiaBasePlayerState::CheatSetRole_Implementation(EMafiaRole InRole)
 #if ENABLE_CHEAT
 	if (UMafiaBaseGameInstance* GI = GetGameInstance<UMafiaBaseGameInstance>())
 	{
-		if (UMafiaChairManManager* ChairMan = GI->GetChairMan())
+		if (UMafiaChairmanManager* ChairMan = GI->GetChairMan())
 		{
 			ChairMan->CheatChangeRole(this, AssignAbility(InRole));
 		}

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "MafiaCore/Framework/Types/MafiaTypes.h"
-#include "MafiaChairManManager.generated.h"
+#include "MafiaChairmanManager.generated.h"
 
 
 
@@ -39,12 +39,12 @@ public:
  *	ktw : Server에 존재하는 GameInstance만 이 객체를 가지고 있습니다. 따라서, 멤버 함수는 서버에서만 호출됩니다.
  */
 UCLASS()
-class MAFIA_API UMafiaChairManManager final : public UObject
+class MAFIA_API UMafiaChairmanManager final : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	UMafiaChairManManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UMafiaChairmanManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
 	bool StartGame();

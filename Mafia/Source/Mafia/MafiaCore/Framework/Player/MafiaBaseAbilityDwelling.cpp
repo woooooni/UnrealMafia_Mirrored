@@ -32,7 +32,7 @@ bool UMafiaBaseAbilityDwelling::Initialize(const EMafiaColor& InColorEnum, AMafi
 	return false;
 }
 
-EMafiaUseAbilityFlag UMafiaBaseAbilityDwelling::DispatchInstantEvent(AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType)
+EMafiaUseAbilityFlag UMafiaBaseAbilityDwelling::SendInstantEvent(AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType)
 {
 	if (InEventType == EMafiaAbilityEventType::DeferredEvent)
 	{

@@ -57,7 +57,7 @@ public:
 	bool Initialize(const EMafiaColor& InColorEnum, class AMafiaBasePlayerState* InPlayerState);
 
 public:
-	EMafiaUseAbilityFlag DispatchInstantEvent(class AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType);
+	EMafiaUseAbilityFlag SendInstantEvent(class AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType);
 	EMafiaUseAbilityFlag AddDeferredAbilityEvent(class AMafiaBasePlayerState* InOther, EMafiaAbilityEventType InEventType);
 	bool RemoveDeferredAbilityEvent(class AMafiaBasePlayerState* InPlayerState, FAbilityEvent& OutRemovedEvent);
 	

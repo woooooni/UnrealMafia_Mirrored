@@ -48,7 +48,7 @@ public:
 	//FORCEINLINE const FBusData& GetBusData() { return BusData; }
 
 public:
-	void BusDrive(class UMafiaChairManManager* InContext);
+	void BusDrive(class UMafiaChairmanManager* InContext);
 	EMafiaUseAbilityFlag PickupPassenger(class UMafiaBaseAbilityDwelling* InPassengerDwelling);
 
 protected:

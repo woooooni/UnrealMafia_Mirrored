@@ -2,7 +2,7 @@
 
 
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaBusDriverRoleComponent.h"
-#include "Framework/Manager/MafiaChairManManager.h"
+#include "Framework/Manager/MafiaChairmanManager.h"
 #include "MafiaCore/Framework/Player/MafiaBaseAbilityDwelling.h"
 #include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
 #include "Net/UnrealNetwork.h"
@@ -30,7 +30,7 @@ void UMafiaBusDriverRoleComponent::GetLifetimeReplicatedProps(TArray<FLifetimePr
 	
 }
 
-void UMafiaBusDriverRoleComponent::BusDrive(UMafiaChairManManager* InContext)
+void UMafiaBusDriverRoleComponent::BusDrive(UMafiaChairmanManager* InContext)
 {
 	if (IsValid(InContext))
 	{

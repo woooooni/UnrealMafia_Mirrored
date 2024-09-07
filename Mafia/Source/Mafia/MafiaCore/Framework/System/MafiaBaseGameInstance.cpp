@@ -50,7 +50,7 @@ void UMafiaBaseGameInstance::Init()
 	}
 	else
 	{
-		MafiaChairManManager = NewObject<UMafiaChairManManager>(this, UMafiaChairManManager::StaticClass());
+		MafiaChairManManager = NewObject<UMafiaChairmanManager>(this, UMafiaChairmanManager::StaticClass());
 	}
 
 	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UMafiaBaseGameInstance::OnPreLoadMap);
