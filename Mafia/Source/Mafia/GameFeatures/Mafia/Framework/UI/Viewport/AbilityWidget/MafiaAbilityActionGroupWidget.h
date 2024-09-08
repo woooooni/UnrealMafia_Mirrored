@@ -8,31 +8,6 @@
 #include "MafiaCore/Framework/Types/MafiaTypes.h"
 #include "MafiaAbilityActionGroupWidget.generated.h"
 
-USTRUCT(BlueprintType)
-struct FCircleWidgetParam
-{
-	GENERATED_BODY();
-
-public:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Circle Param")
-	uint8 NumWidgets;
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Circle Param")
-	FVector InitialRotationAxis;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Param")
-	float Radius;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Param")
-	float AngleOfFirstWidget;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Param")
-	float BaseWidgetRotation;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Param")
-	uint8 bRotateWidgets : 1;
-};
-
 /**
  * 
  */
@@ -51,6 +26,11 @@ private:
 	virtual void UnBindDelegates() override;
 
 private:
+	virtual void OnStartAnimation() override;
+	void TickAnimation();
+	virtual void OnEndAnimation() override;
+
+private:
 	void CreatePlayerCards();
 	void ArrangeCircleCards();
 	void UpdatePlayerCards();
@@ -65,12 +45,31 @@ private:
 	void OnResponseUseAbility(const class AMafiaBasePlayerState* InOther, const EMafiaUseAbilityFlag InFlag, const EMafiaAbilityEventType InEventType);
 	void OnClickedCard();
 
+
+
 private:
 	bool IsAbilityRole();
+
+
 	
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Param")
-	FCircleWidgetParam CircleWidgetParam;
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UMG")
+	uint8 NumWidgets;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UMG")
+	FVector InitialRotationAxis;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Interp, Category = "UMG")
+	float Radius;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "UMG")
+	float AngleOfFirstWidget;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "UMG")
+	float BaseWidgetRotation;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "UMG")
+	uint8 bRotateWidgets : 1;
 
 private:
 	UPROPERTY(meta = (BindWidgetOptional))
@@ -85,6 +84,9 @@ private:
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<class UTextBlock> TB_AbilityToolTip;
 
+	UPROPERTY(meta = (BindWidgetAnimOptional), Transient)
+	TObjectPtr<class UWidgetAnimation> ArrangeCircleCardAnimation;
+
 private:
 	TArray<TWeakObjectPtr<class UMafiaAbilityPlayerCardUserWidget>> PlayerCards;
 
@@ -97,5 +99,6 @@ private:
 	FDelegateHandle OnClickedPlayerCard;
 	FDelegateHandle OnResponseAbilityHandle;
 	
+	FTimerHandle OnAnimationTickHandle;
 	
 };

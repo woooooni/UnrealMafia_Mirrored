@@ -218,8 +218,11 @@ protected:
 	virtual void HandleNotifyResultAbility(AMafiaBasePlayerState* InOther) { /**/ };
 	virtual void HandleReceiveBroadCastEvent(AMafiaBasePlayerState* InSender, const EMafiaBroadCastEvent& InEvent);
 
-	virtual	void HandleAbilityEvents();
-	virtual void HandleBroadCastEvents();
+	void HandleAbilityEvents();
+	void HandleBroadCastEvents();
+
+	virtual void HandleAbilityEvent(const FAffectedEvent& InEvent);
+	virtual void HandleBroadCastEvent(const FBroadCastEvent& InEvent);
 	
 
 	virtual void HandleStartVoteEvent() { /**/ };
@@ -267,11 +270,11 @@ protected:
 
 	/** ktw : 처리된 능력 이벤트 목록 */
 	UPROPERTY()
-	TArray<FAffectedEvent> CachedProcessedAbilityEvents;
+	TSet<EMafiaRole> CachedProcessedAbilityEventsSet;
 
 	/** ktw : 처리된 전체 이벤트 목록 */
 	UPROPERTY()
-	TArray<FAffectedEvent> CachedProcessedBroadCastEvents;
+	TSet<EMafiaBroadCastEvent> CachedProcessedBroadCastEventsSet;
 
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_Dead)

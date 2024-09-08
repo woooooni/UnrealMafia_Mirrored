@@ -33,6 +33,7 @@ protected:
 	virtual void BindDelegates() override;
 	virtual void UnBindDelegates() override;
 
+
 private:
 	UFUNCTION()
 	void OnClickedPlayerAbilityCard();

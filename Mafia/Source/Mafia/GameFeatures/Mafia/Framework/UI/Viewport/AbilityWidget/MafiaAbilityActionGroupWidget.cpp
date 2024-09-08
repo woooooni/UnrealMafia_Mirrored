@@ -17,7 +17,6 @@
 UMafiaAbilityActionGroupWidget::UMafiaAbilityActionGroupWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	
 	static ConstructorHelpers::FClassFinder<UUserWidget> PlayerCardWidgetRef = TEXT("/Game/UI/ActionGruopWidget/Viewport/Ability/WBP_MafiaAbilityPlayerCard.WBP_MafiaAbilityPlayerCard_C");
 	if (PlayerCardWidgetRef.Succeeded())
 	{
@@ -30,6 +29,14 @@ void UMafiaAbilityActionGroupWidget::NativePreConstruct()
 	Super::NativePreConstruct();
 	ArrangeCircleCards();
 	UpdatePlayerCards();
+
+	if (ArrangeCircleCardAnimation)
+	{
+		WidgetAnimationStartDelegate.BindDynamic(this, &UMafiaAbilityActionGroupWidget::OnStartAnimation);
+		WidgetAnimationEndDelegate.BindDynamic(this, &UMafiaAbilityActionGroupWidget::OnEndAnimation);
+		BindToAnimationStarted(ArrangeCircleCardAnimation, WidgetAnimationStartDelegate);
+		BindToAnimationFinished(ArrangeCircleCardAnimation, WidgetAnimationEndDelegate);
+	}
 }
 
 void UMafiaAbilityActionGroupWidget::NativeConstruct()
@@ -40,6 +47,15 @@ void UMafiaAbilityActionGroupWidget::NativeConstruct()
 void UMafiaAbilityActionGroupWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
+	if (WidgetAnimationStartDelegate.IsBound())
+	{
+		WidgetAnimationStartDelegate.Unbind();
+	}
+
+	if (WidgetAnimationEndDelegate.IsBound())
+	{
+		WidgetAnimationEndDelegate.Unbind();
+	}
 }
 
 void UMafiaAbilityActionGroupWidget::BindDelegates()
@@ -64,6 +80,31 @@ void UMafiaAbilityActionGroupWidget::UnBindDelegates()
 		UnbindGameEvent(OnChangedMatchState, OnChangedMatchStateHandle);
 	}
 	
+}
+
+void UMafiaAbilityActionGroupWidget::OnStartAnimation()
+{
+	Super::OnStartAnimation();
+	ArrangeCircleCards();
+	TickAnimation();
+}
+
+void UMafiaAbilityActionGroupWidget::TickAnimation()
+{
+	ArrangeCircleCards();
+	UWorld* MyWorld = GetWorld();
+	if (IsValid(MyWorld))
+	{
+		if (bWidgetAnimationProgress)
+		{
+			MyWorld->GetTimerManager().SetTimer(OnAnimationTickHandle, this, &UMafiaAbilityActionGroupWidget::TickAnimation, 0.01f);
+		}
+	}
+}
+
+void UMafiaAbilityActionGroupWidget::OnEndAnimation()
+{
+	Super::OnEndAnimation();
 }
 
 void UMafiaAbilityActionGroupWidget::CreatePlayerCards()
@@ -124,8 +165,8 @@ void UMafiaAbilityActionGroupWidget::ArrangeCircleCards()
 		return;
 	}
 
-	CircleWidgetParam.InitialRotationAxis = FVector(0.f, -1.f, 0.f).RotateAngleAxis(CircleWidgetParam.AngleOfFirstWidget, { 0.f, 0.f, 1.f });
-	CircleWidgetParam.NumWidgets = CP_PlayerCardCirclePanel->GetSlots().Num();
+	InitialRotationAxis = FVector(0.f, -1.f, 0.f).RotateAngleAxis(AngleOfFirstWidget, { 0.f, 0.f, 1.f });
+	NumWidgets = CP_PlayerCardCirclePanel->GetSlots().Num();
 
 	uint32 Index = 0;
 	const TArray<UWidget*>& Children = CP_PlayerCardCirclePanel->GetAllChildren();
@@ -141,19 +182,19 @@ void UMafiaAbilityActionGroupWidget::ArrangeCircleCards()
 			PanelSlot->SetAnchors(Anchor);
 			PanelSlot->SetAlignment({ 0.5f, 0.5f });
 
-			float RotateAngleDeg = (360.f / CircleWidgetParam.NumWidgets) * Index;
-			FVector RotateVector = CircleWidgetParam.InitialRotationAxis.RotateAngleAxis(RotateAngleDeg, { 0.f, 0.f, 1.f });
-			FVector RotatePositionVector = RotateVector * CircleWidgetParam.Radius;
+			float RotateAngleDeg = (360.f / NumWidgets) * Index;
+			FVector RotateVector = InitialRotationAxis.RotateAngleAxis(RotateAngleDeg, { 0.f, 0.f, 1.f });
+			FVector RotatePositionVector = RotateVector * Radius;
 
 			PanelSlot->SetPosition({ RotatePositionVector.X, RotatePositionVector.Y });
-			if (CircleWidgetParam.bRotateWidgets)
+			if (bRotateWidgets)
 			{
 				FRotator Rotator = UKismetMathLibrary::MakeRotFromX(RotateVector);
-				PanelSlot->Content->SetRenderTransformAngle(CircleWidgetParam.BaseWidgetRotation + Rotator.Yaw);
+				PanelSlot->Content->SetRenderTransformAngle(BaseWidgetRotation + Rotator.Yaw);
 			}
 			else
 			{
-				PanelSlot->Content->SetRenderTransformAngle(CircleWidgetParam.BaseWidgetRotation);
+				PanelSlot->Content->SetRenderTransformAngle(BaseWidgetRotation);
 			}
 			Index++;
 		}

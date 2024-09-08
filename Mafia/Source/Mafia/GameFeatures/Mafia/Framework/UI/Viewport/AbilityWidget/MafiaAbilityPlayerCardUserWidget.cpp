@@ -24,42 +24,6 @@ UMafiaAbilityPlayerCardUserWidget::UMafiaAbilityPlayerCardUserWidget(const FObje
 	
 }
 
-bool UMafiaAbilityPlayerCardUserWidget::InitializePlayer(AMafiaBasePlayerState* InPlayerState)
-{
-	if (IsValid(InPlayerState))
-	{
-		OwnerPlayer = InPlayerState;
-		UpdateCard();
-	}
-	
-
-	return OwnerPlayer.IsValid();
-}
-
-void UMafiaAbilityPlayerCardUserWidget::UpdateCard()
-{
-	if (OwnerPlayer.IsValid())
-	{
-		if (UMafiaBaseRoleComponent* RoleComponent = OwnerPlayer.Get()->GetRoleComponent())
-		{
-			EMafiaColor PlayerColor = OwnerPlayer.Get()->GetPlayerColor();
-			int32 Index = int32(PlayerColor);
-
-			if (GPlayerColorKoreanNames.IsValidIndex(Index))
-			{
-				IMG_PlayerColor->SetBrushTintColor(FSlateColor(GPlayerColors[Index]));
-				IMG_AbilityIcon->SetBrushTintColor(FSlateColor(GPlayerColors[Index]));
-				TB_PlayerColor->SetText(FText::FromName(GPlayerColorKoreanNames[Index]));
-			}
-		}
-	}
-	
-}
-
-void UMafiaAbilityPlayerCardUserWidget::ResetForNextRound()
-{
-	BTN_AbilityPlayerCard->WidgetStyle.Normal.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 0.1f));	
-}
 
 
 void UMafiaAbilityPlayerCardUserWidget::NativeConstruct()
@@ -92,6 +56,45 @@ void UMafiaAbilityPlayerCardUserWidget::UnBindDelegates()
 		BTN_AbilityPlayerCard->OnClicked.RemoveDynamic(this, &UMafiaAbilityPlayerCardUserWidget::OnClickedPlayerAbilityCard);
 	}
 }
+
+
+bool UMafiaAbilityPlayerCardUserWidget::InitializePlayer(AMafiaBasePlayerState* InPlayerState)
+{
+	if (IsValid(InPlayerState))
+	{
+		OwnerPlayer = InPlayerState;
+		UpdateCard();
+	}
+
+
+	return OwnerPlayer.IsValid();
+}
+
+void UMafiaAbilityPlayerCardUserWidget::UpdateCard()
+{
+	if (OwnerPlayer.IsValid())
+	{
+		if (UMafiaBaseRoleComponent* RoleComponent = OwnerPlayer.Get()->GetRoleComponent())
+		{
+			EMafiaColor PlayerColor = OwnerPlayer.Get()->GetPlayerColor();
+			int32 Index = int32(PlayerColor);
+
+			if (GPlayerColorKoreanNames.IsValidIndex(Index))
+			{
+				IMG_PlayerColor->SetBrushTintColor(FSlateColor(GPlayerColors[Index]));
+				IMG_AbilityIcon->SetBrushTintColor(FSlateColor(GPlayerColors[Index]));
+				TB_PlayerColor->SetText(FText::FromName(GPlayerColorKoreanNames[Index]));
+			}
+		}
+	}
+
+}
+
+void UMafiaAbilityPlayerCardUserWidget::ResetForNextRound()
+{
+	BTN_AbilityPlayerCard->WidgetStyle.Normal.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 0.1f));
+}
+
 
 bool UMafiaAbilityPlayerCardUserWidget::IsOwnerPlayer(AMafiaBasePlayerState* InPlayerState)
 {

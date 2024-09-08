@@ -14,6 +14,7 @@ UMafiaBaseAbilityDwelling::UMafiaBaseAbilityDwelling(const FObjectInitializer& O
 bool UMafiaBaseAbilityDwelling::Initialize(const EMafiaColor& InColorEnum, AMafiaBasePlayerState* InPlayerState)
 {
 	ResetAll();
+
 	if (IsValid(InPlayerState))
 	{
 		if (UMafiaBaseRoleComponent* RoleComponent = InPlayerState->GetRoleComponent())
@@ -101,8 +102,8 @@ bool UMafiaBaseAbilityDwelling::RemoveDeferredAbilityEvent(AMafiaBasePlayerState
 						return ((RoleComponent->GetRoleType()) == PlayerRole);
 					}
 				}
+
 				return false;
-					
 			});
 
 			if (FindEvent)
@@ -247,5 +248,4 @@ void UMafiaBaseAbilityDwelling::ResetAll()
 
 	OriginPlayer = nullptr;
 	ChangedPlayer = nullptr;
-	
 }

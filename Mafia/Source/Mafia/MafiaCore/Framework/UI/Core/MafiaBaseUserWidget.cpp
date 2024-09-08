@@ -58,3 +58,13 @@ void UMafiaBaseUserWidget::Finalize()
 		UnBindDelegates();
 	}
 }
+
+void UMafiaBaseUserWidget::OnStartAnimation()
+{
+	bWidgetAnimationProgress = true;
+}
+
+void UMafiaBaseUserWidget::OnEndAnimation()
+{
+	bWidgetAnimationProgress = false;
+}

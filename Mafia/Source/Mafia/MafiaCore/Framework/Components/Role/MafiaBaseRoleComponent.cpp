@@ -86,8 +86,8 @@ void UMafiaBaseRoleComponent::UnBindDelegates()
 
 void UMafiaBaseRoleComponent::ResetForNextRound()
 {
-	CachedProcessedAbilityEvents.Empty();
-	CachedProcessedBroadCastEvents.Empty();
+	CachedProcessedAbilityEventsSet.Empty();
+	CachedProcessedBroadCastEventsSet.Empty();
 	CachedAffectedEventsHeap.Empty();
 	CachedBroadCastEventsHeap.Empty();
 }
@@ -365,6 +365,12 @@ void UMafiaBaseRoleComponent::HandleAbilityEvents()
 {
 	if (!CachedAffectedEventsHeap.IsEmpty())
 	{
+		FAffectedEvent OutAffectedEvent;
+		CachedAffectedEventsHeap.HeapPop(OutAffectedEvent);
+
+		HandleAbilityEvent(OutAffectedEvent);
+		CachedProcessedAbilityEventsSet.Emplace(OutAffectedEvent.AbilityPlayerRole);
+
 		UWorld* World = GetWorld();
 		if (IsValid(World))
 		{
@@ -373,16 +379,32 @@ void UMafiaBaseRoleComponent::HandleAbilityEvents()
 	}
 }
 
+void UMafiaBaseRoleComponent::HandleAbilityEvent(const FAffectedEvent& InEvent)
+{
+
+}
+
 void UMafiaBaseRoleComponent::HandleBroadCastEvents()
 {
 	if (!CachedBroadCastEventsHeap.IsEmpty())
 	{
+		FBroadCastEvent OutBroadCastEvent;
+		CachedBroadCastEventsHeap.HeapPop(OutBroadCastEvent);
+
+		HandleBroadCastEvent(OutBroadCastEvent);
+		CachedProcessedBroadCastEventsSet.Emplace(OutBroadCastEvent.EventType);
+
 		UWorld* World = GetWorld();
 		if (IsValid(World))
 		{
 			World->GetTimerManager().SetTimer(BroadCastEventTimerHandle, this, &UMafiaBaseRoleComponent::HandleBroadCastEvents, HandleBroadCastEventTime);
 		}
 	}
+}
+
+void UMafiaBaseRoleComponent::HandleBroadCastEvent(const FBroadCastEvent& InEvent)
+{
+
 }
 
 void UMafiaBaseRoleComponent::HandleReceiveAffectedAbility(EMafiaRole InRole, AMafiaBasePlayerState* InOther)

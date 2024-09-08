@@ -43,12 +43,28 @@ protected:
 		return nullptr;
 	}
 
+protected:	
+	UFUNCTION()
+	virtual void OnStartAnimation();
+
+	UFUNCTION()
+	virtual void OnEndAnimation();
+
 protected:
 	virtual void OnAllWidgetsInitialized() {}
 	virtual void BindDelegates() {}
 	virtual void UnBindDelegates() {}
 
+protected:
+	UPROPERTY()
+	uint8 bWidgetAnimationProgress : 1;
+
+	FWidgetAnimationDynamicEvent WidgetAnimationStartDelegate;
+	FWidgetAnimationDynamicEvent WidgetAnimationEndDelegate;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Widget Visibility Handle Config")
 	bool bVisibleManageByState;
+
+	
 };
