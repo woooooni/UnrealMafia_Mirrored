@@ -239,22 +239,22 @@ void UMafiaBaseRoleComponent::ServerReqUseAbility_Implementation(AMafiaBasePlaye
 
 void UMafiaBaseRoleComponent::ClientAffectedAbilityByOther_Implementation(EMafiaRole InRole, AMafiaBasePlayerState* InOther)
 {
-	HandleReceiveAffectedAbility(InRole, InOther);
+	HandleReceiveAffectedAbilityEvent(InRole, InOther);
 }
 
 void UMafiaBaseRoleComponent::ClientResponseUseAbility_Implementation(AMafiaBasePlayerState* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
 {
-	HandleResponseUseAbility(InOther, InFlag, InEventType);
+	HandleResponseUseAbilityEvent(InOther, InFlag, InEventType);
 }
 
 void UMafiaBaseRoleComponent::ClientNotifyResultAbility_Implementation(AMafiaBasePlayerState* InOther)
 {
-	HandleNotifyResultAbility(InOther);
+	HandleNotifyResultAbilityEvent(InOther);
 }
 
 void UMafiaBaseRoleComponent::ClientAbilityEventsFlush_Implementation()
 {
-	HandleAbilityEvents();
+	HandleAffectedAbilityEvents();
 }
 
 void UMafiaBaseRoleComponent::ClientReceiveInstantEvent_Implementation(AMafiaBasePlayerState* InOther)
@@ -301,7 +301,7 @@ void UMafiaBaseRoleComponent::ClientResponseVoteEvent_Implementation(AMafiaBaseP
 
 void UMafiaBaseRoleComponent::ClientReceiveVoteResult_Implementation(AMafiaBasePlayerState* InDeadMan, EMafiaVoteResultFlag InFlag)
 {
-	HandleReceiveVoteResult(InDeadMan, InFlag);
+	HandleReceiveVoteResultEvent(InDeadMan, InFlag);
 }
 
 void UMafiaBaseRoleComponent::ClientFinishVoteEvent_Implementation()
@@ -352,7 +352,7 @@ void UMafiaBaseRoleComponent::OnChangedMafiaFlowState(const EMafiaFlowState& InM
 
 	else if (InMafiaFlowState == EMafiaFlowState::EndNight)
 	{
-		HandleAbilityEvents();
+		HandleAffectedAbilityEvents();
 	}
 
 	else if (InMafiaFlowState == EMafiaFlowState::BeforeDay)
@@ -361,25 +361,25 @@ void UMafiaBaseRoleComponent::OnChangedMafiaFlowState(const EMafiaFlowState& InM
 	}
 }
 
-void UMafiaBaseRoleComponent::HandleAbilityEvents()
+void UMafiaBaseRoleComponent::HandleAffectedAbilityEvents()
 {
 	if (!CachedAffectedEventsHeap.IsEmpty())
 	{
 		FAffectedEvent OutAffectedEvent;
 		CachedAffectedEventsHeap.HeapPop(OutAffectedEvent);
 
-		HandleAbilityEvent(OutAffectedEvent);
+		HandleAffectedAbilityEvent(OutAffectedEvent);
 		CachedProcessedAbilityEventsSet.Emplace(OutAffectedEvent.AbilityPlayerRole);
 
 		UWorld* World = GetWorld();
 		if (IsValid(World))
 		{
-			World->GetTimerManager().SetTimer(AffectedAbilityTimerHandle, this, &UMafiaBaseRoleComponent::HandleAbilityEvents, HandleAbilityEventTime);
+			World->GetTimerManager().SetTimer(AffectedAbilityTimerHandle, this, &UMafiaBaseRoleComponent::HandleAffectedAbilityEvents, HandleAbilityEventTime);
 		}
 	}
 }
 
-void UMafiaBaseRoleComponent::HandleAbilityEvent(const FAffectedEvent& InEvent)
+void UMafiaBaseRoleComponent::HandleAffectedAbilityEvent(const FAffectedEvent& InEvent)
 {
 
 }
@@ -407,7 +407,7 @@ void UMafiaBaseRoleComponent::HandleBroadCastEvent(const FBroadCastEvent& InEven
 
 }
 
-void UMafiaBaseRoleComponent::HandleReceiveAffectedAbility(EMafiaRole InRole, AMafiaBasePlayerState* InOther)
+void UMafiaBaseRoleComponent::HandleReceiveAffectedAbilityEvent(EMafiaRole InRole, AMafiaBasePlayerState* InOther)
 {
 	if (IsValid(InOther))
 	{
@@ -430,7 +430,7 @@ void UMafiaBaseRoleComponent::HandleReceiveBroadCastEvent(AMafiaBasePlayerState*
 	}
 }
 
-void UMafiaBaseRoleComponent::HandleResponseUseAbility(AMafiaBasePlayerState* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
+void UMafiaBaseRoleComponent::HandleResponseUseAbilityEvent(AMafiaBasePlayerState* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
 {
 	SendGameEvent_ThreeParams(OnResponseUseAbility, InOther, InFlag, InEventType);
 }

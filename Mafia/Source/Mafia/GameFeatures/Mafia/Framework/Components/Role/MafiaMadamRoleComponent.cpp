@@ -2,6 +2,7 @@
 
 
 #include "GameFeatures/Mafia/Framework/Components/Role/MafiaMadamRoleComponent.h"
+#include "MafiaCore/Framework/Player/MafiaBasePlayerState.h"
 
 UMafiaMadamRoleComponent::UMafiaMadamRoleComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

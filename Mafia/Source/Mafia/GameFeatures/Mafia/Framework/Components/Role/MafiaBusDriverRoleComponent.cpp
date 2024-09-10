@@ -85,15 +85,75 @@ EMafiaUseAbilityFlag UMafiaBusDriverRoleComponent::PickupPassenger(UMafiaBaseAbi
 	return EMafiaUseAbilityFlag::Failed;
 }
 
+void UMafiaBusDriverRoleComponent::HandleResponseUseAbilityEvent(AMafiaBasePlayerState* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
+{
+	Super::HandleResponseUseAbilityEvent(InOther, InFlag, InEventType);
+	if (InFlag == EMafiaUseAbilityFlag::Succeed)
+	{
+		EMafiaColor OtherColor = InOther->GetPlayerColor();
+		MAFIA_ULOG(LogMafiaAbility, Log, TEXT("%s을 승객으로 태웠습니다."), *GPlayerColorKoreanNames[int32(OtherColor)].ToString());
+	}
+}
+
+void UMafiaBusDriverRoleComponent::HandleReceiveAffectedAbilityEvent(EMafiaRole InRole, AMafiaBasePlayerState* InOther)
+{
+	Super::HandleReceiveAffectedAbilityEvent(InRole, InOther);
+}
+
+void UMafiaBusDriverRoleComponent::HandleReceiveInstantEvent(AMafiaBasePlayerState* InOther)
+{
+	Super::HandleReceiveInstantEvent(InOther);
+}
+
+void UMafiaBusDriverRoleComponent::HandleNotifyResultAbilityEvent(AMafiaBasePlayerState* InOther)
+{
+	Super::HandleNotifyResultAbilityEvent(InOther);
+}
+
+void UMafiaBusDriverRoleComponent::HandleReceiveBroadCastEvent(AMafiaBasePlayerState* InSender, const EMafiaBroadCastEvent& InEvent)
+{
+	Super::HandleReceiveBroadCastEvent(InSender, InEvent);
+}
+
+void UMafiaBusDriverRoleComponent::HandleAffectedAbilityEvent(const FAffectedEvent& InEvent)
+{
+	Super::HandleAffectedAbilityEvent(InEvent);
+}
+
+void UMafiaBusDriverRoleComponent::HandleBroadCastEvent(const FBroadCastEvent& InEvent)
+{
+	Super::HandleBroadCastEvent(InEvent);
+}
+
+void UMafiaBusDriverRoleComponent::HandleStartVoteEvent()
+{
+	Super::HandleStartVoteEvent();
+}
+
+void UMafiaBusDriverRoleComponent::HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag)
+{
+	Super::HandleResponseVoteEvent(InCandidate, InFlag);
+}
+
+void UMafiaBusDriverRoleComponent::HandleReceiveVoteResultEvent(AMafiaBasePlayerState* InDeathRow, EMafiaVoteResultFlag InFlag)
+{
+	Super::HandleReceiveVoteResultEvent(InDeathRow, InFlag);
+}
+
+void UMafiaBusDriverRoleComponent::HandleFinishVoteEvent()
+{
+	Super::HandleFinishVoteEvent();
+}
+
 
 void UMafiaBusDriverRoleComponent::OnRep_Dead()
 {
-	
+	Super::OnRep_Dead();
 }
 
 void UMafiaBusDriverRoleComponent::OnRep_BusData()
 {
-
+	
 }
 
 

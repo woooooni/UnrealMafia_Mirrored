@@ -212,22 +212,22 @@ protected:
 
 protected:
 	/** ktw : Only Exec On Client */
-	virtual void HandleResponseUseAbility(AMafiaBasePlayerState* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType);
-	virtual void HandleReceiveAffectedAbility(EMafiaRole InRole, AMafiaBasePlayerState* InOther);
+	virtual void HandleResponseUseAbilityEvent(AMafiaBasePlayerState* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType);
+	virtual void HandleReceiveAffectedAbilityEvent(EMafiaRole InRole, AMafiaBasePlayerState* InOther);
 	virtual void HandleReceiveInstantEvent(AMafiaBasePlayerState* InOther) { /**/ };
-	virtual void HandleNotifyResultAbility(AMafiaBasePlayerState* InOther) { /**/ };
+	virtual void HandleNotifyResultAbilityEvent(AMafiaBasePlayerState* InOther) { /**/ };
 	virtual void HandleReceiveBroadCastEvent(AMafiaBasePlayerState* InSender, const EMafiaBroadCastEvent& InEvent);
 
-	void HandleAbilityEvents();
+	void HandleAffectedAbilityEvents();
 	void HandleBroadCastEvents();
 
-	virtual void HandleAbilityEvent(const FAffectedEvent& InEvent);
+	virtual void HandleAffectedAbilityEvent(const FAffectedEvent& InEvent);
 	virtual void HandleBroadCastEvent(const FBroadCastEvent& InEvent);
 	
 
 	virtual void HandleStartVoteEvent() { /**/ };
 	virtual void HandleResponseVoteEvent(AMafiaBasePlayerState* InCandidate, EMafiaVoteFlag InFlag) { /**/ };
-	virtual void HandleReceiveVoteResult(AMafiaBasePlayerState* InDeathRow, EMafiaVoteResultFlag InFlag) { /**/ };
+	virtual void HandleReceiveVoteResultEvent(AMafiaBasePlayerState* InDeathRow, EMafiaVoteResultFlag InFlag) { /**/ };
 	virtual void HandleFinishVoteEvent() { /**/ };
 
 protected:
