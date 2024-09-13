@@ -23,9 +23,6 @@ public:
 
 	UPROPERTY()
 	TWeakObjectPtr<class UMafiaBaseAbilityDwelling> SecondPassenger;
-
-	UPROPERTY()
-	TWeakObjectPtr<UMafiaBusDriverRoleComponent> BusDriver;
 };
 
 /**
@@ -45,11 +42,11 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
-	//FORCEINLINE const FBusData& GetBusData() { return BusData; }
-
-public:
 	void BusDrive(class UMafiaChairmanManager* InContext);
 	EMafiaUseAbilityFlag PickupPassenger(class UMafiaBaseAbilityDwelling* InPassengerDwelling);
+
+protected:
+	void CheckTrafficAccident();
 
 protected:
 	virtual void HandleResponseUseAbilityEvent(AMafiaBasePlayerState* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType) override;
@@ -68,6 +65,9 @@ protected:
 	virtual void HandleReceiveVoteResultEvent(AMafiaBasePlayerState* InDeathRow, EMafiaVoteResultFlag InFlag) override;
 	virtual void HandleFinishVoteEvent() override;
 	
+
+protected:
+	virtual void OnChangedMafiaFlowState(const EMafiaFlowState& InFlowState) override;
 
 protected:
 	virtual void OnRep_Dead() override;

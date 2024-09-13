@@ -14,8 +14,6 @@ UMafiaBusDriverRoleComponent::UMafiaBusDriverRoleComponent(const FObjectInitiali
 	RoleType = EMafiaRole::BusDriver;
 	RoleName = TEXT("버스기사");
 	AbilityEventType = EMafiaAbilityEventType::BusDriveEvent;
-
-	BusData.BusDriver = this;
 }
 
 void UMafiaBusDriverRoleComponent::BeginPlay()
@@ -30,19 +28,30 @@ void UMafiaBusDriverRoleComponent::GetLifetimeReplicatedProps(TArray<FLifetimePr
 	
 }
 
+
 void UMafiaBusDriverRoleComponent::BusDrive(UMafiaChairmanManager* InContext)
 {
 	if (IsValid(InContext))
 	{
 		UMafiaBaseAbilityDwelling* FirstPassenger = BusData.FirstPassenger.Get();
 		UMafiaBaseAbilityDwelling* SecondPassenger = BusData.SecondPassenger.Get();
-		if (IsValid(FirstPassenger) && IsValid(SecondPassenger) && BusData.BusDriver.IsValid())
+		if (IsValid(FirstPassenger) && IsValid(SecondPassenger))
 		{
-			FirstPassenger->SetChangedPlayer(SecondPassenger->GetOriginPlayerState());
-			SecondPassenger->SetChangedPlayer(FirstPassenger->GetOriginPlayerState());
+			bool bSucceed = true;
+			bSucceed &= FirstPassenger->SetChangedPlayer(SecondPassenger->GetOriginPlayerState());
+			bSucceed &= SecondPassenger->SetChangedPlayer(FirstPassenger->GetOriginPlayerState());
 
-			FirstPassenger->AddDeferredAbilityEvent(BusData.BusDriver.Get()->GetOwningPlayerState(), EMafiaAbilityEventType::DeferredEvent);
-			SecondPassenger->AddDeferredAbilityEvent(BusData.BusDriver.Get()->GetOwningPlayerState(), EMafiaAbilityEventType::DeferredEvent);
+			if (bSucceed == false)
+			{
+				FirstPassenger->ResetChangedPlayer();
+				SecondPassenger->ResetChangedPlayer();
+				return;
+			}
+
+			FirstPassenger->AddDeferredAbilityEvent(GetOwningPlayerState(), EMafiaAbilityEventType::DeferredEvent);
+			SecondPassenger->AddDeferredAbilityEvent(GetOwningPlayerState(), EMafiaAbilityEventType::DeferredEvent);
+
+			CheckTrafficAccident();
 		}
 	}
 }
@@ -81,8 +90,56 @@ EMafiaUseAbilityFlag UMafiaBusDriverRoleComponent::PickupPassenger(UMafiaBaseAbi
 		}
 	}
 	
-
 	return EMafiaUseAbilityFlag::Failed;
+}
+
+void UMafiaBusDriverRoleComponent::CheckTrafficAccident()
+{
+	UMafiaBaseAbilityDwelling* FirstPassenger = BusData.FirstPassenger.Get();
+	UMafiaBaseAbilityDwelling* SecondPassenger = BusData.SecondPassenger.Get();
+
+	if (IsValid(FirstPassenger) && IsValid(SecondPassenger))
+	{
+		UMafiaBaseRoleComponent* FirstRoleComponent = FirstPassenger->GetOriginPlayerRoleComponent();
+		UMafiaBaseRoleComponent* SecondRoleComponent = SecondPassenger->GetOriginPlayerRoleComponent();
+
+		if (IsValid(FirstRoleComponent) && IsValid(SecondRoleComponent))
+		{
+			EMafiaRole FirstRoleType = FirstRoleComponent->GetRoleType();
+			EMafiaRole SecondRoleType = SecondRoleComponent->GetRoleType();
+
+			bool bKillerRoleFlag = false;
+
+			bKillerRoleFlag |= (FirstRoleType == EMafiaRole::GodFather);
+			bKillerRoleFlag |= (FirstRoleType == EMafiaRole::Killer);
+			bKillerRoleFlag |= (FirstRoleType == EMafiaRole::Vigilante);
+			bKillerRoleFlag &= (FirstRoleType != EMafiaRole::GodFather);
+
+			if (bKillerRoleFlag)
+			{
+				if (SecondPassenger->CheckAffectedOtherRole(FirstRoleType))
+				{
+					SendBroadCastEvent(EMafiaBroadCastEvent::TrafficAccident);
+				}
+			}
+
+			bKillerRoleFlag = false;
+			bKillerRoleFlag |= (SecondRoleType == EMafiaRole::GodFather);
+			bKillerRoleFlag |= (SecondRoleType == EMafiaRole::Killer);
+			bKillerRoleFlag |= (SecondRoleType == EMafiaRole::Vigilante);
+			bKillerRoleFlag &= (SecondRoleType != EMafiaRole::GodFather);
+
+			if (bKillerRoleFlag)
+			{
+				if (FirstPassenger->CheckAffectedOtherRole(SecondRoleType))
+				{
+					SendBroadCastEvent(EMafiaBroadCastEvent::TrafficAccident);
+				}
+			}
+		}
+	}
+
+	return;
 }
 
 void UMafiaBusDriverRoleComponent::HandleResponseUseAbilityEvent(AMafiaBasePlayerState* InOther, EMafiaUseAbilityFlag InFlag, EMafiaAbilityEventType InEventType)
@@ -145,6 +202,15 @@ void UMafiaBusDriverRoleComponent::HandleFinishVoteEvent()
 	Super::HandleFinishVoteEvent();
 }
 
+
+void UMafiaBusDriverRoleComponent::OnChangedMafiaFlowState(const EMafiaFlowState& InFlowState)
+{
+	Super::OnChangedMafiaFlowState(InFlowState);
+	if (InFlowState == EMafiaFlowState::BeforeNight)
+	{
+		BusData.Reset();
+	}
+}
 
 void UMafiaBusDriverRoleComponent::OnRep_Dead()
 {

@@ -233,6 +233,48 @@ bool UMafiaBaseAbilityDwelling::SetChangedPlayer(AMafiaBasePlayerState* InAffect
 	return ChangedPlayer.IsValid();
 }
 
+UMafiaBaseRoleComponent* UMafiaBaseAbilityDwelling::GetOriginPlayerRoleComponent()
+{
+	if (OriginPlayer.IsValid())
+	{
+		return OriginPlayer.Get()->GetRoleComponent();
+	}
+	return nullptr;
+}
+
+UMafiaBaseRoleComponent* UMafiaBaseAbilityDwelling::GetChangedPlayerRoleComponent()
+{
+	if (ChangedPlayer.IsValid())
+	{
+		return ChangedPlayer.Get()->GetRoleComponent();
+	}
+	return nullptr;
+}
+
+bool UMafiaBaseAbilityDwelling::CheckAffectedOtherRole(EMafiaRole InRole)
+{
+	FAbilityEvent* FindEvent = DeferredEventArray.FindByPredicate([&](const FAbilityEvent& Event)
+	{
+		if (Event.AbilityUser.IsValid())
+		{
+			if (UMafiaBaseRoleComponent* RoleComponent = Event.AbilityUser.Get()->GetRoleComponent())
+			{
+				return ((RoleComponent->GetRoleType()) == InRole);
+			}
+		}
+
+		return false;
+	});
+
+
+	return FindEvent != nullptr;
+}
+
+void UMafiaBaseAbilityDwelling::ResetChangedPlayer()
+{
+	ChangedPlayer = OriginPlayer;
+}
+
 void UMafiaBaseAbilityDwelling::ResetForNextRound()
 {
 	DeferredEventArray.Empty();

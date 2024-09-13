@@ -81,4 +81,5 @@ void UMafiaGodFatherRoleComponent::HandleFinishVoteEvent()
 
 void UMafiaGodFatherRoleComponent::OnRep_Dead()
 {
+
 }

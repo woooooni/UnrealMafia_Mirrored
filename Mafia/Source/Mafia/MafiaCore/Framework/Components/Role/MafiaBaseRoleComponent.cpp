@@ -363,13 +363,17 @@ void UMafiaBaseRoleComponent::OnChangedMafiaFlowState(const EMafiaFlowState& InM
 
 void UMafiaBaseRoleComponent::HandleAffectedAbilityEvents()
 {
+	for (auto& Event : CachedAffectedEventsHeap)
+	{
+		CachedProcessedAbilityEventsSet.Emplace(Event.AbilityPlayerRole);
+	}
+	
 	if (!CachedAffectedEventsHeap.IsEmpty())
 	{
 		FAffectedEvent OutAffectedEvent;
 		CachedAffectedEventsHeap.HeapPop(OutAffectedEvent);
 
 		HandleAffectedAbilityEvent(OutAffectedEvent);
-		CachedProcessedAbilityEventsSet.Emplace(OutAffectedEvent.AbilityPlayerRole);
 
 		UWorld* World = GetWorld();
 		if (IsValid(World))
@@ -381,18 +385,22 @@ void UMafiaBaseRoleComponent::HandleAffectedAbilityEvents()
 
 void UMafiaBaseRoleComponent::HandleAffectedAbilityEvent(const FAffectedEvent& InEvent)
 {
-
+	
 }
 
 void UMafiaBaseRoleComponent::HandleBroadCastEvents()
 {
+	for (auto& Event : CachedBroadCastEventsHeap)
+	{
+		CachedProcessedBroadCastEventsSet.Emplace(Event.EventType);
+	}
+
 	if (!CachedBroadCastEventsHeap.IsEmpty())
 	{
 		FBroadCastEvent OutBroadCastEvent;
 		CachedBroadCastEventsHeap.HeapPop(OutBroadCastEvent);
 
 		HandleBroadCastEvent(OutBroadCastEvent);
-		CachedProcessedBroadCastEventsSet.Emplace(OutBroadCastEvent.EventType);
 
 		UWorld* World = GetWorld();
 		if (IsValid(World))
@@ -426,7 +434,7 @@ void UMafiaBaseRoleComponent::HandleReceiveBroadCastEvent(AMafiaBasePlayerState*
 		Event.EventSender = InSender;
 		Event.EventType = InEvent;
 
-		CachedBroadCastEventsHeap.HeapPush(Event);
+		CachedBroadCastEventsHeap.HeapPush(Event);\
 	}
 }
 
