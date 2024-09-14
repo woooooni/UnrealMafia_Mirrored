@@ -19,6 +19,7 @@ class MAFIA_API UMafiaAbilityActionGroupWidget : public UMafiaBaseActionGroupWid
 private:
 	UMafiaAbilityActionGroupWidget(const FObjectInitializer& ObjectInitializer);
 
+protected:
 	virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
@@ -26,12 +27,7 @@ private:
 	virtual void UnBindDelegates() override;
 
 private:
-	virtual void OnStartAnimation() override;
-	void TickAnimation();
-	virtual void OnEndAnimation() override;
-
-private:
-	void CreatePlayerCards();
+	void InitializeCards();
 	void ArrangeCircleCards();
 	void UpdatePlayerCards();
 	void ResetCards();
@@ -43,9 +39,6 @@ private:
 	void OnChangedMafiaFlowState(const EMafiaFlowState& InFlowState);
 	void OnChangedMatchState(const FName& InMatchState);
 	void OnResponseUseAbility(const class AMafiaBasePlayerState* InOther, const EMafiaUseAbilityFlag InFlag, const EMafiaAbilityEventType InEventType);
-	void OnClickedCard();
-
-
 
 private:
 	bool IsAbilityRole();
@@ -53,27 +46,30 @@ private:
 
 	
 public:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UMG")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Card Class")
+	TSoftClassPtr<class UMafiaBaseUserWidget> CardWidgetClass;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Circle Arrange")
 	uint8 NumWidgets;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UMG")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Circle Arrange")
 	FVector InitialRotationAxis;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Interp, Category = "UMG")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Interp, Category = "Circle Arrange")
 	float Radius;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "UMG")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Arrange")
 	float AngleOfFirstWidget;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "UMG")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Arrange")
 	float BaseWidgetRotation;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "UMG")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Arrange")
 	uint8 bRotateWidgets : 1;
 
 private:
 	UPROPERTY(meta = (BindWidgetOptional))
-	TObjectPtr<class UCanvasPanel> CP_PlayerCardCirclePanel;
+	TObjectPtr<class UCanvasPanel> CP_AbilityCanvas;
 
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<class UImage> IMG_AbilityIcon;
@@ -84,21 +80,10 @@ private:
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<class UTextBlock> TB_AbilityToolTip;
 
-	UPROPERTY(meta = (BindWidgetAnimOptional), Transient)
-	TObjectPtr<class UWidgetAnimation> ArrangeCircleCardAnimation;
-
-private:
-	TArray<TWeakObjectPtr<class UMafiaAbilityPlayerCardUserWidget>> PlayerCards;
-
-private:
-	TSubclassOf<class UMafiaAbilityPlayerCardUserWidget> CardWidgetClass;
-
 private:
 	FDelegateHandle OnChangedMatchStateHandle;
 	FDelegateHandle OnChangedMafiaFlowStateHandle;
 	FDelegateHandle OnClickedPlayerCard;
-	FDelegateHandle OnResponseAbilityHandle;
-	
-	FTimerHandle OnAnimationTickHandle;
+	FDelegateHandle OnResponseAbilityHandle;	
 	
 };

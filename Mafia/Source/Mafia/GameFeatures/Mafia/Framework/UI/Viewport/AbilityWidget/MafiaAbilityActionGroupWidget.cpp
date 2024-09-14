@@ -17,11 +17,7 @@
 UMafiaAbilityActionGroupWidget::UMafiaAbilityActionGroupWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	static ConstructorHelpers::FClassFinder<UUserWidget> PlayerCardWidgetRef = TEXT("/Game/UI/ActionGruopWidget/Viewport/Ability/WBP_MafiaAbilityPlayerCard.WBP_MafiaAbilityPlayerCard_C");
-	if (PlayerCardWidgetRef.Succeeded())
-	{
-		CardWidgetClass = PlayerCardWidgetRef.Class;
-	}
+
 }
 
 void UMafiaAbilityActionGroupWidget::NativePreConstruct()
@@ -29,14 +25,6 @@ void UMafiaAbilityActionGroupWidget::NativePreConstruct()
 	Super::NativePreConstruct();
 	ArrangeCircleCards();
 	UpdatePlayerCards();
-
-	if (ArrangeCircleCardAnimation)
-	{
-		WidgetAnimationStartDelegate.BindDynamic(this, &UMafiaAbilityActionGroupWidget::OnStartAnimation);
-		WidgetAnimationEndDelegate.BindDynamic(this, &UMafiaAbilityActionGroupWidget::OnEndAnimation);
-		BindToAnimationStarted(ArrangeCircleCardAnimation, WidgetAnimationStartDelegate);
-		BindToAnimationFinished(ArrangeCircleCardAnimation, WidgetAnimationEndDelegate);
-	}
 }
 
 void UMafiaAbilityActionGroupWidget::NativeConstruct()
@@ -47,15 +35,6 @@ void UMafiaAbilityActionGroupWidget::NativeConstruct()
 void UMafiaAbilityActionGroupWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
-	if (WidgetAnimationStartDelegate.IsBound())
-	{
-		WidgetAnimationStartDelegate.Unbind();
-	}
-
-	if (WidgetAnimationEndDelegate.IsBound())
-	{
-		WidgetAnimationEndDelegate.Unbind();
-	}
 }
 
 void UMafiaAbilityActionGroupWidget::BindDelegates()
@@ -64,7 +43,6 @@ void UMafiaAbilityActionGroupWidget::BindDelegates()
 	OnChangedMafiaFlowStateHandle = BindGameEvent(OnChangedMafiaFlowState, &UMafiaAbilityActionGroupWidget::OnChangedMafiaFlowState);
 	OnChangedMatchStateHandle = BindGameEvent(OnChangedMatchState, &UMafiaAbilityActionGroupWidget::OnChangedMatchState);
 	OnResponseAbilityHandle = BindGameEvent(OnResponseUseAbility, &UMafiaAbilityActionGroupWidget::OnResponseUseAbility);
-	OnClickedPlayerCard = BindGameEvent(OnClickedPlayerCard, &UMafiaAbilityActionGroupWidget::OnClickedCard);
 }
 
 void UMafiaAbilityActionGroupWidget::UnBindDelegates()
@@ -82,155 +60,165 @@ void UMafiaAbilityActionGroupWidget::UnBindDelegates()
 	
 }
 
-void UMafiaAbilityActionGroupWidget::OnStartAnimation()
-{
-	Super::OnStartAnimation();
-	ArrangeCircleCards();
-	TickAnimation();
-}
 
-void UMafiaAbilityActionGroupWidget::TickAnimation()
-{
-	ArrangeCircleCards();
-	UWorld* MyWorld = GetWorld();
-	if (IsValid(MyWorld))
-	{
-		if (bWidgetAnimationProgress)
-		{
-			MyWorld->GetTimerManager().SetTimer(OnAnimationTickHandle, this, &UMafiaAbilityActionGroupWidget::TickAnimation, 0.01f);
-		}
-	}
-}
-
-void UMafiaAbilityActionGroupWidget::OnEndAnimation()
-{
-	Super::OnEndAnimation();
-}
-
-void UMafiaAbilityActionGroupWidget::CreatePlayerCards()
+void UMafiaAbilityActionGroupWidget::InitializeCards()
 {
 	UWorld* World = GetWorld();
-	
-	if (IsValid(World))
+	if (IsValid(World) == false)
 	{
-		bool bAbilityRole = IsAbilityRole();
+		ensure(false);
+		return;
+	}
 
-		if (AMafiaBaseGameState* GameState = World->GetGameState<AMafiaBaseGameState>())
+	AMafiaBaseGameState* GameState = World->GetGameState<AMafiaBaseGameState>();
+	if (IsValid(GameState) == false)
+	{
+		ensure(false);
+		return;
+	}
+
+	AMafiaBasePlayerState* MyPlayerState = GetOwningPlayerState<AMafiaBasePlayerState>();
+	if (IsValid(MyPlayerState) == false)
+	{
+		ensure(false);
+		return;
+	}
+
+	UMafiaBaseRoleComponent* MyRoleComponent = MyPlayerState->GetRoleComponent();
+	if (IsValid(MyRoleComponent) == false)
+	{
+		ensure(false);
+		return;
+	}
+
+	ResetCards();
+
+	if (IsAbilityRole())
+	{
+		int32 Index = 0;
+
+		TArray<TWeakObjectPtr<AMafiaBasePlayerState>> OutPlayerStateArray;
+		GameState->GetJoinedUserPlayerStateMap().GenerateValueArray(OutPlayerStateArray);
+
+		for (UWidget* Widget : CP_AbilityCanvas->GetAllChildren())
 		{
-			uint32 NumOfPlayer = GameState->GetJoinedUserCount();
-			int32 Index = 0;
-			for (auto& Pair : GameState->GetJoinedUserPlayerStateMap())
+			if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Cast<UMafiaAbilityPlayerCardUserWidget>(Widget))
 			{
-				if (AMafiaBasePlayerState* OtherPlayerState = Pair.Value.Get())
+				if (OutPlayerStateArray.IsValidIndex(Index))
 				{
-					if (OtherPlayerState->GetUniqueId() == GetOwningPlayerState()->GetUniqueId())
+					if (MyPlayerState->GetUniqueId() != OutPlayerStateArray[Index].Get()->GetUniqueId())
 					{
-						if (UMafiaBaseRoleComponent* MyRoleComponent = OtherPlayerState->GetRoleComponent())
-						{
-							EMafiaRole MyRole = MyRoleComponent->GetRoleType();
-							TB_RoleName->SetText(FText::FromName(MyRoleComponent->GetRoleName()));
-							// TB_AbilityToolTip->SetText();
-						}
+						CardWidget->InitializePlayer(OutPlayerStateArray[Index].Get());
+						CardWidget->SetVisibility(ESlateVisibility::Visible);
 					}
-					else
-					{
-						if (bAbilityRole)
-						{
-							if (UMafiaBaseRoleComponent* RoleComponent = OtherPlayerState->GetRoleComponent())
-							{
-								// const FName WidgetName = FName(*FString::Printf(TEXT("PlayerCard %d"), Index));
-								UMafiaAbilityPlayerCardUserWidget* CardWidget = CreateWidget<UMafiaAbilityPlayerCardUserWidget>(GetWorld(), CardWidgetClass.Get());
-								if (IsValid(CardWidget))
-								{
-									CardWidget->InitializePlayer(OtherPlayerState);
-									CP_PlayerCardCirclePanel->AddChildToCanvas(CardWidget);
-									PlayerCards.Add(CardWidget);
-								}
-							}
-						}
-					}
+					Index++;
 				}
-				Index++;
+				else
+				{
+					CardWidget->SetVisibility(ESlateVisibility::Collapsed);
+				}
 			}
 		}
 	}
+	
+	TB_RoleName->SetText(FText::FromName(MyRoleComponent->GetRoleName()));
 
 	ArrangeCircleCards();
+	UpdatePlayerCards();
 }
 
 void UMafiaAbilityActionGroupWidget::ArrangeCircleCards()
 {
-	if (IsValid(CP_PlayerCardCirclePanel) == false)
+	if (IsValid(CP_AbilityCanvas) == false)
 	{
 		return;
 	}
 
-	InitialRotationAxis = FVector(0.f, -1.f, 0.f).RotateAngleAxis(AngleOfFirstWidget, { 0.f, 0.f, 1.f });
-	NumWidgets = CP_PlayerCardCirclePanel->GetSlots().Num();
-
-	uint32 Index = 0;
-	const TArray<UWidget*>& Children = CP_PlayerCardCirclePanel->GetAllChildren();
-
-	FAnchors Anchor;
-	Anchor.Minimum = { 0.5f, 0.5f };
-	Anchor.Maximum = { 0.5f, 0.5f };
-
-	for (auto& ChildSlot : CP_PlayerCardCirclePanel->GetSlots())
+	NumWidgets = 0;
+	for (auto& Widget : CP_AbilityCanvas->GetAllChildren())
 	{
-		if (UCanvasPanelSlot* PanelSlot = Cast<UCanvasPanelSlot>(ChildSlot))
+		if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Cast<UMafiaAbilityPlayerCardUserWidget>(Widget))
 		{
-			PanelSlot->SetAnchors(Anchor);
-			PanelSlot->SetAlignment({ 0.5f, 0.5f });
-
-			float RotateAngleDeg = (360.f / NumWidgets) * Index;
-			FVector RotateVector = InitialRotationAxis.RotateAngleAxis(RotateAngleDeg, { 0.f, 0.f, 1.f });
-			FVector RotatePositionVector = RotateVector * Radius;
-
-			PanelSlot->SetPosition({ RotatePositionVector.X, RotatePositionVector.Y });
-			if (bRotateWidgets)
-			{
-				FRotator Rotator = UKismetMathLibrary::MakeRotFromX(RotateVector);
-				PanelSlot->Content->SetRenderTransformAngle(BaseWidgetRotation + Rotator.Yaw);
-			}
-			else
-			{
-				PanelSlot->Content->SetRenderTransformAngle(BaseWidgetRotation);
-			}
-			Index++;
+			if (CardWidget->GetVisibility() != ESlateVisibility::Collapsed)
+				NumWidgets++;
 		}
 	}
+
+	InitialRotationAxis = FVector(0.f, -1.f, 0.f).RotateAngleAxis(AngleOfFirstWidget, { 0.f, 0.f, 1.f });
+	if (0 < NumWidgets)
+	{
+		uint32 Index = 0;
+
+		FAnchors Anchor;
+		Anchor.Minimum = { 0.5f, 0.5f };
+		Anchor.Maximum = { 0.5f, 0.5f };
+
+		for (UPanelSlot* PanelSlot : CP_AbilityCanvas->GetSlots())
+		{
+			if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Cast<UMafiaAbilityPlayerCardUserWidget>(PanelSlot->Content))
+			{
+				if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(PanelSlot))
+				{
+					CanvasSlot->SetAnchors(Anchor);
+					CanvasSlot->SetAlignment({ 0.5f, 0.5f });
+
+					float RotateAngleDeg = (360.f / NumWidgets) * Index;
+					FVector RotateVector = InitialRotationAxis.RotateAngleAxis(RotateAngleDeg, { 0.f, 0.f, 1.f });
+					FVector RotatePositionVector = RotateVector * Radius;
+
+					CanvasSlot->SetPosition({ RotatePositionVector.X, RotatePositionVector.Y });
+					if (bRotateWidgets)
+					{
+						FRotator Rotator = UKismetMathLibrary::MakeRotFromX(RotateVector);
+						CardWidget->SetRenderTransformAngle(BaseWidgetRotation + Rotator.Yaw);
+					}
+					else
+					{
+						CardWidget->SetRenderTransformAngle(BaseWidgetRotation);
+					}
+					Index++;
+				}
+				
+			}
+		}
+	}
+
+	
 }
 
 void UMafiaAbilityActionGroupWidget::UpdatePlayerCards()
 {
-	for(auto Weak : PlayerCards)
+	const TArray<UWidget*>& Children = CP_AbilityCanvas->GetAllChildren();
+	for (auto& Card : Children)
 	{
-		if (Weak.IsValid())
+		if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Cast<UMafiaAbilityPlayerCardUserWidget>(Card))
 		{
-			Weak.Get()->UpdateCard();
+			CardWidget->UpdateCard();
 		}
 	}
 }
 
 void UMafiaAbilityActionGroupWidget::ResetCards()
 {
-	if (IsValid(CP_PlayerCardCirclePanel))
+	const TArray<UWidget*>& Children = CP_AbilityCanvas->GetAllChildren();
+	for (auto& Card : Children)
 	{
-		CP_PlayerCardCirclePanel->ClearChildren();
+		if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Cast<UMafiaAbilityPlayerCardUserWidget>(Card))
+		{
+			CardWidget->Reset();
+			CardWidget->SetVisibility(ESlateVisibility::Collapsed);
+		}
 	}
-	PlayerCards.Empty();
 }
 
 void UMafiaAbilityActionGroupWidget::ResetForNextRound()
 {
-	for (auto Weak : PlayerCards)
+	const TArray<UWidget*>& Children = CP_AbilityCanvas->GetAllChildren();
+	for (auto& Card : Children)
 	{
-		if (Weak.IsValid())
+		if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Cast<UMafiaAbilityPlayerCardUserWidget>(Card))
 		{
-			if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Weak.Get())
-			{
-				CardWidget->ResetForNextRound();
-			}
+			CardWidget->ResetForNextRound();
 		}
 	}
 }
@@ -247,8 +235,7 @@ void UMafiaAbilityActionGroupWidget::OnChangedMatchState(const FName& InMatchSta
 {
 	if (InMatchState == MafiaMatchState::InProgressMafia)
 	{
-		ResetCards();
-		CreatePlayerCards();
+		InitializeCards();
 	}
 }
 
@@ -260,19 +247,6 @@ void UMafiaAbilityActionGroupWidget::OnResponseUseAbility(const AMafiaBasePlayer
 	}
 }
 
-void UMafiaAbilityActionGroupWidget::OnClickedCard()
-{
-	for (auto Weak : PlayerCards)
-	{
-		if (Weak.IsValid())
-		{
-			if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Weak.Get())
-			{
-				CardWidget->ResetForNextRound();
-			}
-		}
-	}
-}
 
 bool UMafiaAbilityActionGroupWidget::IsAbilityRole()
 {

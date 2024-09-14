@@ -87,12 +87,24 @@ void UMafiaAbilityPlayerCardUserWidget::UpdateCard()
 			}
 		}
 	}
+	else
+	{
+		IMG_PlayerColor->SetBrushTintColor(FSlateColor(FLinearColor(1, 1, 1, 1)));
+		IMG_AbilityIcon->SetBrushTintColor(FSlateColor(FLinearColor(1, 1, 1, 1)));
+		TB_PlayerColor->SetText(FText::FromName(TEXT("Player None")));
+	}
 
 }
 
 void UMafiaAbilityPlayerCardUserWidget::ResetForNextRound()
 {
 	BTN_AbilityPlayerCard->WidgetStyle.Normal.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 0.1f));
+}
+
+void UMafiaAbilityPlayerCardUserWidget::Reset()
+{
+	OwnerPlayer = nullptr;
+	UpdateCard();
 }
 
 

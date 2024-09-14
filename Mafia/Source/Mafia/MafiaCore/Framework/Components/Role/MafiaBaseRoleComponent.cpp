@@ -434,7 +434,7 @@ void UMafiaBaseRoleComponent::HandleReceiveBroadCastEvent(AMafiaBasePlayerState*
 		Event.EventSender = InSender;
 		Event.EventType = InEvent;
 
-		CachedBroadCastEventsHeap.HeapPush(Event);\
+		CachedBroadCastEventsHeap.HeapPush(Event);
 	}
 }
 

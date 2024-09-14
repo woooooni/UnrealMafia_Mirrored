@@ -21,6 +21,7 @@ public:
 	bool InitializePlayer(class AMafiaBasePlayerState* InPlayerState);
 	void UpdateCard();
 	void ResetForNextRound();
+	void Reset();
 
 public:
 	FORCEINLINE class AMafiaBasePlayerState* GetOwnerPlayer() { return OwnerPlayer.Get(); }
