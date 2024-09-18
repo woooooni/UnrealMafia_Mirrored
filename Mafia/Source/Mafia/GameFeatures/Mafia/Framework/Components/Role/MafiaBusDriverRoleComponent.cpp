@@ -117,7 +117,7 @@ void UMafiaBusDriverRoleComponent::CheckTrafficAccident()
 
 			if (bKillerRoleFlag)
 			{
-				if (SecondPassenger->CheckAffectedOtherRole(FirstRoleType))
+				if (SecondPassenger->CheckAffectedOtherRole(FirstRoleType) == true)
 				{
 					SendBroadCastEvent(EMafiaBroadCastEvent::TrafficAccident);
 				}
@@ -131,7 +131,7 @@ void UMafiaBusDriverRoleComponent::CheckTrafficAccident()
 
 			if (bKillerRoleFlag)
 			{
-				if (FirstPassenger->CheckAffectedOtherRole(SecondRoleType))
+				if (FirstPassenger->CheckAffectedOtherRole(SecondRoleType) == true)
 				{
 					SendBroadCastEvent(EMafiaBroadCastEvent::TrafficAccident);
 				}

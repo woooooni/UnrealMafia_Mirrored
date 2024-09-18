@@ -23,15 +23,18 @@ public:
 	static UMafiaWorldDataManager* GetMafiaWorldDataManager(const UObject* WorldContextObject);
 
 public:
+	virtual void Init() override;
+
+#if WITH_EDITOR
 	/* [OnlyEditor] Called to initialize the game instance for PIE instances of the game */
 	/** @See UEditorEngine::CreateInnerProcessPIEGameInstance() 에서 호출됨. */
 	virtual FGameInstancePIEResult InitializeForPlayInEditor(int32 PIEInstanceIndex, const FGameInstancePIEParameters& Params) override;
 
-	virtual void Init() override;
 
 	/* [OnlyEditor] Called to actually start the game when doing Play/Simulate In Editor */
 	/** 내부에서 GameMode InitGame 호출함. @See PlayWorld->InitializeActorsForPlay(URL); */
 	virtual FGameInstancePIEResult StartPlayInEditorGameInstance(ULocalPlayer* LocalPlayer, const FGameInstancePIEParameters& Params) override;
+#endif
 
 	virtual void OnStart() override;
 

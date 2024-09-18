@@ -83,7 +83,7 @@ public:
 	FORCEINLINE void SetDeferredEventArray(const TArray<FAbilityEvent>& InEventArray) { DeferredEventArray = InEventArray; }
 	FORCEINLINE const TArray<FAbilityEvent>& GetDeferredEventArray() const { return DeferredEventArray; }
 
-	FORCEINLINE bool CheckAffectedOtherRole(EMafiaRole InRole);
+	bool CheckAffectedOtherRole(EMafiaRole InRole);
 
 	void ResetChangedPlayer();
 

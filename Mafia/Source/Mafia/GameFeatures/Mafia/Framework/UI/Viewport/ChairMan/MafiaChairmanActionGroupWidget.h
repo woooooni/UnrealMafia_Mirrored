@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MafiaCore/Framework/Types/MafiaTypes.h"
 #include "MafiaCore/Framework/UI/Core/MafiaBaseActionGroupWidget.h"
 #include "MafiaChairmanActionGroupWidget.generated.h"
 
@@ -20,8 +21,20 @@ private:
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	virtual void BindDelegates() override;
 	virtual void UnBindDelegates() override;
+
+private:
+	void OnAffectedAbilityEvent(const class AMafiaBasePlayerState* InOther, const EMafiaRole& InRole);
+	void OnChangedMafiaFlowState(const EMafiaFlowState& InFlowState);
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<class UTexture2D> DayImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<class UTexture2D> NightImage;
 
 private:
 	UPROPERTY(meta = (BindWidgetOptional))
@@ -41,4 +54,11 @@ private:
 
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<class UTextBlock> TB_TimerText;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	TObjectPtr<class UWidgetAnimation> FadeSignalTextAnimation;
+
+private:
+	FDelegateHandle OnAffectedAbilityHandle;
+	FDelegateHandle OnChangedMafiaFlowStateHandle;
 };

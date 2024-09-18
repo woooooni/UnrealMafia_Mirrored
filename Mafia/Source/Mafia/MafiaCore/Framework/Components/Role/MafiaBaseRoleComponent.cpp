@@ -363,10 +363,14 @@ void UMafiaBaseRoleComponent::OnChangedMafiaFlowState(const EMafiaFlowState& InM
 
 void UMafiaBaseRoleComponent::HandleAffectedAbilityEvents()
 {
-	for (auto& Event : CachedAffectedEventsHeap)
+	if (CachedProcessedAbilityEventsSet.IsEmpty())
 	{
-		CachedProcessedAbilityEventsSet.Emplace(Event.AbilityPlayerRole);
+		for (auto& Event : CachedAffectedEventsHeap)
+		{
+			CachedProcessedAbilityEventsSet.Emplace(Event.AbilityPlayerRole);
+		}
 	}
+	
 	
 	if (!CachedAffectedEventsHeap.IsEmpty())
 	{
@@ -385,7 +389,7 @@ void UMafiaBaseRoleComponent::HandleAffectedAbilityEvents()
 
 void UMafiaBaseRoleComponent::HandleAffectedAbilityEvent(const FAffectedEvent& InEvent)
 {
-	
+	SendGameEvent_TwoParams(OnAffectedAbilityEvent, InEvent.AbilityPlayer.Get(), InEvent.AbilityPlayerRole);
 }
 
 void UMafiaBaseRoleComponent::HandleBroadCastEvents()

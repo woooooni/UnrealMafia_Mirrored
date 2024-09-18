@@ -98,7 +98,7 @@ void UMafiaAbilityPlayerCardUserWidget::UpdateCard()
 
 void UMafiaAbilityPlayerCardUserWidget::ResetForNextRound()
 {
-	BTN_AbilityPlayerCard->WidgetStyle.Normal.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 0.1f));
+	BTN_AbilityPlayerCard->WidgetStyle.Normal.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 0.1f));	
 }
 
 void UMafiaAbilityPlayerCardUserWidget::Reset()
@@ -129,8 +129,7 @@ void UMafiaAbilityPlayerCardUserWidget::OnClickedPlayerAbilityCard()
 			if (IsValid(MyPlayerComponent))
 			{
 				MyPlayerComponent->UseAbility(OwnerPlayer.Get());
-
-				BTN_AbilityPlayerCard->WidgetStyle.Normal.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 1.f ));
+				BTN_AbilityPlayerCard->WidgetStyle.Normal.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 1.f));
 			}
 		}
 	}

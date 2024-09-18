@@ -37,6 +37,9 @@ public:
 	DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnResponseUseAbility, const AMafiaBasePlayerState* InOther, const EMafiaUseAbilityFlag InFlag, const EMafiaAbilityEventType InEventType);
 	FOnResponseUseAbility OnResponseUseAbility;
 
+	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnAffectedAbilityEvent, const AMafiaBasePlayerState* InOther, const EMafiaRole& InRole);
+	FOnAffectedAbilityEvent OnAffectedAbilityEvent;
+
 	DECLARE_MULTICAST_DELEGATE(FOnClickedPlayerCard)
 	FOnClickedPlayerCard OnClickedPlayerCard;
 };

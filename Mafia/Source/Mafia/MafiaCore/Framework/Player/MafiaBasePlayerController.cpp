@@ -175,10 +175,12 @@ void AMafiaBasePlayerController::CheatSetMinPlayerCount(const int32 InMinPlayerC
 
 void AMafiaBasePlayerController::ServerCheatSetMinPlayerCount_Implementation(const int32 InMinPlayerCount)
 {
+#if ENABLE_CHEAT
 	if (AMafiaBaseGameMode* MafiaBaseGameMode = GetWorld()->GetAuthGameMode<AMafiaBaseGameMode>())
 	{
 		MafiaBaseGameMode->SetGameStartMinPlayerCount(InMinPlayerCount);
 	}
+#endif
 }
 
 void AMafiaBasePlayerController::CheatSetReadyForGame(const bool bReady /*= true*/)
@@ -390,6 +392,8 @@ bool AMafiaBasePlayerController::FindPlayerColor(const FString& InColorStr, OUT 
 
 	OutMafiaColor = static_cast<EMafiaColor>(FindIndex);
 	return true;
+#else
+	return false;
 #endif
 }
 

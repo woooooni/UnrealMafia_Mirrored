@@ -141,6 +141,7 @@ UMafiaGameEvents* UMafiaBaseGameInstance::GetGameEvents() const
 	return GameEvents;
 }
 
+#if WITH_EDITOR
 FGameInstancePIEResult UMafiaBaseGameInstance::InitializeForPlayInEditor(int32 PIEInstanceIndex, const FGameInstancePIEParameters& Params)
 {
 	/** @See UGameInstance* UEditorEngine::CreateInnerProcessPIEGameInstance(FRequestPlaySessionParams& InParams, const FGameInstancePIEParameters& InPIEParameters, int32 InPIEInstanceIndex)에서 호출. 오직 에디터용 */
@@ -153,6 +154,7 @@ FGameInstancePIEResult UMafiaBaseGameInstance::StartPlayInEditorGameInstance(ULo
 	MAFIA_ULOG(LogMafiaGameInstance, Warning, TEXT("Called"));
 	return Super::StartPlayInEditorGameInstance(LocalPlayer, Params);
 }
+#endif
 
 class AGameModeBase* UMafiaBaseGameInstance::CreateGameModeForURL(FURL InURL, UWorld* InWorld)
 {
