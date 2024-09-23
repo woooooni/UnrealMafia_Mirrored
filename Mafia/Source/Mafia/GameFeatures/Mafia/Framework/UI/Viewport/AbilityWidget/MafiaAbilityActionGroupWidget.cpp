@@ -102,7 +102,7 @@ void UMafiaAbilityActionGroupWidget::InitializeCards()
 
 		for (UWidget* Widget : CP_AbilityCanvas->GetAllChildren())
 		{
-			if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Cast<UMafiaAbilityPlayerCardUserWidget>(Widget))
+			if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(Widget))
 			{
 				if (OutPlayerStateArray.IsValidIndex(Index))
 				{
@@ -137,7 +137,7 @@ void UMafiaAbilityActionGroupWidget::ArrangeCircleCards()
 	NumWidgets = 0;
 	for (auto& Widget : CP_AbilityCanvas->GetAllChildren())
 	{
-		if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Cast<UMafiaAbilityPlayerCardUserWidget>(Widget))
+		if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(Widget))
 		{
 			if (CardWidget->GetVisibility() != ESlateVisibility::Collapsed)
 				NumWidgets++;
@@ -155,7 +155,7 @@ void UMafiaAbilityActionGroupWidget::ArrangeCircleCards()
 
 		for (UPanelSlot* PanelSlot : CP_AbilityCanvas->GetSlots())
 		{
-			if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Cast<UMafiaAbilityPlayerCardUserWidget>(PanelSlot->Content))
+			if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(PanelSlot->Content))
 			{
 				if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(PanelSlot))
 				{
@@ -191,9 +191,9 @@ void UMafiaAbilityActionGroupWidget::UpdatePlayerCards()
 	const TArray<UWidget*>& Children = CP_AbilityCanvas->GetAllChildren();
 	for (auto& Card : Children)
 	{
-		if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Cast<UMafiaAbilityPlayerCardUserWidget>(Card))
+		if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(Card))
 		{
-			CardWidget->UpdateCard();
+			CardWidget->UpdateInfo();
 		}
 	}
 }
@@ -203,7 +203,7 @@ void UMafiaAbilityActionGroupWidget::ResetCards()
 	const TArray<UWidget*>& Children = CP_AbilityCanvas->GetAllChildren();
 	for (auto& Card : Children)
 	{
-		if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Cast<UMafiaAbilityPlayerCardUserWidget>(Card))
+		if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(Card))
 		{
 			CardWidget->Reset();
 			CardWidget->SetVisibility(ESlateVisibility::Collapsed);
@@ -216,7 +216,7 @@ void UMafiaAbilityActionGroupWidget::ResetForNextRound()
 	const TArray<UWidget*>& Children = CP_AbilityCanvas->GetAllChildren();
 	for (auto& Card : Children)
 	{
-		if (UMafiaAbilityPlayerCardUserWidget* CardWidget = Cast<UMafiaAbilityPlayerCardUserWidget>(Card))
+		if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(Card))
 		{
 			CardWidget->ResetForNextRound();
 		}

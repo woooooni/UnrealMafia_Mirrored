@@ -25,6 +25,10 @@ protected:
 	virtual void BindDelegates() override;
 	virtual void UnBindDelegates() override;
 
+protected:
+	void Veil();
+	void UnVeil();
+
 private:
 	void OnAffectedAbilityEvent(const class AMafiaBasePlayerState* InOther, const EMafiaRole& InRole);
 	void OnChangedMafiaFlowState(const EMafiaFlowState& InFlowState);
@@ -47,6 +51,9 @@ private:
 	TObjectPtr<class UImage> IMG_Timer;
 
 	UPROPERTY(meta = (BindWidgetOptional))
+	TObjectPtr<class UImage> IMG_Veil;
+
+	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<class UTextBlock> TB_SignalText;
 
 	UPROPERTY(meta = (BindWidgetOptional))
@@ -58,6 +65,16 @@ private:
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	TObjectPtr<class UWidgetAnimation> FadeSignalTextAnimation;
 
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	TObjectPtr<class UWidgetAnimation> VeilAnimation;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	TObjectPtr<class UWidgetAnimation> UnveilAnimation;
+
+	
+
+	
 private:
 	FDelegateHandle OnAffectedAbilityHandle;
 	FDelegateHandle OnChangedMafiaFlowStateHandle;

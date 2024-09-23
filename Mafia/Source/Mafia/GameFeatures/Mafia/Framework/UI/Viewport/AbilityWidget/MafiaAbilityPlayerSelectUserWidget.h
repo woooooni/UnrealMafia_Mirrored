@@ -4,22 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "MafiaCore/Framework/UI/Core/MafiaBaseUserWidget.h"
-#include "MafiaAbilityPlayerCardUserWidget.generated.h"
+#include "MafiaAbilityPlayerSelectUserWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MAFIA_API UMafiaAbilityPlayerCardUserWidget : public UMafiaBaseUserWidget
+class MAFIA_API UMafiaAbilityPlayerSelectUserWidget : public UMafiaBaseUserWidget
 {
 	GENERATED_BODY()
 
 private:
-	UMafiaAbilityPlayerCardUserWidget(const FObjectInitializer& ObjectInitializer);
+	UMafiaAbilityPlayerSelectUserWidget(const FObjectInitializer& ObjectInitializer);
 	
 public:
 	bool InitializePlayer(class AMafiaBasePlayerState* InPlayerState);
-	void UpdateCard();
+	void UpdateInfo();
 	void ResetForNextRound();
 	void Reset();
 

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MafiaCore/Framework/UI/Core/MafiaBaseActionGroupWidget.h"
-#include "GameFeatures/Mafia/Framework/UI/Viewport/AbilityWidget/MafiaAbilityPlayerCardUserWidget.h"
+#include "GameFeatures/Mafia/Framework/UI/Viewport/AbilityWidget/MafiaAbilityPlayerSelectUserWidget.h"
 #include "MafiaCore/Framework/Types/MafiaTypes.h"
 #include "MafiaAbilityActionGroupWidget.generated.h"
 

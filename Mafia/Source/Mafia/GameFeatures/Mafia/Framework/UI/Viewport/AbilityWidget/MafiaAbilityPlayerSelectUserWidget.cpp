@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GameFeatures/Mafia/Framework/UI/Viewport/AbilityWidget/MafiaAbilityPlayerCardUserWidget.h"
-
+#include "GameFeatures/Mafia/Framework/UI/Viewport/AbilityWidget/MafiaAbilityPlayerSelectUserWidget.h"
 
 #include "Mafia/Framework/Player/MafiaPlayerState.h"
 #include "Mafia/MafiaCore/Framework/Components/Role/MafiaBaseRoleComponent.h"
@@ -18,7 +17,7 @@
 #include "Components/Image.h"
 #include "Framework/System/MafiaGameEvents.h"
 
-UMafiaAbilityPlayerCardUserWidget::UMafiaAbilityPlayerCardUserWidget(const FObjectInitializer& ObjectInitializer)
+UMafiaAbilityPlayerSelectUserWidget::UMafiaAbilityPlayerSelectUserWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	
@@ -26,51 +25,51 @@ UMafiaAbilityPlayerCardUserWidget::UMafiaAbilityPlayerCardUserWidget(const FObje
 
 
 
-void UMafiaAbilityPlayerCardUserWidget::NativeConstruct()
+void UMafiaAbilityPlayerSelectUserWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 }
 
-void UMafiaAbilityPlayerCardUserWidget::NativeDestruct()
+void UMafiaAbilityPlayerSelectUserWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 }
 
-void UMafiaAbilityPlayerCardUserWidget::BindDelegates()
+void UMafiaAbilityPlayerSelectUserWidget::BindDelegates()
 {
 	Super::BindDelegates();
 	if (IsValid(BTN_AbilityPlayerCard))
 	{
-		BTN_AbilityPlayerCard->OnClicked.AddDynamic(this, &UMafiaAbilityPlayerCardUserWidget::OnClickedPlayerAbilityCard);
+		BTN_AbilityPlayerCard->OnClicked.AddDynamic(this, &UMafiaAbilityPlayerSelectUserWidget::OnClickedPlayerAbilityCard);
 	}
 
 	// OnChangedMatchStateHandle = BindGameEvent(OnChangedMatchState, &UMafiaActionGroupWidget::OnChangedMatchState);
 	// OnChangedMafiaFlowStateHandle = BindGameEvent(OnChangedMafiaFlowState, &UMafiaActionGroupWidget::OnChangedMafiaFlowState);
 }
 
-void UMafiaAbilityPlayerCardUserWidget::UnBindDelegates()
+void UMafiaAbilityPlayerSelectUserWidget::UnBindDelegates()
 {
 	Super::UnBindDelegates();
 	if (IsValid(BTN_AbilityPlayerCard))
 	{
-		BTN_AbilityPlayerCard->OnClicked.RemoveDynamic(this, &UMafiaAbilityPlayerCardUserWidget::OnClickedPlayerAbilityCard);
+		BTN_AbilityPlayerCard->OnClicked.RemoveDynamic(this, &UMafiaAbilityPlayerSelectUserWidget::OnClickedPlayerAbilityCard);
 	}
 }
 
 
-bool UMafiaAbilityPlayerCardUserWidget::InitializePlayer(AMafiaBasePlayerState* InPlayerState)
+bool UMafiaAbilityPlayerSelectUserWidget::InitializePlayer(AMafiaBasePlayerState* InPlayerState)
 {
 	if (IsValid(InPlayerState))
 	{
 		OwnerPlayer = InPlayerState;
-		UpdateCard();
+		UpdateInfo();
 	}
 
 
 	return OwnerPlayer.IsValid();
 }
 
-void UMafiaAbilityPlayerCardUserWidget::UpdateCard()
+void UMafiaAbilityPlayerSelectUserWidget::UpdateInfo()
 {
 	if (OwnerPlayer.IsValid())
 	{
@@ -96,19 +95,19 @@ void UMafiaAbilityPlayerCardUserWidget::UpdateCard()
 
 }
 
-void UMafiaAbilityPlayerCardUserWidget::ResetForNextRound()
+void UMafiaAbilityPlayerSelectUserWidget::ResetForNextRound()
 {
 	BTN_AbilityPlayerCard->WidgetStyle.Normal.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 0.1f));	
 }
 
-void UMafiaAbilityPlayerCardUserWidget::Reset()
+void UMafiaAbilityPlayerSelectUserWidget::Reset()
 {
 	OwnerPlayer = nullptr;
-	UpdateCard();
+	UpdateInfo();
 }
 
 
-bool UMafiaAbilityPlayerCardUserWidget::IsOwnerPlayer(AMafiaBasePlayerState* InPlayerState)
+bool UMafiaAbilityPlayerSelectUserWidget::IsOwnerPlayer(AMafiaBasePlayerState* InPlayerState)
 {
 	if (IsValid(InPlayerState) && OwnerPlayer.IsValid())
 	{
@@ -117,7 +116,7 @@ bool UMafiaAbilityPlayerCardUserWidget::IsOwnerPlayer(AMafiaBasePlayerState* InP
 	return false;
 }
 
-void UMafiaAbilityPlayerCardUserWidget::OnClickedPlayerAbilityCard()
+void UMafiaAbilityPlayerSelectUserWidget::OnClickedPlayerAbilityCard()
 {
 	SendGameEvent(OnClickedPlayerCard);
 

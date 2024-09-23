@@ -76,6 +76,16 @@ void UMafiaChairmanActionGroupWidget::UnBindDelegates()
 	}
 }
 
+void UMafiaChairmanActionGroupWidget::Veil()
+{
+	PlayAnimation(VeilAnimation);
+}
+
+void UMafiaChairmanActionGroupWidget::UnVeil()
+{
+	PlayAnimation(UnveilAnimation);
+}
+
 void UMafiaChairmanActionGroupWidget::OnAffectedAbilityEvent(const AMafiaBasePlayerState* InOther, const EMafiaRole& InRole)
 {
 	UWorld* World = GetWorld();
@@ -134,6 +144,8 @@ void UMafiaChairmanActionGroupWidget::OnChangedMafiaFlowState(const EMafiaFlowSt
 
 		TB_SignalText->SetText(FText::FromName(TEXT("아침이 되었습니다.")));
 		PlayAnimation(FadeSignalTextAnimation);
+
+		UnVeil();
 	}
 	else if (InFlowState == EMafiaFlowState::BeforeVote)
 	{
@@ -149,6 +161,10 @@ void UMafiaChairmanActionGroupWidget::OnChangedMafiaFlowState(const EMafiaFlowSt
 
 		TB_SignalText->SetText(FText::FromName(TEXT("밤이 되었습니다.")));
 		PlayAnimation(FadeSignalTextAnimation);
+	}
+	else if (InFlowState == EMafiaFlowState::AfterNight)
+	{
+		Veil();
 	}
 }
 
