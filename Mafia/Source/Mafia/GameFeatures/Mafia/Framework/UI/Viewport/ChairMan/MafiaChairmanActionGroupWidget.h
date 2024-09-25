@@ -51,9 +51,6 @@ private:
 	TObjectPtr<class UImage> IMG_Timer;
 
 	UPROPERTY(meta = (BindWidgetOptional))
-	TObjectPtr<class UImage> IMG_Veil;
-
-	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<class UTextBlock> TB_SignalText;
 
 	UPROPERTY(meta = (BindWidgetOptional))
@@ -65,12 +62,14 @@ private:
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	TObjectPtr<class UWidgetAnimation> FadeSignalTextAnimation;
 
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	TObjectPtr<class UWidgetAnimation> VeilFadeAnimation;
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	TObjectPtr<class UWidgetAnimation> VeilAnimation;
+	TObjectPtr<class UWidgetAnimation> HealVeilAnimation;
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
-	TObjectPtr<class UWidgetAnimation> UnveilAnimation;
+	TObjectPtr<class UWidgetAnimation> MurederedVeilAnimation;
 
 	
 

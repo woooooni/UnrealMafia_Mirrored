@@ -33,6 +33,7 @@ void UMafiaChairmanActionGroupWidget::NativeDestruct()
 
 void UMafiaChairmanActionGroupWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
+	Super::NativeTick(MyGeometry, InDeltaTime);
 	UWorld* World = GetWorld();
 	if (IsValid(World) == false)
 	{
@@ -74,16 +75,6 @@ void UMafiaChairmanActionGroupWidget::UnBindDelegates()
 	{
 		UnbindGameEvent(OnChangedMafiaFlowState, OnChangedMafiaFlowStateHandle);
 	}
-}
-
-void UMafiaChairmanActionGroupWidget::Veil()
-{
-	PlayAnimation(VeilAnimation);
-}
-
-void UMafiaChairmanActionGroupWidget::UnVeil()
-{
-	PlayAnimation(UnveilAnimation);
 }
 
 void UMafiaChairmanActionGroupWidget::OnAffectedAbilityEvent(const AMafiaBasePlayerState* InOther, const EMafiaRole& InRole)
@@ -145,7 +136,7 @@ void UMafiaChairmanActionGroupWidget::OnChangedMafiaFlowState(const EMafiaFlowSt
 		TB_SignalText->SetText(FText::FromName(TEXT("아침이 되었습니다.")));
 		PlayAnimation(FadeSignalTextAnimation);
 
-		UnVeil();
+		PlayAnimationReverse(VeilFadeAnimation);
 	}
 	else if (InFlowState == EMafiaFlowState::BeforeVote)
 	{
@@ -164,7 +155,7 @@ void UMafiaChairmanActionGroupWidget::OnChangedMafiaFlowState(const EMafiaFlowSt
 	}
 	else if (InFlowState == EMafiaFlowState::AfterNight)
 	{
-		Veil();
+		PlayAnimation(VeilFadeAnimation);
 	}
 }
 
