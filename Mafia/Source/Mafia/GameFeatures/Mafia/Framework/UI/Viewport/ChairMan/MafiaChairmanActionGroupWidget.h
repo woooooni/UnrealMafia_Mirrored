@@ -40,9 +40,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSoftObjectPtr<class UTexture2D> NightImage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<class UTexture2D> VoteImage;
+
 private:
-	UPROPERTY(meta = (BindWidgetOptional))
-	TObjectPtr<class UScrollBox> SB_AbilityStatus;
+
 
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<class UImage> IMG_Day;
@@ -59,6 +61,12 @@ private:
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<class UTextBlock> TB_TimerText;
 
+	UPROPERTY(meta = (BindWidgetOptional))
+	TObjectPtr<class UMafiaChairmanLogScrollUserWidget> LogScrollWidget;
+	
+
+
+private:
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	TObjectPtr<class UWidgetAnimation> FadeSignalTextAnimation;
 
@@ -70,6 +78,9 @@ private:
 
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	TObjectPtr<class UWidgetAnimation> MurederedVeilAnimation;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	TObjectPtr<class UWidgetAnimation> MadamVeilAnimation;
 
 	
 

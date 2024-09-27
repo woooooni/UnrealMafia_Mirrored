@@ -2,6 +2,8 @@
 
 
 #include "GameFeatures/Mafia/Framework/UI/Viewport/ChairMan/MafiaChairmanActionGroupWidget.h"
+#include "GameFeatures/Mafia/Framework/UI/Viewport/ChairMan/MafiaChairmanLogScrollUserWidget.h"
+
 #include "Mafia/Framework/GameModes/MafiaGameState.h"
 #include "MafiaCore/Framework/System/MafiaGameEvents.h"
 
@@ -61,6 +63,7 @@ void UMafiaChairmanActionGroupWidget::BindDelegates()
 	Super::BindDelegates();
 	OnAffectedAbilityHandle = BindGameEvent(OnAffectedAbilityEvent, &UMafiaChairmanActionGroupWidget::OnAffectedAbilityEvent);
 	OnChangedMafiaFlowStateHandle = BindGameEvent(OnChangedMafiaFlowState, &UMafiaChairmanActionGroupWidget::OnChangedMafiaFlowState);
+	
 }
 
 void UMafiaChairmanActionGroupWidget::UnBindDelegates()
@@ -77,6 +80,16 @@ void UMafiaChairmanActionGroupWidget::UnBindDelegates()
 	}
 }
 
+void UMafiaChairmanActionGroupWidget::Veil()
+{
+	PlayAnimation(VeilFadeAnimation);
+}
+
+void UMafiaChairmanActionGroupWidget::UnVeil()
+{
+	PlayAnimationReverse(VeilFadeAnimation);
+}
+
 void UMafiaChairmanActionGroupWidget::OnAffectedAbilityEvent(const AMafiaBasePlayerState* InOther, const EMafiaRole& InRole)
 {
 	UWorld* World = GetWorld();
@@ -91,11 +104,24 @@ void UMafiaChairmanActionGroupWidget::OnAffectedAbilityEvent(const AMafiaBasePla
 		return;
 	}
 
-	/*FString LogTextStr = FString::Printf(TEXT("%d일차 : "), GameState->GetGameRound());
+	FString LogTextStr = FString::Printf(TEXT("%d일차 : "), GameState->GetGameRound());
 	switch (InRole)
 	{
+	case EMafiaRole::Doctor:
+		LogTextStr += TEXT("의사가 혼신의 힘을 다해 당신을 살렸습니다.");
+		PlayAnimation(HealVeilAnimation);
+		break;
+	case EMafiaRole::Killer:
+		LogTextStr += TEXT("연쇄살인마의 칼에 무참히 살해됐습니다.");
+		PlayAnimation(MurederedVeilAnimation);
+		break;
+	case EMafiaRole::GodFather:
+		LogTextStr += TEXT("마피아의 총에 맞아 사망했습니다.");
+		PlayAnimation(MurederedVeilAnimation);
+		break;
 	case EMafiaRole::Madam:
 		LogTextStr += TEXT("마담의 유혹에 당해 이번 밤의 능력이 무효화됩니다.");
+		PlayAnimation(MadamVeilAnimation);
 		break;
 	case EMafiaRole::BusDriver:
 		LogTextStr += TEXT("버스의 승객이 되어 여행을 떠납니다.");
@@ -103,7 +129,7 @@ void UMafiaChairmanActionGroupWidget::OnAffectedAbilityEvent(const AMafiaBasePla
 	}
 
 
-	for (auto& Child : SB_AbilityStatus->GetAllChildren())
+	/*for (auto& Child : SB_AbilityStatus->GetAllChildren())
 	{
 		if (Child->GetVisibility() == ESlateVisibility::Collapsed)
 		{
@@ -111,6 +137,7 @@ void UMafiaChairmanActionGroupWidget::OnAffectedAbilityEvent(const AMafiaBasePla
 			{
 				ChildTextBlock->SetText(FText::FromString(LogTextStr));
 				ChildTextBlock->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
 				return;
 			}
 		}
@@ -128,34 +155,34 @@ void UMafiaChairmanActionGroupWidget::OnChangedMafiaFlowState(const EMafiaFlowSt
 		return;
 	}
 
-	if (InFlowState == EMafiaFlowState::BeforeDay)
+	if (InFlowState == EMafiaFlowState::Day)
 	{
 		IMG_Day->SetBrushFromSoftTexture(DayImage);
 		TB_DayText->SetText(FText::FromName(TEXT("아침")));
-
 		TB_SignalText->SetText(FText::FromName(TEXT("아침이 되었습니다.")));
-		PlayAnimation(FadeSignalTextAnimation);
 
-		PlayAnimationReverse(VeilFadeAnimation);
+		PlayAnimation(FadeSignalTextAnimation);
+		UnVeil();
 	}
 	else if (InFlowState == EMafiaFlowState::BeforeVote)
 	{
+		IMG_Day->SetBrushFromSoftTexture(VoteImage);
 		TB_DayText->SetText(FText::FromName(TEXT("투표")));
-
 		TB_SignalText->SetText(FText::FromName(TEXT("투표시간입니다.")));
+
 		PlayAnimation(FadeSignalTextAnimation);
 	}
 	else if (InFlowState == EMafiaFlowState::BeforeNight)
 	{
 		IMG_Day->SetBrushFromSoftTexture(NightImage);
 		TB_DayText->SetText(FText::FromName(TEXT("밤")));
-
 		TB_SignalText->SetText(FText::FromName(TEXT("밤이 되었습니다.")));
+
 		PlayAnimation(FadeSignalTextAnimation);
 	}
 	else if (InFlowState == EMafiaFlowState::AfterNight)
 	{
-		PlayAnimation(VeilFadeAnimation);
+		Veil();
 	}
 }
 
