@@ -101,5 +101,8 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRepChangePlayerName)
 	FName PlayerName;
+
+private:
+	float AccNameWidget;
 };
 

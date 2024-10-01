@@ -142,12 +142,12 @@ void UMafiaAssetManager::LoadAsyncByPath(const FSoftObjectPath& AssetPath, FAsyn
 			TSharedPtr<FStreamableHandle> Handle = GetStreamableManager().RequestAsyncLoad(AssetPaths);
 
 			Handle->BindCompleteDelegate(FStreamableDelegate::CreateLambda([AssetName = AssetPath.GetAssetFName(), AssetPath, CompleteDelegate = MoveTemp(CompletedDelegate)]()
-				{
-					UObject* LoadedAsset = AssetPath.ResolveObject();
-					Get().AddLoadedAsset(AssetName, LoadedAsset);
-					if (CompleteDelegate.IsBound())
-						CompleteDelegate.Execute(AssetName, LoadedAsset);
-				}));
+			{
+				UObject* LoadedAsset = AssetPath.ResolveObject();
+				Get().AddLoadedAsset(AssetName, LoadedAsset);
+				if (CompleteDelegate.IsBound())
+					CompleteDelegate.Execute(AssetName, LoadedAsset);
+			}));
 		}
 	}
 }

@@ -115,22 +115,32 @@ void AMafiaSampleCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// 카메라 위치와의 거리 계산
-	
-	FVector CameraLocation = GetWorld()->GetFirstPlayerController()->PlayerCameraManager->GetCameraLocation();
-	float Distance = FVector::Dist(CameraLocation, GetActorLocation());
-
-	// 거리에 따른 크기 계산 (예시: 가까울수록 크기 작음.)
-	float ScaleFactor = FMath::Clamp(100.f / (Distance / 100.f), 0.f, 32.f);
-
-	// 위젯 크기 적용
-	UMafiaPlayerNameActionGroupWidget* NameWidget = Cast<UMafiaPlayerNameActionGroupWidget>(PlayerNameComponent->GetWidget());
-	if (IsValid(NameWidget))
+	if (NM_Client != GetNetMode())
 	{
-		NameWidget->SetFontSize(ScaleFactor, DeltaTime);
+		return;
 	}
-	
+		
+	AccNameWidget += DeltaTime;
+	if (AccNameWidget >= 0.1f)
+	{
+		if (APlayerController* PlayerController = GetController<APlayerController>())
+		{
+			// 카메라 위치와의 거리 계산
+			FVector CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
+			float Distance = FVector::Dist(CameraLocation, GetActorLocation());
 
+			// 거리에 따른 크기 계산 (예시: 가까울수록 크기 작음.)
+			float ScaleFactor = FMath::Clamp(100.f / (Distance / 100.f), 0.f, 32.f);
+
+			// 위젯 크기 적용
+			UMafiaPlayerNameActionGroupWidget* NameWidget = Cast<UMafiaPlayerNameActionGroupWidget>(PlayerNameComponent->GetWidget());
+			if (IsValid(NameWidget))
+			{
+				NameWidget->SetFontSize(ScaleFactor, DeltaTime);
+			}
+		}
+		AccNameWidget = 0.f;
+	}
 }
 
 void AMafiaSampleCharacter::ChangeColor(FLinearColor InColor)
