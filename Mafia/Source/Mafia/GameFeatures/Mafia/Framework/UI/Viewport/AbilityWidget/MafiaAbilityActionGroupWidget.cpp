@@ -23,7 +23,6 @@ UMafiaAbilityActionGroupWidget::UMafiaAbilityActionGroupWidget(const FObjectInit
 void UMafiaAbilityActionGroupWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
-	ArrangeCircleCards();
 	UpdatePlayerCards();
 }
 
@@ -52,7 +51,7 @@ void UMafiaAbilityActionGroupWidget::UnBindDelegates()
 	{
 		UnbindGameEvent(OnChangedMafiaFlowState, OnChangedMafiaFlowStateHandle);
 	}
-
+	
 	if (OnChangedMatchStateHandle.IsValid())
 	{
 		UnbindGameEvent(OnChangedMatchState, OnChangedMatchStateHandle);
@@ -122,103 +121,53 @@ void UMafiaAbilityActionGroupWidget::InitializeCards()
 	}
 	
 	TB_RoleName->SetText(FText::FromName(MyRoleComponent->GetRoleName()));
-
-	ArrangeCircleCards();
 	UpdatePlayerCards();
 }
 
-void UMafiaAbilityActionGroupWidget::ArrangeCircleCards()
-{
-	if (IsValid(CP_AbilityCanvas) == false)
-	{
-		return;
-	}
-
-	NumWidgets = 0;
-	for (auto& Widget : CP_AbilityCanvas->GetAllChildren())
-	{
-		if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(Widget))
-		{
-			if (CardWidget->GetVisibility() != ESlateVisibility::Collapsed)
-				NumWidgets++;
-		}
-	}
-
-	InitialRotationAxis = FVector(0.f, -1.f, 0.f).RotateAngleAxis(AngleOfFirstWidget, { 0.f, 0.f, 1.f });
-	if (0 < NumWidgets)
-	{
-		uint32 Index = 0;
-
-		FAnchors Anchor;
-		Anchor.Minimum = { 0.5f, 0.5f };
-		Anchor.Maximum = { 0.5f, 0.5f };
-
-		for (UPanelSlot* PanelSlot : CP_AbilityCanvas->GetSlots())
-		{
-			if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(PanelSlot->Content))
-			{
-				if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(PanelSlot))
-				{
-					CanvasSlot->SetAnchors(Anchor);
-					CanvasSlot->SetAlignment({ 0.5f, 0.5f });
-
-					float RotateAngleDeg = (360.f / NumWidgets) * Index;
-					FVector RotateVector = InitialRotationAxis.RotateAngleAxis(RotateAngleDeg, { 0.f, 0.f, 1.f });
-					FVector RotatePositionVector = RotateVector * Radius;
-
-					CanvasSlot->SetPosition({ RotatePositionVector.X, RotatePositionVector.Y });
-					if (bRotateWidgets)
-					{
-						FRotator Rotator = UKismetMathLibrary::MakeRotFromX(RotateVector);
-						CardWidget->SetRenderTransformAngle(BaseWidgetRotation + Rotator.Yaw);
-					}
-					else
-					{
-						CardWidget->SetRenderTransformAngle(BaseWidgetRotation);
-					}
-					Index++;
-				}
-				
-			}
-		}
-	}
-
-	
-}
 
 void UMafiaAbilityActionGroupWidget::UpdatePlayerCards()
 {
-	const TArray<UWidget*>& Children = CP_AbilityCanvas->GetAllChildren();
-	for (auto& Card : Children)
+	if (IsValid(CP_AbilityCanvas))
 	{
-		if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(Card))
+		const TArray<UWidget*>& Children = CP_AbilityCanvas->GetAllChildren();
+		for (auto& Card : Children)
 		{
-			CardWidget->UpdateInfo();
+			if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(Card))
+			{
+				CardWidget->UpdateInfo();
+			}
 		}
 	}
+	
 }
 
 void UMafiaAbilityActionGroupWidget::ResetCards()
 {
-	const TArray<UWidget*>& Children = CP_AbilityCanvas->GetAllChildren();
-	for (auto& Card : Children)
+	if (IsValid(CP_AbilityCanvas)) 
 	{
-		if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(Card))
+		const TArray<UWidget*>& Children = CP_AbilityCanvas->GetAllChildren();
+		for (auto& Card : Children)
 		{
-			CardWidget->Reset();
-			CardWidget->SetVisibility(ESlateVisibility::Collapsed);
+			if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(Card))
+			{
+				CardWidget->Reset();
+				CardWidget->SetVisibility(ESlateVisibility::Collapsed);
+			}
 		}
 	}
 }
 
 void UMafiaAbilityActionGroupWidget::ResetForNextRound()
 {
-	const TArray<UWidget*>& Children = CP_AbilityCanvas->GetAllChildren();
-	for (auto& Card : Children)
+	if (IsValid(CP_AbilityCanvas))
 	{
-		if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(Card))
+		const TArray<UWidget*>& Children = CP_AbilityCanvas->GetAllChildren();
+		for (auto& Card : Children)
 		{
-			CardWidget->ResetForNextRound();
+			if (UMafiaAbilityPlayerSelectUserWidget* CardWidget = Cast<UMafiaAbilityPlayerSelectUserWidget>(Card))
+			{
+				CardWidget->ResetForNextRound();
+			}
 		}
 	}
 }

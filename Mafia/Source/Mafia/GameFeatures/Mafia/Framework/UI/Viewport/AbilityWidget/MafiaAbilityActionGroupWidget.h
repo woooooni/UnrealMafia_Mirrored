@@ -28,7 +28,6 @@ protected:
 
 private:
 	void InitializeCards();
-	void ArrangeCircleCards();
 	void UpdatePlayerCards();
 	void ResetCards();
 
@@ -44,28 +43,6 @@ private:
 	bool IsAbilityRole();
 
 
-	
-public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Card Class")
-	TSoftClassPtr<class UMafiaBaseUserWidget> CardWidgetClass;
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Circle Arrange")
-	uint8 NumWidgets;
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Circle Arrange")
-	FVector InitialRotationAxis;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Interp, Category = "Circle Arrange")
-	float Radius;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Arrange")
-	float AngleOfFirstWidget;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Arrange")
-	float BaseWidgetRotation;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Circle Arrange")
-	uint8 bRotateWidgets : 1;
 
 private:
 	UPROPERTY(meta = (BindWidgetOptional))
